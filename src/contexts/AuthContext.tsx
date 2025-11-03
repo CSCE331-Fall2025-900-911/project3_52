@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { User } from "../types/models";
-import { apiFetch, BACKEND_URL } from "../api/http";
+import { apiFetch, API_BASE_URL } from "../api/http";
 
 interface IAuthContext {
   user: User | null;
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [refetchUser]);
 
   const login = () => {
-    window.location.href = `${BACKEND_URL}/api/auth/login`;
+    window.location.href = `${API_BASE_URL}/api/auth/login`;
   };
   const logout = async () => {
     await apiFetch("/api/auth/logout");

@@ -27,7 +27,7 @@ const MainApp = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
-      <header className="bg-white shadow-md p-4 h-16 flex justify-between items-center">
+      <header className="bg-white shadow-md p-4 h-20 flex justify-between items-center">
         {/* Left group: brand + weather */}
         <div className="flex items-center gap-4">
           <button

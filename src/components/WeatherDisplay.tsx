@@ -42,12 +42,12 @@ export default function WeatherDisplay() {
   const iconUrl = `https://openweathermap.org/img/wn/${weather.icon}@2x.png`;
 
   return (
-    <div className="bg-gray-100 px-2 py-1 rounded-md shadow-sm flex items-center">
-      <img src={iconUrl} alt={weather.description} className="w-8 h-8" />
-      <div className="ml-2 leading-tight">
-        <div className="text-sm font-semibold">{weather.city}</div>
-        <div className="text-xs text-gray-600">
-          {Math.round(weather.temp)}°F — {weather.description}
+    <div className="bg-gray-100 p-2 rounded-lg shadow-sm flex items-center">
+      <img src={iconUrl} alt={weather.description} className="w-12 h-12" />
+      <div className="ml-2">
+        <div className="text-xl font-bold">{weather.city}</div>
+        <div className="text-sm text-gray-600">
+          {Math.round(weather.temp)}°F - {weather.description}
         </div>
       </div>
     </div>

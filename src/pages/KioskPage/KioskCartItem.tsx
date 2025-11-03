@@ -1,0 +1,17 @@
+import { CartItem } from "../../types/models";
+import { T } from "../../contexts/LangContext";
+
+export default function KioskCartItem({ item, onRemove }: { item: CartItem; onRemove: (id: string) => void; }) {
+  return (
+    <div className="mb-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg flex">
+      <div className="flex-grow">
+        <h4 className="font-bold dark:text-white"><T>{item.product.product_name}</T></h4>
+        <p className="text-sm text-gray-600 dark:text-gray-400"><T>Size</T>: {item.size}</p>
+      </div>
+      <div className="text-right">
+        <p className="font-bold dark:text-white">${item.final_price}</p>
+        <button onClick={() => onRemove(item.cart_id)} className="text-red-500 text-sm hover:underline"><T>Remove</T></button>
+      </div>
+    </div>
+  );
+}

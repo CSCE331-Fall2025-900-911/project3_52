@@ -1,5 +1,5 @@
 export const BACKEND_URL = "http://127.0.0.1:5000";
-export const KIOSK_API_KEY = "my_secret_kiosk_password_12345";
+
 
 export const apiFetch = (endpoint: string, options: RequestInit = {}) =>
   fetch(`${BACKEND_URL}${endpoint}`, {
@@ -13,7 +13,6 @@ export const kioskApiFetch = (endpoint: string, options: RequestInit = {}) =>
     ...options,
     headers: {
       "Content-Type": "application/json",
-      "X-API-KEY": KIOSK_API_KEY,
       ...(options.headers || {}),
     },
   });

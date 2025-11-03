@@ -1,7 +1,7 @@
 import HomePage from "./pages/HomePage";
 import KioskPage from "./pages/KioskPage/KioskPage";
 import CashierPage from "./pages/CashierPage";
-import ManagerPage from "./pages/ManagerPage";
+import ManagerPage from "./pages/ManagerPage/ManagerPage";
 import WeatherDisplay from "./components/WeatherDisplay";
 import LoginButton from "./components/LoginButton";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -27,7 +27,7 @@ const MainApp = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
-      <header className="bg-white shadow-md p-4 flex justify-between items-center">
+      <header className="bg-white shadow-md p-4 h-16 flex justify-between items-center">
         {/* Left group: brand + weather */}
         <div className="flex items-center gap-4">
           <button

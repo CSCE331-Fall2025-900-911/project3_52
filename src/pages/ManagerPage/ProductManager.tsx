@@ -140,7 +140,7 @@ const ProductForm = ({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:opacity-50"
+          className="px-4 py-2 bg-maroon text-white rounded-lg shadow hover:bg-darkmaroon disabled:opacity-50"
         >
           {isSubmitting ? "Saving..." : "Save Product"}
         </button>
@@ -264,7 +264,7 @@ export default function ProductManager() {
         <h2 className="text-3xl font-bold">Product Management</h2>
         <button
           onClick={openAddModal}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700"
+          className="px-4 py-2 bg-maroon text-white rounded-lg shadow hover:bg-darkmaroon"
         >
           + Add Product
         </button>

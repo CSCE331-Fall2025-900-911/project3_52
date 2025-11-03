@@ -128,7 +128,7 @@ export default function KioskPage() {
             <button
               onClick={submitOrder}
               disabled={cart.length === 0}
-              className="w-full py-4 bg-green-500 text-white text-xl font-bold rounded-lg shadow-lg disabled:opacity-50 hover:bg-green-600"
+              className="w-full py-4 bg-maroon text-white text-xl font-bold rounded-lg shadow-lg disabled:opacity-50 hover:bg-darkmaroon"
             >
               <T>Pay Now</T>
             </button>

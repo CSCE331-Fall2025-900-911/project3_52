@@ -230,10 +230,9 @@ export default function OrderHistory() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold">Order History</h2>
-        {/* We can add a "Refresh" button here if needed */}
         <button
           onClick={() => fetchOrders()}
-          className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow-sm hover:bg-gray-300"
+          className="px-4 py-2 bg-maroon text-white rounded-lg shadow hover:bg-darkmaroon"
           disabled={isLoading}
         >
           {isLoading ? "Refreshing..." : "Refresh"}
@@ -247,4 +246,4 @@ export default function OrderHistory() {
       )}
     </div>
   );
-};
+}

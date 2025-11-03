@@ -1,4 +1,5 @@
 import { useAuth } from "../contexts/AuthContext";
+import { IconLogin, IconLogout } from "./Icons";
 
 export default function LoginButton() {
   const { user, login, logout, isLoading } = useAuth();
@@ -12,17 +13,19 @@ export default function LoginButton() {
       </span>
       <button
         onClick={logout}
-        className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600"
+        className="flex items-center px-4 py-2 bg-maroon text-white rounded-lg shadow hover:bg-darkmaroon gap-1"
       >
-        Log Out
+        <IconLogout />
+        <span> Logout</span>
       </button>
     </div>
   ) : (
     <button
       onClick={login}
-      className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600"
+      className="flex items-center px-4 py-2 bg-maroon text-white rounded-lg shadow hover:bg-darkmaroon gap-1"
     >
-      Staff Login
+      <IconLogin />
+      <span>Staff Login</span>
     </button>
   );
 }

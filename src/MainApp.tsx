@@ -5,11 +5,16 @@ import ManagerPage from "./pages/ManagerPage/ManagerPage";
 import WeatherDisplay from "./components/WeatherDisplay";
 import LoginButton from "./components/LoginButton";
 import { AuthProvider } from "./contexts/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const MainApp = () => {
-  const [page, setPage] = useState("home");
+  const [page, setPage] = useState(
+    () => localStorage.getItem("momtea.page") || "home"
+  );
 
+  useEffect(() => {
+    localStorage.setItem("momtea.page", page);
+  }, [page]);
   const renderPage = () => {
     switch (page) {
       case "home":
@@ -32,9 +37,9 @@ const MainApp = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => setPage("home")}
-            className="text-2xl font-bold text-blue-600"
+            className="text-2xl font-bold text-maroon"
           >
-            TeaFlow POS
+            MomTea POS
           </button>
           <WeatherDisplay />
         </div>

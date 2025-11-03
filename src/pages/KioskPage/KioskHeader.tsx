@@ -4,7 +4,7 @@ export default function KioskHeader({ isHighContrast, setIsHighContrast }: { isH
   return (
     <div className="mb-4 flex justify-between items-center">
       <div>
-        <h1 className="text-4xl font-bold dark:text-white"><T>Welcome to TeaFlow</T></h1>
+        <h1 className="text-4xl font-bold dark:text-white"><T>Welcome to MomTea</T></h1>
         <p className="text-lg text-gray-600 dark:text-gray-300"><T>Tap an item to start your order.</T></p>
       </div>
       <div className="flex gap-2">

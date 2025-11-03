@@ -5,7 +5,7 @@ export default function AccessDenied() {
       <p className="text-lg text-gray-700 mb-6">You do not have permission to view this page.</p>
       <a
         href="/"
-        className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700"
+        className="px-6 py-3 bg-maroon text-white rounded-lg font-semibold shadow hover:bg-darkmaroon"
       >
         Return Home
       </a>

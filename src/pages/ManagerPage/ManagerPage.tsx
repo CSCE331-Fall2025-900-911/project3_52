@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import AccessDenied from "../../components/AccessDenied";
-import { IconUser, IconBox, IconList, IconUsers } from "../../components/Icons";
+import { IconBox, IconList, IconUsers, IconReceipt } from "../../components/Icons";
 
 // Import the sub-pages
 import ProductManager from "./ProductManager";
@@ -60,7 +60,7 @@ export default function ManagerPage() {
             active={view === "inventory"}
           />
           <ManagerNavLink
-            icon={<IconUser />}
+            icon={<IconReceipt />}
             label="Orders"
             onClick={() => setView("orders")}
             active={view === "orders"}
@@ -89,7 +89,7 @@ const ManagerNavLink = ({
       onClick={onClick}
       className={`flex items-center gap-3 w-full p-3 rounded-lg text-lg ${
         active
-          ? "bg-blue-600 text-white shadow-lg"
+          ? "bg-maroon text-white shadow-lg"
           : "text-gray-700 hover:bg-gray-200"
       }`}
     >

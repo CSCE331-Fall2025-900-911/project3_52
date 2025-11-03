@@ -3,6 +3,7 @@ import { apiFetch } from "../../api/http";
 import { Inventory } from "../../types/models";
 import Modal from "../../components/Modal";
 import Spinner from "../../components/Spinner";
+import { toast } from "react-hot-toast";
 
 // --- Inventory Add Form (co-located) ---
 const InventoryAddForm = ({
@@ -132,7 +133,7 @@ const InventoryAddForm = ({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:opacity-50"
+          className="px-4 py-2 bg-maroon text-white rounded-lg shadow hover:bg-darkmaroon disabled:opacity-50"
         >
           {isSubmitting ? "Creating..." : "Create Item"}
         </button>
@@ -256,7 +257,7 @@ const InventoryEditForm = ({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:opacity-50"
+          className="px-4 py-2 bg-maroon text-white rounded-lg shadow hover:bg-darkmaroon disabled:opacity-50"
         >
           {isSubmitting ? "Saving..." : "Save Changes"}
         </button>
@@ -310,16 +311,9 @@ export default function InventoryManager() {
     setCurrentItem(null);
   };
 
-  const handleSaveSuccess = (savedItem: Inventory) => {
-    if (currentItem) {
-      setInventory(
-        inventory.map((i) =>
-          i.inv_item_id === savedItem.inv_item_id ? savedItem : i
-        )
-      );
-    } else {
-      setInventory([...inventory, savedItem]);
-    }
+  const handleSaveSuccess = async (_savedItem: Inventory) => {
+    toast.success("Inventory updated successfully!");
+    await fetchInventory();
     closeModal();
   };
 

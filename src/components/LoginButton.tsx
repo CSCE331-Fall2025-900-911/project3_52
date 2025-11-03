@@ -8,9 +8,7 @@ export default function LoginButton() {
 
   return user ? (
     <div className="flex items-center gap-4">
-      <span className="text-gray-700">
-        Welcome, {user.name} ({user.role})
-      </span>
+      <span className="text-gray-700">Welcome, {user.name}</span>
       <button
         onClick={logout}
         className="flex items-center px-4 py-2 bg-maroon text-white rounded-lg shadow hover:bg-darkmaroon gap-1"

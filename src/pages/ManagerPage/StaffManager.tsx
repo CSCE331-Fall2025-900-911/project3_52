@@ -3,6 +3,7 @@ import { apiFetch } from "../../api/http";
 import { Staff } from "../../types/models";
 import Modal from "../../components/Modal";
 import Spinner from "../../components/Spinner";
+import { toast } from "react-hot-toast";
 
 // --- Staff Form (co-located) ---
 const StaffForm = ({
@@ -217,7 +218,7 @@ const StaffForm = ({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:opacity-50"
+          className="px-4 py-2 bg-maroon text-white rounded-lg shadow hover:bg-darkmaroon disabled:opacity-50"
         >
           {isSubmitting ? "Saving..." : "Save Employee"}
         </button>
@@ -271,14 +272,9 @@ export default function StaffManager() {
     setCurrentStaff(null);
   };
 
-  const handleSaveSuccess = (savedStaff: Staff) => {
-    if (currentStaff) {
-      setStaff(
-        staff.map((s) => (s.staff_id === savedStaff.staff_id ? savedStaff : s))
-      );
-    } else {
-      setStaff([...staff, savedStaff]);
-    }
+  const handleSaveSuccess = async (_savedStaff: Staff) => {
+    toast.success("Staff updated successfully!");
+    await fetchStaff();
     closeModal();
   };
 

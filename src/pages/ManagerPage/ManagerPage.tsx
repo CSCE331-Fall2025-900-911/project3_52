@@ -13,7 +13,17 @@ export default function ManagerPage() {
   const { user } = useAuth();
   const [view, setView] = useState<
     "products" | "staff" | "inventory" | "orders"
-  >("products");
+  >(() => localStorage.getItem("momtea.managerView") as
+    | "products"
+    | "staff"
+    | "inventory"
+    | "orders"
+    || "products"
+  );
+
+  React.useEffect(() => {
+    localStorage.setItem("momtea.managerView", view);
+  }, [view]);
 
   // Access check
   if (!user || user.role !== "Manager") {

@@ -1,4 +1,10 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { User } from "../types/models";
 import { apiFetch, BACKEND_URL } from "../api/http";
 
@@ -27,13 +33,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
-  useEffect(() => { refetchUser(); }, [refetchUser]);
+  useEffect(() => {
+    refetchUser();
+  }, [refetchUser]);
 
-  const login = () => { window.location.href = `${BACKEND_URL}/api/auth/login`; };
-  const logout = async () => { await apiFetch("/api/auth/logout"); setUser(null); };
+  const login = () => {
+    window.location.href = `${BACKEND_URL}/api/auth/login`;
+  };
+  const logout = async () => {
+    await apiFetch("/api/auth/logout");
+    setUser(null);
+    localStorage.removeItem("momtea.page");
+    localStorage.removeItem("momtea.tab");
+    window.location.reload();
+  };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, refetchUser }}>
+    <AuthContext.Provider
+      value={{ user, isLoading, login, logout, refetchUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

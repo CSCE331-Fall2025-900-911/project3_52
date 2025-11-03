@@ -6,6 +6,7 @@ import WeatherDisplay from "./components/WeatherDisplay";
 import LoginButton from "./components/LoginButton";
 import { AuthProvider } from "./contexts/AuthContext";
 import { useState, useEffect } from "react";
+import { Toaster } from 'react-hot-toast';
 
 const MainApp = () => {
   const [page, setPage] = useState(
@@ -32,12 +33,12 @@ const MainApp = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
-      <header className="bg-white shadow-md p-4 h-20 flex justify-between items-center">
+      <header className="bg-white shadow-md p-4 h-20 flex justify-between items-center fixed top-0 left-0 w-full z-50">
         {/* Left group: brand + weather */}
         <div className="flex items-center gap-4">
           <button
             onClick={() => setPage("home")}
-            className="text-2xl font-bold text-maroon"
+            className="text-2xl font-bold text-maroon hover:text-red-700"
           >
             MomTea POS
           </button>
@@ -49,7 +50,7 @@ const MainApp = () => {
           <LoginButton />
         </div>
       </header>
-      <main>{renderPage()}</main>
+      <main className="pt-20">{renderPage()}</main>
     </div>
   );
 };
@@ -58,6 +59,7 @@ export default function App() {
   return (
     <AuthProvider>
       <MainApp />
+      <Toaster position="top-center" />
     </AuthProvider>
   );
 }

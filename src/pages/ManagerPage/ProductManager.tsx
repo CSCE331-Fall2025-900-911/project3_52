@@ -3,6 +3,7 @@ import { apiFetch } from "../../api/http";
 import { Product } from "../../types/models";
 import Modal from "../../components/Modal";
 import Spinner from "../../components/Spinner";
+import { toast } from "react-hot-toast";
 
 // --- Product Form (co-located) ---
 const ProductForm = ({
@@ -194,16 +195,9 @@ export default function ProductManager() {
     setCurrentProduct(null);
   };
 
-  const handleSaveSuccess = (savedProduct: Product) => {
-    if (currentProduct) {
-      setProducts(
-        products.map((p) =>
-          p.product_id === savedProduct.product_id ? savedProduct : p
-        )
-      );
-    } else {
-      setProducts([...products, savedProduct]);
-    }
+  const handleSaveSuccess = async (_savedProduct: Product) => {
+    toast.success("Product updated successfully!");
+    await fetchProducts();
     closeModal();
   };
 

@@ -1,46 +1,101 @@
-# Getting Started with Create React App
+# MomTea POS (Point of Sale System)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
 
-## Available Scripts
+MomTea POS is a full-stack Point of Sale web application designed for efficient and seamless retail operations. This project leverages modern technologies including React, TypeScript, Express, and TailwindCSS to deliver a responsive and scalable solution.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. Clone the repository:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+   ```bash
+   git clone <repository-url>
+   cd pos-app
+   ```
 
-### `npm test`
+2. Install dependencies:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+   ```bash
+   npm install
+   ```
 
-### `npm run build`
+## Development
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+To start the development server with hot-reloading:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm start
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The app will be available at [http://localhost:3000](http://localhost:3000).
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Build
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+To create a production-ready build:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```bash
+npm run build
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+The build artifacts will be stored in the `build/` directory.
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Testing
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Run the test suite in interactive watch mode:
+
+```bash
+npm test
+```
+
+---
+
+## Environment Setup
+
+- Ensure you have Node.js (v18 or higher recommended) and npm installed.
+- Configure environment variables in `.env`:
+
+  ```
+  REACT_APP_API_BASE=<your-backend-api-base-url>
+  ```
+
+  This variable is used to connect the frontend to the backend API.
+
+---
+
+## Tech Stack
+
+- **React** 19
+- **TypeScript**
+- **TailwindCSS** 3
+- **Express** 5
+
+---
+
+## Folder Structure
+
+```
+/src
+    /api         # API service utilities
+    /components  # Reusable UI components
+    /contexts    # Context providers (AuthContext, LangContext)
+    /pages       # Page-level components
+    /types       # TypeScript type definitions
+```
+
+---
+
+## Developer Notes
+
+- **Customization:** Modify components in `/src/components` and pages in `/src/pages` to tailor the UI and functionality.
+- **API Integration:** Update API endpoints in `/src/api/configure.ts` according to your backend implementation.
+- **Styling:** Use TailwindCSS utility classes for rapid UI development and customization.
+- **Deployment:** The production build in `build/` can be served using any static file server or integrated with your backend server.
+- **Ejecting:** If you need to customize the build configuration, you can eject using `npm run eject`, but note this is irreversible.
+
+For more detailed documentation, refer to the official docs of the respective technologies used in this project.

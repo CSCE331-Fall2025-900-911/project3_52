@@ -336,7 +336,9 @@ export default function StaffManager() {
                 className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
               >
                 Staff ID{" "}
-                {sortField === "staff_id" && (sortOrder === "asc" ? "▲" : "▼")}
+                <span className="inline-block w-3 text-center">
+                    {sortField === "staff_id" && (sortOrder === "asc" ? "▲" : "▼")}
+                  </span>
               </th>
 
               <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
@@ -353,7 +355,9 @@ export default function StaffManager() {
                 className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
               >
                 Salary{" "}
-                {sortField === "salary" && (sortOrder === "asc" ? "▲" : "▼")}
+                <span className="inline-block w-3 text-center">
+                    {sortField === "salary" && (sortOrder === "asc" ? "▲" : "▼")}
+                  </span>
               </th>
 
               <th className="p-4 text-right text-xs font-medium text-gray-500 uppercase">

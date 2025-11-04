@@ -59,10 +59,6 @@ const OrderDetailsModal = ({
           >
             <div>
               <p className="font-semibold text-gray-800">
-                {/* NOTE: The OrderItem table doesn't have the product_name.
-                  A good API would JOIN this table with Products.
-                  We'll assume the API provides 'product_name' for this view.
-                */}
                 {item.product_name || `Product ID: ${item.product_id}`}
               </p>
               <p className="text-sm text-gray-500">
@@ -137,8 +133,6 @@ export default function OrderHistory() {
   const [pageInput, setPageInput] = useState(currentPage);
 
   // --- State for editing page number inline ---
-  const [isEditingPage, setIsEditingPage] = useState(false);
-
   const handleSort = (field: "order_id" | "total_price") => {
     if (sortField === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -167,9 +161,8 @@ export default function OrderHistory() {
         ? ordersData
         : [];
 
-      
       orders.sort((a, b) => Number(b.order_id) - Number(a.order_id));
-      
+
       setOrders(orders);
       setTotalCount(result.count ?? 0);
       console.log("Fetched orders count:", orders.length);
@@ -201,7 +194,6 @@ export default function OrderHistory() {
     } else {
       setPageInput(currentPage);
     }
-    setIsEditingPage(false);
   };
 
   // --- Render Logic ---
@@ -227,7 +219,6 @@ export default function OrderHistory() {
     });
 
     const paginatedOrders = filteredOrders;
-    
 
     return (
       <div>
@@ -251,27 +242,46 @@ export default function OrderHistory() {
                   onClick={() => handleSort("order_id")}
                   className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
                 >
-                  Order ID{" "}
-                  {sortField === "order_id" &&
-                    (sortOrder === "asc" ? "▲" : "▼")}
+                  <div className="flex items-center justify-between">
+                    <span>Order ID</span>
+                    <span className="inline-block w-3 text-center">
+                      {sortField === "order_id"
+                        ? sortOrder === "asc"
+                          ? "▲"
+                          : "▼"
+                        : ""}
+                    </span>
+                  </div>
                 </th>
+
                 <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                   Date
                 </th>
+
                 <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                   Time
                 </th>
+
                 <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                   Payment Method
                 </th>
+
                 <th
                   onClick={() => handleSort("total_price")}
                   className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
                 >
-                  Total Price{" "}
-                  {sortField === "total_price" &&
-                    (sortOrder === "asc" ? "▲" : "▼")}
+                  <div className="flex items-center justify-between">
+                    <span>Total Price</span>
+                    <span className="inline-block w-3 text-center">
+                      {sortField === "total_price"
+                        ? sortOrder === "asc"
+                          ? "▲"
+                          : "▼"
+                        : ""}
+                    </span>
+                  </div>
                 </th>
+
                 <th className="p-4 text-right text-xs font-medium text-gray-500 uppercase">
                   Actions
                 </th>
@@ -339,34 +349,21 @@ export default function OrderHistory() {
             </button>
             <span className="text-sm text-gray-600">
               Page{" "}
-              {isEditingPage ? (
-                <input
-                  type="number"
-                  min={1}
-                  max={totalPages}
-                  value={pageInput}
-                  onChange={(e) => setPageInput(Number(e.target.value))}
-                  onBlur={handlePageJump}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handlePageJump();
-                    }
-                  }}
-                  className="w-16 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-maroon text-center"
-                  autoFocus
-                />
-              ) : (
-                <button
-                  onClick={() => {
-                    setPageInput(currentPage);
-                    setIsEditingPage(true);
-                  }}
-                  className="underline cursor-pointer"
-                  aria-label="Edit page number"
-                >
-                  {currentPage}
-                </button>
-              )}{" "}
+              <input
+                type="number"
+                min={1}
+                max={totalPages}
+                value={pageInput}
+                onChange={(e) => setPageInput(Number(e.target.value))}
+                onBlur={handlePageJump}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handlePageJump();
+                  }
+                }}
+                className="w-16 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-maroon text-center"
+                autoFocus
+              />{" "}
               of {totalPages}
             </span>
             <button

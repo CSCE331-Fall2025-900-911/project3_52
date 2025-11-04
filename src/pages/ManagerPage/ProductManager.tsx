@@ -382,7 +382,10 @@ export default function ProductManager() {
                   onClick={() => handleSort("id")}
                   className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
                 >
-                  ID {sortField === "id" && (sortOrder === "asc" ? "▲" : "▼")}
+                  ID{" "}
+                  <span className="inline-block w-3 text-center">
+                    {sortField === "id" && (sortOrder === "asc" ? "▲" : "▼")}
+                  </span>
                 </th>
                 <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                   Name
@@ -395,7 +398,9 @@ export default function ProductManager() {
                   className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
                 >
                   Price{" "}
-                  {sortField === "price" && (sortOrder === "asc" ? "▲" : "▼")}
+                  <span className="inline-block w-3 text-center">
+                    {sortField === "price" && (sortOrder === "asc" ? "▲" : "▼")}
+                  </span>
                 </th>
                 <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                   Flavor
@@ -428,7 +433,9 @@ export default function ProductManager() {
                   const fieldA = sortField === "id" ? a.product_id : a.price;
                   const fieldB = sortField === "id" ? b.product_id : b.price;
 
-                  return sortOrder === "asc" ? fieldA - fieldB : fieldB - fieldA;
+                  return sortOrder === "asc"
+                    ? fieldA - fieldB
+                    : fieldB - fieldA;
                 })
                 .map((product) => (
                   <tr key={product.product_id}>

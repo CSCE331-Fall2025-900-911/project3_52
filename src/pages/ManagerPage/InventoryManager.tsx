@@ -346,8 +346,9 @@ export default function InventoryManager() {
                 className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
               >
                 Item ID{" "}
-                {sortField === "inv_item_id" &&
-                  (sortOrder === "asc" ? "▲" : "▼")}
+                <span className="inline-block w-3 text-center">
+                    {sortField === "inv_item_id" && (sortOrder === "asc" ? "▲" : "▼")}
+                  </span>
               </th>
               <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                 Name
@@ -357,16 +358,20 @@ export default function InventoryManager() {
                 className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
               >
                 Units Remaining{" "}
-                {sortField === "units_remaining" &&
-                  (sortOrder === "asc" ? "▲" : "▼")}
+                <span className="inline-block w-3 text-center">
+                  {sortField === "units_remaining" &&
+                    (sortOrder === "asc" ? "▲" : "▼")}
+                </span>
               </th>
               <th
                 onClick={() => handleSort("numServings")}
                 className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
               >
                 Num. of Servings{" "}
-                {sortField === "numServings" &&
-                  (sortOrder === "asc" ? "▲" : "▼")}
+                <span className="inline-block w-3 text-center">
+                  {sortField === "numServings" &&
+                    (sortOrder === "asc" ? "▲" : "▼")}
+                </span>
               </th>
               <th className="p-4 text-right text-xs font-medium text-gray-500 uppercase">
                 Actions

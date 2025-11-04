@@ -127,6 +127,12 @@ export default function OrderHistory() {
   // --- State for search query ---
   const [searchQuery, setSearchQuery] = useState("");
 
+  // --- State for pagination ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 50;
+  const [totalCount, setTotalCount] = useState(0);
+  const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
+
   const handleSort = (field: "order_id" | "total_price") => {
     if (sortField === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -140,20 +146,33 @@ export default function OrderHistory() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await apiFetch("/api/orders");
+      const response = await apiFetch(
+        `/api/orders?limit=${itemsPerPage}&offset=${
+          (currentPage - 1) * itemsPerPage
+        }`
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch order history.");
       }
-      const data: OrderHistoryRecord[] = await response.json();
-      // Sort by most recent first
-      data.sort((a, b) => b.order_id - a.order_id);
-      setOrders(data);
+      const result = await response.json();
+      console.log("Fetched orders result:", result);
+      const ordersData = result?.orders ?? result;
+      const orders: OrderHistoryRecord[] = Array.isArray(ordersData)
+        ? ordersData
+        : [];
+
+      
+      orders.sort((a, b) => Number(b.order_id) - Number(a.order_id));
+      
+      setOrders(orders);
+      setTotalCount(result.count ?? 0);
+      console.log("Fetched orders count:", orders.length);
     } catch (err: any) {
       setError(err.message);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [currentPage]);
 
   useEffect(() => {
     fetchOrders();
@@ -187,10 +206,11 @@ export default function OrderHistory() {
       const query = searchQuery.toLowerCase();
       const orderIdStr = String(order.order_id).toLowerCase();
       const paymentMethodStr = order.payment_method.toLowerCase();
-      return (
-        orderIdStr.includes(query) || paymentMethodStr.includes(query)
-      );
+      return orderIdStr.includes(query) || paymentMethodStr.includes(query);
     });
+
+    const paginatedOrders = filteredOrders;
+    
 
     return (
       <div>
@@ -200,7 +220,10 @@ export default function OrderHistory() {
             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-maroon"
             placeholder="Search by Order ID or Payment Method..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
           />
         </div>
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -212,7 +235,8 @@ export default function OrderHistory() {
                   className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
                 >
                   Order ID{" "}
-                  {sortField === "order_id" && (sortOrder === "asc" ? "▲" : "▼")}
+                  {sortField === "order_id" &&
+                    (sortOrder === "asc" ? "▲" : "▼")}
                 </th>
                 <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                   Date
@@ -237,7 +261,7 @@ export default function OrderHistory() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredOrders
+              {paginatedOrders
                 .sort((a, b) => {
                   if (!sortField) return 0;
 
@@ -288,6 +312,25 @@ export default function OrderHistory() {
                 ))}
             </tbody>
           </table>
+          <div className="flex justify-between items-center p-4 bg-gray-50">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 bg-gray-200 text-gray-800 rounded disabled:opacity-50 hover:bg-gray-300"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-600">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 bg-gray-200 text-gray-800 rounded disabled:opacity-50 hover:bg-gray-300"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     );

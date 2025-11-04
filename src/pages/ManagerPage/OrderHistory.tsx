@@ -242,9 +242,9 @@ export default function OrderHistory() {
                   onClick={() => handleSort("order_id")}
                   className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
                     <span>Order ID</span>
-                    <span className="inline-block w-3 text-center">
+                    <span className=" w-3">
                       {sortField === "order_id"
                         ? sortOrder === "asc"
                           ? "▲"
@@ -270,7 +270,7 @@ export default function OrderHistory() {
                   onClick={() => handleSort("total_price")}
                   className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
                     <span>Total Price</span>
                     <span className="inline-block w-3 text-center">
                       {sortField === "total_price"

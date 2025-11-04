@@ -10,37 +10,38 @@ import { toast } from "react-hot-toast";
 import Modal from "../../components/Modal";
 import { CustomizationData } from "../../types/models";
 
-
 const AVAILABLE_TOPPINGS = [
-  'Boba',
-  'Lychee Jelly',
-  'Grass Jelly',
-  'Pudding',
-  'Red Bean',
-  'Crystal Boba',
+  "Boba",
+  "Lychee Jelly",
+  "Grass Jelly",
+  "Pudding",
+  "Red Bean",
+  "Crystal Boba",
 ];
-const CustomizationForm = ({ 
-  product, 
-  onSubmit 
-}: { 
-  product: Product, 
-  onSubmit: (data: CustomizationData) => void 
+const CustomizationForm = ({
+  product,
+  onSubmit,
+}: {
+  product: Product;
+  onSubmit: (data: CustomizationData) => void;
 }) => {
   // Internal state for the form, with defaults
-  const [size, setSize] = useState<'Small' | 'Medium' | 'Large' | "Bucee's">('Medium');
-  const [sugar, setSugar] = useState<'0' | '50' | '75' | '100'>('100');
-  const [ice, setIce] = useState<'0' | '50' | '75' | '100'>('100');
-  
+  const [size, setSize] = useState<"Small" | "Medium" | "Large" | "Bucee's">(
+    "Medium"
+  );
+  const [sugar, setSugar] = useState<"0" | "50" | "75" | "100">("100");
+  const [ice, setIce] = useState<"0" | "50" | "75" | "100">("100");
+
   const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
-  
+
   // --- UPDATED: Handler to limit selection to 3 ---
   const handleToppingChange = (topping: string) => {
     setSelectedToppings((prev) => {
       const isSelected = prev.includes(topping);
-      
+
       if (isSelected) {
         // Always allow un-checking
-        return prev.filter(t => t !== topping);
+        return prev.filter((t) => t !== topping);
       } else {
         // Only allow checking if under the limit
         if (prev.length < 3) {
@@ -60,7 +61,7 @@ const CustomizationForm = ({
       size: size,
       sugar_level: sugar,
       ice_level: ice,
-      toppings: selectedToppings.join(', '), 
+      toppings: selectedToppings.join(", "),
     });
   };
 
@@ -70,14 +71,17 @@ const CustomizationForm = ({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <p className="text-lg dark:text-gray-200">
-        <T>Customizing</T>: <span className="font-bold">{product.product_name}</span>
+        <T>Customizing</T>:{" "}
+        <span className="font-bold">{product.product_name}</span>
       </p>
-      
+
       {/* Size Selector (Added p-3 for better mobile tap) */}
       <label className="block">
-        <span className="text-gray-700 dark:text-gray-300"><T>Size</T></span>
-        <select 
-          value={size} 
+        <span className="text-gray-700 dark:text-gray-300">
+          <T>Size</T>
+        </span>
+        <select
+          value={size}
           onChange={(e) => setSize(e.target.value as any)}
           className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
         >
@@ -87,12 +91,14 @@ const CustomizationForm = ({
           <option value="Bucee's">Bucee's</option>
         </select>
       </label>
-      
+
       {/* Sugar Selector (Added p-3 for better mobile tap) */}
       <label className="block">
-        <span className="text-gray-700 dark:text-gray-300"><T>Sugar Level</T></span>
-        <select 
-          value={sugar} 
+        <span className="text-gray-700 dark:text-gray-300">
+          <T>Sugar Level</T>
+        </span>
+        <select
+          value={sugar}
           onChange={(e) => setSugar(e.target.value as any)}
           className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
         >
@@ -102,12 +108,14 @@ const CustomizationForm = ({
           <option value="0">0%</option>
         </select>
       </label>
-      
+
       {/* Ice Selector (Added p-3 for better mobile tap) */}
       <label className="block">
-        <span className="text-gray-700 dark:text-gray-300"><T>Ice Level</T></span>
-        <select 
-          value={ice} 
+        <span className="text-gray-700 dark:text-gray-300">
+          <T>Ice Level</T>
+        </span>
+        <select
+          value={ice}
           onChange={(e) => setIce(e.target.value as any)}
           className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
         >
@@ -117,7 +125,7 @@ const CustomizationForm = ({
           <option value="0">0%</option>
         </select>
       </label>
-      
+
       {/* --- UPDATED: Toppings Fieldset --- */}
       <fieldset>
         <div className="flex justify-between items-center">
@@ -128,7 +136,7 @@ const CustomizationForm = ({
             <T>Select up to 3</T> ({selectedToppings.length} / 3)
           </span>
         </div>
-        
+
         {/* Responsive grid, larger tap targets with borders */}
         <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
           {AVAILABLE_TOPPINGS.map((topping) => {
@@ -137,16 +145,16 @@ const CustomizationForm = ({
             const isDisabled = toppingsLimitReached && !isSelected;
 
             return (
-              <label 
-                key={topping} 
+              <label
+                key={topping}
                 className={`flex items-center gap-2 p-3 rounded-md border cursor-pointer 
                             dark:border-gray-600 
-                            ${isSelected 
-                              ? 'bg-maroon/10 border-maroon' 
-                              : 'hover:bg-gray-100 dark:hover:bg-gray-700'}
-                            ${isDisabled 
-                              ? 'opacity-50 cursor-not-allowed' 
-                              : ''}
+                            ${
+                              isSelected
+                                ? "bg-maroon/10 border-maroon"
+                                : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                            }
+                            ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}
                           `}
               >
                 <input
@@ -156,7 +164,9 @@ const CustomizationForm = ({
                   disabled={isDisabled} // Disable the checkbox
                   onChange={() => handleToppingChange(topping)}
                 />
-                <span className="dark:text-gray-200"><T>{topping}</T></span>
+                <span className="dark:text-gray-200">
+                  <T>{topping}</T>
+                </span>
               </label>
             );
           })}
@@ -174,7 +184,6 @@ const CustomizationForm = ({
   );
 };
 
-
 export default function KioskPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -186,7 +195,8 @@ export default function KioskPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   // --- NEW STATE for customization modal ---
-  const [isCustomizationModalOpen, setIsCustomizationModalOpen] = useState(false);
+  const [isCustomizationModalOpen, setIsCustomizationModalOpen] =
+    useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
@@ -202,7 +212,7 @@ export default function KioskPage() {
     setSelectedProduct(product);
     setIsCustomizationModalOpen(true);
   };
-  
+
   // --- NEW: This is the new "Add to Cart" handler, called by the form ---
   const handleAddToCart = (customData: CustomizationData) => {
     if (!selectedProduct) return; // Guard clause
@@ -218,18 +228,18 @@ export default function KioskPage() {
     if (customData.toppings) {
       selectedProduct.price += 0.75;
     }
-    const final_price = selectedProduct.price; 
+    const final_price = selectedProduct.price;
 
     const newCartItem: CartItem = {
       cart_id: crypto.randomUUID(),
       product: selectedProduct,
       quantity: 1,
       ...customData,
-      final_price: final_price, 
+      final_price: final_price,
     };
-    
+
     setCart((prev) => [...prev, newCartItem]);
-    
+
     // Close and reset
     setIsCustomizationModalOpen(false);
     setSelectedProduct(null);
@@ -238,7 +248,7 @@ export default function KioskPage() {
 
   const removeFromCart = (id: string) =>
     setCart((prev) => prev.filter((i) => i.cart_id !== id));
-    
+
   const total = useMemo(
     () => cart.reduce((s, i) => s + i.final_price, 0),
     [cart]
@@ -323,15 +333,29 @@ export default function KioskPage() {
           />
           {isLoading && <Spinner />}{" "}
           {error && <p className="text-red-500">{error}</p>}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {products.map((p) => (
-              <KioskProductCard
-                key={p.product_id}
-                product={p}
-                onSelect={openCustomizationModal}
-              />
-            ))}
-          </div>
+          {Object.entries(
+            products.reduce((groups, product) => {
+              const category = product.category || "Other";
+              if (!groups[category]) groups[category] = [];
+              groups[category].push(product);
+              return groups;
+            }, {} as Record<string, typeof products>)
+          ).map(([category, group]) => (
+            <div key={category} className="mb-8">
+              <h2 className="text-2xl font-bold mb-3 text-maroon dark:text-white border-b pb-2">
+                {String(category).toUpperCase()}
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {group.map((p) => (
+                  <KioskProductCard
+                    key={p.product_id}
+                    product={p}
+                    onSelect={openCustomizationModal}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
         <div className="w-1/3 bg-white dark:bg-gray-800 shadow-lg p-6 flex flex-col">
           {/* ... (The cart UI is unchanged) ... */}
@@ -369,7 +393,7 @@ export default function KioskPage() {
             </button>
           </div>
         </div>
-        
+
         {/* --- Payment Modal (Unchanged) --- */}
         <Modal
           isOpen={isPaymentModalOpen}
@@ -406,7 +430,6 @@ export default function KioskPage() {
           </div>
         </Modal>
 
-        {/* --- ADD THIS NEW CUSTOMIZATION MODAL --- */}
         {selectedProduct && (
           <Modal
             isOpen={isCustomizationModalOpen}
@@ -416,7 +439,7 @@ export default function KioskPage() {
             }}
             title="Customize Your Drink"
           >
-            <CustomizationForm 
+            <CustomizationForm
               product={selectedProduct}
               onSubmit={handleAddToCart}
             />

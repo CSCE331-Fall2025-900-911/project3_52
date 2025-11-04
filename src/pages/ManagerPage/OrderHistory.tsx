@@ -362,7 +362,7 @@ export default function OrderHistory() {
                   }
                 }}
                 className="w-16 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-maroon text-center"
-                autoFocus
+                
               />{" "}
               of {totalPages}
             </span>

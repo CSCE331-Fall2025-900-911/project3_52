@@ -10,6 +10,12 @@ export type Product = {
   product_name: string;
   price: number;
   category: string;
+  flavor: number;
+  flavor_2: number;
+  flavor_3: number;
+  milk: number;
+  cream: number;
+  sugar: number;
 };
 
 export type CartItem = {

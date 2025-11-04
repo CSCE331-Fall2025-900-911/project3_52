@@ -19,6 +19,12 @@ const ProductForm = ({
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
+  const [flavor, setFlavor] = useState(0);
+  const [flavor_2, setFlavor_2] = useState(0);
+  const [flavor_3, setFlavor_3] = useState(0);
+  const [milk, setMilk] = useState(0);
+  const [cream, setCream] = useState(0);
+  const [sugar, setSugar] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const isEditing = product !== null;
@@ -28,10 +34,22 @@ const ProductForm = ({
       setName(product.product_name);
       setPrice(String(product.price));
       setCategory(product.category);
+      setFlavor(product.flavor ?? 0);
+      setFlavor_2(product.flavor_2 ?? 0);
+      setFlavor_3(product.flavor_3 ?? 0);
+      setMilk(product.milk ?? 0);
+      setCream(product.cream ?? 0);
+      setSugar(product.sugar ?? 0);
     } else {
       setName("");
       setPrice("");
       setCategory("");
+      setFlavor(0);
+      setFlavor_2(0);
+      setFlavor_3(0);
+      setMilk(0);
+      setCream(0);
+      setSugar(0);
     }
   }, [product, isEditing]);
 
@@ -47,6 +65,12 @@ const ProductForm = ({
       product_name: name,
       price: parseFloat(price),
       category: category,
+      flavor: flavor,
+      flavor_2: flavor_2,
+      flavor_3: flavor_3,
+      milk: milk,
+      cream: cream,
+      sugar: sugar,
     };
     if (
       !payload.product_name ||
@@ -113,6 +137,121 @@ const ProductForm = ({
           step="0.01"
         />
       </div>
+
+      <div>
+        <label
+          htmlFor="flavor"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Flavor
+        </label>
+        <input
+          type="number"
+          id="flavor"
+          value={flavor}
+          onChange={(e) => setFlavor(Number(e.target.value))}
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+          required
+          min="0"
+          step="1"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="flavor_2"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Flavor 2
+        </label>
+        <input
+          type="number"
+          id="flavor_2"
+          value={flavor_2}
+          onChange={(e) => setFlavor_2(Number(e.target.value))}
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+          required
+          min="0"
+          step="1"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="flavor_3"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Flavor 3
+        </label>
+        <input
+          type="number"
+          id="flavor_3"
+          value={flavor_3}
+          onChange={(e) => setFlavor_3(Number(e.target.value))}
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+          required
+          min="0"
+          step="1"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="milk"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Milk
+        </label>
+        <input
+          type="number"
+          id="milk"
+          value={milk}
+          onChange={(e) => setMilk(Number(e.target.value))}
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+          required
+          min="0"
+          step="0.05"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="cream"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Cream
+        </label>
+        <input
+          type="number"
+          id="cream"
+          value={cream}
+          onChange={(e) => setCream(Number(e.target.value))}
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+          required
+          min="0"
+          step="1"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="sugar"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Sugar
+        </label>
+        <input
+          type="number"
+          id="sugar"
+          value={sugar}
+          onChange={(e) => setSugar(Number(e.target.value))}
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+          required
+          min="0"
+          step="1"
+        />
+      </div>
+
       <div>
         <label
           htmlFor="category"
@@ -120,6 +259,7 @@ const ProductForm = ({
         >
           Category
         </label>
+
         <input
           type="text"
           id="category"
@@ -152,7 +292,6 @@ const ProductForm = ({
 
 // --- Product Manager (the main export) ---
 export default function ProductManager() {
-  // ... (Paste the exact code for ProductManager here) ...
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -207,9 +346,11 @@ export default function ProductManager() {
     return (
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="w-full min-w-full divide-y divide-gray-200">
-          {/* ... (Paste the full JSX for the table) ... */}
           <thead className="bg-gray-50">
             <tr>
+              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                ID
+              </th>
               <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                 Name
               </th>
@@ -218,6 +359,24 @@ export default function ProductManager() {
               </th>
               <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                 Price
+              </th>
+              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                Flavor
+              </th>
+              {/* <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                Flavor_2
+              </th>
+              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                Flavor_3
+              </th> */}
+              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                Milk
+              </th>
+              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                Cream
+              </th>
+              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                Sugar
               </th>
               <th className="p-4 text-right text-xs font-medium text-gray-500 uppercase">
                 Actions
@@ -228,6 +387,9 @@ export default function ProductManager() {
             {products.map((product) => (
               <tr key={product.product_id}>
                 <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {product.product_id}
+                </td>
+                <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {product.product_name}
                 </td>
                 <td className="p-4 whitespace-nowrap text-sm text-gray-500">
@@ -235,6 +397,24 @@ export default function ProductManager() {
                 </td>
                 <td className="p-4 whitespace-nowrap text-sm text-gray-500">
                   ${product.price}
+                </td>
+                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                  {product.flavor}
+                </td>
+                {/* <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                  {product.flavor_2}
+                </td>
+                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                  {product.flavor_3}
+                </td> */}
+                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                  {product.milk}
+                </td>
+                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                  {product.cream}
+                </td>
+                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                  {product.sugar}
                 </td>
                 <td className="p-4 whitespace-nowrap text-sm font-medium text-right space-x-4">
                   <button

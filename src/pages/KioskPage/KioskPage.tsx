@@ -357,7 +357,7 @@ export default function KioskPage() {
             </div>
           ))}
         </div>
-        <div className="w-1/3 bg-white dark:bg-gray-800 shadow-lg p-6 flex flex-col">
+        <div className="fixed top-20 right-0 w-1/3 bg-white dark:bg-gray-800 shadow-lg p-6 flex flex-col h-[calc(100vh-5rem)]">
           {/* ... (The cart UI is unchanged) ... */}
           <h2 className="text-3xl font-bold mb-4 dark:text-white">
             <T>Your Order</T>

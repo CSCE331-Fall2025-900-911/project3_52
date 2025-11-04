@@ -297,6 +297,19 @@ export default function ProductManager() {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
+  const [sortField, setSortField] = useState<"id" | "price" | null>(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSort = (field: "id" | "price") => {
+    if (sortField === field) {
+      // Toggle sort direction
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
 
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
@@ -343,91 +356,125 @@ export default function ProductManager() {
   const renderContent = () => {
     if (isLoading) return <Spinner />;
     if (error) return <p className="text-red-500 text-center">{error}</p>;
+
+    const filteredProducts = products.filter((product) => {
+      const query = searchQuery.toLowerCase();
+      return (
+        product.product_name.toLowerCase().includes(query) ||
+        product.category.toLowerCase().includes(query)
+      );
+    });
+
     return (
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="w-full min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                ID
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Name
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Category
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Price
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Flavor
-              </th>
-              {/* <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Flavor_2
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Flavor_3
-              </th> */}
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Milk
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Cream
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Sugar
-              </th>
-              <th className="p-4 text-right text-xs font-medium text-gray-500 uppercase">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {products.map((product) => (
-              <tr key={product.product_id}>
-                <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {product.product_id}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {product.product_name}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {product.category}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  ${product.price}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {product.flavor}
-                </td>
-                {/* <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {product.flavor_2}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {product.flavor_3}
-                </td> */}
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {product.milk}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {product.cream}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {product.sugar}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm font-medium text-right space-x-4">
-                  <button
-                    onClick={() => openEditModal(product)}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    Edit
-                  </button>
-                </td>
+      <div>
+        <input
+          type="text"
+          placeholder="Search by name or category"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-maroon mb-4"
+        />
+        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <table className="w-full min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th
+                  onClick={() => handleSort("id")}
+                  className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
+                >
+                  ID {sortField === "id" && (sortOrder === "asc" ? "▲" : "▼")}
+                </th>
+                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                  Name
+                </th>
+                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                  Category
+                </th>
+                <th
+                  onClick={() => handleSort("price")}
+                  className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
+                >
+                  Price{" "}
+                  {sortField === "price" && (sortOrder === "asc" ? "▲" : "▼")}
+                </th>
+                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                  Flavor
+                </th>
+                {/* <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                  Flavor_2
+                </th>
+                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                  Flavor_3
+                </th> */}
+                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                  Milk
+                </th>
+                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                  Cream
+                </th>
+                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                  Sugar
+                </th>
+                <th className="p-4 text-right text-xs font-medium text-gray-500 uppercase">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredProducts
+                .sort((a, b) => {
+                  if (!sortField) return 0;
+
+                  const fieldA = sortField === "id" ? a.product_id : a.price;
+                  const fieldB = sortField === "id" ? b.product_id : b.price;
+
+                  return sortOrder === "asc" ? fieldA - fieldB : fieldB - fieldA;
+                })
+                .map((product) => (
+                  <tr key={product.product_id}>
+                    <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {product.product_id}
+                    </td>
+                    <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {product.product_name}
+                    </td>
+                    <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                      {product.category}
+                    </td>
+                    <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                      ${product.price}
+                    </td>
+                    <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                      {product.flavor}
+                    </td>
+                    {/* <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                    {product.flavor_2}
+                  </td>
+                  <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                    {product.flavor_3}
+                  </td> */}
+                    <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                      {product.milk}
+                    </td>
+                    <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                      {product.cream}
+                    </td>
+                    <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                      {product.sugar}
+                    </td>
+                    <td className="p-4 whitespace-nowrap text-sm font-medium text-right space-x-4">
+                      <button
+                        onClick={() => openEditModal(product)}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   };

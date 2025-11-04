@@ -274,6 +274,21 @@ export default function InventoryManager() {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<Inventory | null>(null);
+  const [sortField, setSortField] = useState<
+    "inv_item_id" | "units_remaining" | "numServings" | null
+  >(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  const handleSort = (
+    field: "inv_item_id" | "units_remaining" | "numServings"
+  ) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
 
   const fetchInventory = useCallback(async () => {
     setIsLoading(true);
@@ -326,17 +341,32 @@ export default function InventoryManager() {
         <table className="w-full min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Item ID
+              <th
+                onClick={() => handleSort("inv_item_id")}
+                className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
+              >
+                Item ID{" "}
+                {sortField === "inv_item_id" &&
+                  (sortOrder === "asc" ? "▲" : "▼")}
               </th>
               <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                 Name
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Units Remaining
+              <th
+                onClick={() => handleSort("units_remaining")}
+                className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
+              >
+                Units Remaining{" "}
+                {sortField === "units_remaining" &&
+                  (sortOrder === "asc" ? "▲" : "▼")}
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Num. Servings
+              <th
+                onClick={() => handleSort("numServings")}
+                className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
+              >
+                Num. of Servings{" "}
+                {sortField === "numServings" &&
+                  (sortOrder === "asc" ? "▲" : "▼")}
               </th>
               <th className="p-4 text-right text-xs font-medium text-gray-500 uppercase">
                 Actions
@@ -344,30 +374,55 @@ export default function InventoryManager() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {inventory.map((item) => (
-              <tr key={item.inv_item_id}>
-                <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {item.inv_item_id}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {item.name}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {(item.units_remaining ?? 0).toLocaleString()}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {(item.numServings ?? 0).toLocaleString()}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm font-medium text-right space-x-4">
-                  <button
-                    onClick={() => openEditModal(item)}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    Edit
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {inventory
+              .sort((a, b) => {
+                if (!sortField) return 0;
+
+                // Extract numeric part for string IDs like "I001"
+                const parseId = (id: string) => {
+                  const num = parseInt(id.replace(/\D/g, ""), 10);
+                  return isNaN(num) ? 0 : num;
+                };
+
+                let valA: number, valB: number;
+
+                if (sortField === "inv_item_id") {
+                  valA = parseId(String(a.inv_item_id));
+                  valB = parseId(String(b.inv_item_id));
+                } else if (sortField === "units_remaining") {
+                  valA = a.units_remaining ?? 0;
+                  valB = b.units_remaining ?? 0;
+                } else {
+                  valA = a.numServings ?? 0;
+                  valB = b.numServings ?? 0;
+                }
+
+                return sortOrder === "asc" ? valA - valB : valB - valA;
+              })
+              .map((item) => (
+                <tr key={item.inv_item_id}>
+                  <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {item.inv_item_id}
+                  </td>
+                  <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                    {item.name}
+                  </td>
+                  <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                    {(item.units_remaining ?? 0).toLocaleString()}
+                  </td>
+                  <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                    {(item.numServings ?? 0).toLocaleString()}
+                  </td>
+                  <td className="p-4 whitespace-nowrap text-sm font-medium text-right space-x-4">
+                    <button
+                      onClick={() => openEditModal(item)}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

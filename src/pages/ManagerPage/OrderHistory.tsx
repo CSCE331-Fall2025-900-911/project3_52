@@ -114,12 +114,27 @@ export default function OrderHistory() {
   const [orders, setOrders] = useState<OrderHistoryRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<"order_id" | "total_price" | null>(
+    null
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   // --- State for modal ---
   const [selectedOrder, setSelectedOrder] = useState<OrderHistoryRecord | null>(
     null
   );
 
+  // --- State for search query ---
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSort = (field: "order_id" | "total_price") => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
   // --- Data Fetching ---
   const fetchOrders = useCallback(async () => {
     setIsLoading(true);
@@ -167,61 +182,113 @@ export default function OrderHistory() {
       return <p className="text-gray-500 text-center">No orders found.</p>;
     }
 
+    // Filter orders based on searchQuery (case-insensitive)
+    const filteredOrders = orders.filter((order) => {
+      const query = searchQuery.toLowerCase();
+      const orderIdStr = String(order.order_id).toLowerCase();
+      const paymentMethodStr = order.payment_method.toLowerCase();
+      return (
+        orderIdStr.includes(query) || paymentMethodStr.includes(query)
+      );
+    });
+
     return (
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="w-full min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Order ID
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Date
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Time
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Payment Method
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Total Price
-              </th>
-              <th className="p-4 text-right text-xs font-medium text-gray-500 uppercase">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {orders.map((order) => (
-              <tr key={order.order_id}>
-                <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  #{order.order_id}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {order.month}/{order.day}/{order.year}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {order.time}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {order.payment_method}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  ${order.total_price ?? 0}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm font-medium text-right">
-                  <button
-                    onClick={() => openDetailsModal(order)}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    View Details
-                  </button>
-                </td>
+      <div>
+        <div className="mb-4">
+          <input
+            type="text"
+            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-maroon"
+            placeholder="Search by Order ID or Payment Method..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <table className="w-full min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th
+                  onClick={() => handleSort("order_id")}
+                  className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
+                >
+                  Order ID{" "}
+                  {sortField === "order_id" && (sortOrder === "asc" ? "▲" : "▼")}
+                </th>
+                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                  Date
+                </th>
+                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                  Time
+                </th>
+                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                  Payment Method
+                </th>
+                <th
+                  onClick={() => handleSort("total_price")}
+                  className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
+                >
+                  Total Price{" "}
+                  {sortField === "total_price" &&
+                    (sortOrder === "asc" ? "▲" : "▼")}
+                </th>
+                <th className="p-4 text-right text-xs font-medium text-gray-500 uppercase">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredOrders
+                .sort((a, b) => {
+                  if (!sortField) return 0;
+
+                  const parseId = (id: string | number) => {
+                    const str = String(id);
+                    const num = parseInt(str.replace(/\D/g, ""), 10);
+                    return isNaN(num) ? 0 : num;
+                  };
+
+                  let valA: number, valB: number;
+
+                  if (sortField === "order_id") {
+                    valA = parseId(a.order_id);
+                    valB = parseId(b.order_id);
+                  } else {
+                    valA = a.total_price ?? 0;
+                    valB = b.total_price ?? 0;
+                  }
+
+                  return sortOrder === "asc" ? valA - valB : valB - valA;
+                })
+                .map((order) => (
+                  <tr key={order.order_id}>
+                    <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      #{order.order_id}
+                    </td>
+                    <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                      {order.month}/{order.day}/{order.year}
+                    </td>
+                    <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                      {order.time}
+                    </td>
+                    <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                      {order.payment_method}
+                    </td>
+                    <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                      ${order.total_price ?? 0}
+                    </td>
+                    <td className="p-4 whitespace-nowrap text-sm font-medium text-right">
+                      <button
+                        onClick={() => openDetailsModal(order)}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   };

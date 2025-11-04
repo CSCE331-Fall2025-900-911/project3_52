@@ -235,6 +235,35 @@ export default function StaffManager() {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentStaff, setCurrentStaff] = useState<Staff | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [sortField, setSortField] = useState<"staff_id" | "salary" | null>(
+    null
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  const handleSort = (field: "staff_id" | "salary") => {
+    if (sortField === field) {
+      // toggle direction
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+
+  const openConfirm = (id: string, name: string) => {
+    setPendingDelete({ id, name });
+    setConfirmOpen(true);
+  };
+
+  const closeConfirm = () => {
+    setConfirmOpen(false);
+    setPendingDelete(null);
+  };
 
   const fetchStaff = useCallback(async () => {
     setIsLoading(true);
@@ -279,25 +308,18 @@ export default function StaffManager() {
   };
 
   const handleDelete = async (staffId: string) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to delete staff member "${staffId}"? This action cannot be undone.`
-      )
-    ) {
-      return;
-    }
     try {
       const response = await apiFetch(`/api/staff/${staffId}`, {
         method: "DELETE",
       });
       if (!response.ok) {
         const err = await response.json();
-        throw new Error(err.error || "Failed to delete staff member.");
+        toast.error(err.error || "Failed to delete staff member.");
       }
       setStaff(staff.filter((s) => s.staff_id !== staffId));
-      alert("Staff member deleted successfully.");
+      toast.success("Staff member deleted successfully.");
     } catch (err: any) {
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
 
@@ -307,12 +329,16 @@ export default function StaffManager() {
     return (
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="w-full min-w-full divide-y divide-gray-200">
-          {/* ... (Paste the full JSX for the table) ... */}
           <thead className="bg-gray-50">
             <tr>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Staff ID
+              <th
+                onClick={() => handleSort("staff_id")}
+                className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
+              >
+                Staff ID{" "}
+                {sortField === "staff_id" && (sortOrder === "asc" ? "▲" : "▼")}
               </th>
+
               <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                 Name
               </th>
@@ -322,56 +348,84 @@ export default function StaffManager() {
               <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
                 Email
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                Salary
+              <th
+                onClick={() => handleSort("salary")}
+                className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
+              >
+                Salary{" "}
+                {sortField === "salary" && (sortOrder === "asc" ? "▲" : "▼")}
               </th>
+
               <th className="p-4 text-right text-xs font-medium text-gray-500 uppercase">
                 Actions
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {staff.map((staffMember) => (
-              <tr key={staffMember.staff_id}>
-                <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {staffMember.staff_id}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {staffMember.name}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  <span
-                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      staffMember.role === "Manager"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-green-100 text-green-800"
-                    }`}
-                  >
-                    {staffMember.role}
-                  </span>
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  {staffMember.email}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                  ${(staffMember.salary ?? 0).toLocaleString()}
-                </td>
-                <td className="p-4 whitespace-nowrap text-sm font-medium text-right space-x-4">
-                  <button
-                    onClick={() => openEditModal(staffMember)}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(staffMember.staff_id)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {staff
+              .sort((a, b) => {
+                if (!sortField) return 0;
+
+                const parseId = (id: string) => {
+                  const num = parseInt(id.replace(/\D/g, ""), 10);
+                  return isNaN(num) ? 0 : num;
+                };
+
+                let valA: number, valB: number;
+
+                if (sortField === "staff_id") {
+                  valA = parseId(a.staff_id);
+                  valB = parseId(b.staff_id);
+                } else {
+                  valA = a.salary ?? 0;
+                  valB = b.salary ?? 0;
+                }
+
+                return sortOrder === "asc" ? valA - valB : valB - valA;
+              })
+              .map((staffMember) => (
+                <tr key={staffMember.staff_id}>
+                  <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {staffMember.staff_id}
+                  </td>
+                  <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                    {staffMember.name}
+                  </td>
+                  <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                    <span
+                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        staffMember.role === "Manager"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {staffMember.role}
+                    </span>
+                  </td>
+                  <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                    {staffMember.email}
+                  </td>
+                  <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                    ${(staffMember.salary ?? 0).toLocaleString()}
+                  </td>
+                  <td className="p-4 whitespace-nowrap text-sm font-medium text-right space-x-4">
+                    <button
+                      onClick={() => openEditModal(staffMember)}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() =>
+                        openConfirm(staffMember.staff_id, staffMember.name)
+                      }
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
@@ -400,6 +454,34 @@ export default function StaffManager() {
           onSuccess={handleSaveSuccess}
           onCancel={closeModal}
         />
+      </Modal>
+
+      <Modal isOpen={confirmOpen} onClose={closeConfirm} title="Confirm Delete">
+        <p className="text-gray-700 mb-4">
+          Are you sure you want to delete staff member{" "}
+          <span className="font-semibold">{pendingDelete?.name}</span>? This
+          action cannot be undone.
+        </p>
+
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={closeConfirm}
+            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={async () => {
+              if (!pendingDelete) return;
+              await handleDelete(pendingDelete.id);
+              closeConfirm();
+            }}
+            className="px-4 py-2 rounded bg-maroon hover:bg-darkmaroon text-white"
+          >
+            Delete
+          </button>
+        </div>
       </Modal>
     </div>
   );

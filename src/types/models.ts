@@ -16,7 +16,7 @@ export type CartItem = {
   cart_id: string;
   product: Product;
   quantity: number;
-  size: "Small" | "Medium" | "Large";
+  size: "Small" | "Medium" | "Large" | "Bucee's";
   sugar_level: "0" | "50" | "75" | "100";
   ice_level: "0" | "50" | "75" | "100";
   toppings: string;
@@ -25,7 +25,7 @@ export type CartItem = {
 
 export type OrderItem = {
   product_id: number;
-  size: "Small" | "Medium" | "Large";
+  size: "Small" | "Medium" | "Large"| "Bucee's";
   sugar_level: "0" | "50" | "75" | "100";
   ice_level: "0" | "50" | "75" | "100";
   toppings: string;
@@ -70,4 +70,12 @@ export type OrderHistoryRecord = {
   payment_method: string;
 };
 
+export type CustomizationData = {
+  size: 'Small' | 'Medium' | 'Large' | "Bucee's";
+  sugar_level: '0' | '50' | '75' | '100';
+  ice_level: '0' | '50' | '75' | '100';
+  toppings: string;
+};
 
+
+export type Lang = "en" | "es" | "fr" | "ko" | "zh"| "de" | "ja" | "it" | "ru" | "pt" | "ar";

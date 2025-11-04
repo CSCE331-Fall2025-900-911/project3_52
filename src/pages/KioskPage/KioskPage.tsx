@@ -7,6 +7,173 @@ import KioskHeader from "./KioskHeader";
 import KioskProductCard from "./KioskProductCard";
 import KioskCartItem from "./KioskCartItem";
 import { toast } from "react-hot-toast";
+import Modal from "../../components/Modal";
+import { CustomizationData } from "../../types/models";
+
+
+const AVAILABLE_TOPPINGS = [
+  'Boba',
+  'Lychee Jelly',
+  'Grass Jelly',
+  'Pudding',
+  'Red Bean',
+  'Crystal Boba',
+];
+const CustomizationForm = ({ 
+  product, 
+  onSubmit 
+}: { 
+  product: Product, 
+  onSubmit: (data: CustomizationData) => void 
+}) => {
+  // Internal state for the form, with defaults
+  const [size, setSize] = useState<'Small' | 'Medium' | 'Large' | "Bucee's">('Medium');
+  const [sugar, setSugar] = useState<'0' | '50' | '75' | '100'>('100');
+  const [ice, setIce] = useState<'0' | '50' | '75' | '100'>('100');
+  
+  const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
+  
+  // --- UPDATED: Handler to limit selection to 3 ---
+  const handleToppingChange = (topping: string) => {
+    setSelectedToppings((prev) => {
+      const isSelected = prev.includes(topping);
+      
+      if (isSelected) {
+        // Always allow un-checking
+        return prev.filter(t => t !== topping);
+      } else {
+        // Only allow checking if under the limit
+        if (prev.length < 3) {
+          return [...prev, topping];
+        } else {
+          // Show a warning and do not add the 4th topping
+          toast.error("You can select up to 3 toppings");
+          return prev; // Return the state unchanged
+        }
+      }
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({
+      size: size,
+      sugar_level: sugar,
+      ice_level: ice,
+      toppings: selectedToppings.join(', '), 
+    });
+  };
+
+  // This will be true when 3 toppings are selected
+  const toppingsLimitReached = selectedToppings.length >= 3;
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <p className="text-lg dark:text-gray-200">
+        <T>Customizing</T>: <span className="font-bold">{product.product_name}</span>
+      </p>
+      
+      {/* Size Selector (Added p-3 for better mobile tap) */}
+      <label className="block">
+        <span className="text-gray-700 dark:text-gray-300"><T>Size</T></span>
+        <select 
+          value={size} 
+          onChange={(e) => setSize(e.target.value as any)}
+          className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
+        >
+          <option value="Small">Small</option>
+          <option value="Medium">Medium</option>
+          <option value="Large">Large</option>
+          <option value="Bucee's">Bucee's</option>
+        </select>
+      </label>
+      
+      {/* Sugar Selector (Added p-3 for better mobile tap) */}
+      <label className="block">
+        <span className="text-gray-700 dark:text-gray-300"><T>Sugar Level</T></span>
+        <select 
+          value={sugar} 
+          onChange={(e) => setSugar(e.target.value as any)}
+          className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
+        >
+          <option value="100">100%</option>
+          <option value="75">75%</option>
+          <option value="50">50%</option>
+          <option value="0">0%</option>
+        </select>
+      </label>
+      
+      {/* Ice Selector (Added p-3 for better mobile tap) */}
+      <label className="block">
+        <span className="text-gray-700 dark:text-gray-300"><T>Ice Level</T></span>
+        <select 
+          value={ice} 
+          onChange={(e) => setIce(e.target.value as any)}
+          className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
+        >
+          <option value="100">100%</option>
+          <option value="75">75%</option>
+          <option value="50">50%</option>
+          <option value="0">0%</option>
+        </select>
+      </label>
+      
+      {/* --- UPDATED: Toppings Fieldset --- */}
+      <fieldset>
+        <div className="flex justify-between items-center">
+          <legend className="block text-gray-700 dark:text-gray-300">
+            <T>Toppings</T>
+          </legend>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            <T>Select up to 3</T> ({selectedToppings.length} / 3)
+          </span>
+        </div>
+        
+        {/* Responsive grid, larger tap targets with borders */}
+        <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {AVAILABLE_TOPPINGS.map((topping) => {
+            const isSelected = selectedToppings.includes(topping);
+            // Disable if limit is reached AND this item is not already selected
+            const isDisabled = toppingsLimitReached && !isSelected;
+
+            return (
+              <label 
+                key={topping} 
+                className={`flex items-center gap-2 p-3 rounded-md border cursor-pointer 
+                            dark:border-gray-600 
+                            ${isSelected 
+                              ? 'bg-maroon/10 border-maroon' 
+                              : 'hover:bg-gray-100 dark:hover:bg-gray-700'}
+                            ${isDisabled 
+                              ? 'opacity-50 cursor-not-allowed' 
+                              : ''}
+                          `}
+              >
+                <input
+                  type="checkbox"
+                  className="h-5 w-5 rounded text-maroon focus:ring-maroon"
+                  checked={isSelected}
+                  disabled={isDisabled} // Disable the checkbox
+                  onChange={() => handleToppingChange(topping)}
+                />
+                <span className="dark:text-gray-200"><T>{topping}</T></span>
+              </label>
+            );
+          })}
+        </div>
+      </fieldset>
+      {/* --- END UPDATE --- */}
+
+      <button
+        type="submit"
+        className="w-full py-4 mt-4 bg-maroon text-white text-xl font-bold rounded-lg shadow-lg hover:bg-darkmaroon transition-colors"
+      >
+        <T>Add to Order</T>
+      </button>
+    </form>
+  );
+};
+
 
 export default function KioskPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -14,6 +181,13 @@ export default function KioskPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isHighContrast, setIsHighContrast] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // --- NEW STATE for customization modal ---
+  const [isCustomizationModalOpen, setIsCustomizationModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     kioskApiFetch("/api/products")
@@ -23,29 +197,59 @@ export default function KioskPage() {
       .finally(() => setIsLoading(false));
   }, []);
 
-  const addToCart = (product: Product) => {
-    setCart((prev) => [
-      ...prev,
-      {
-        cart_id: crypto.randomUUID(),
-        product,
-        quantity: 1,
-        size: "Medium",
-        sugar_level: "100",
-        ice_level: "100",
-        toppings: "",
-        final_price: product.price,
-      },
-    ]);
+  // --- RENAMED: This now opens the modal ---
+  const openCustomizationModal = (product: Product) => {
+    setSelectedProduct(product);
+    setIsCustomizationModalOpen(true);
   };
+  
+  // --- NEW: This is the new "Add to Cart" handler, called by the form ---
+  const handleAddToCart = (customData: CustomizationData) => {
+    if (!selectedProduct) return; // Guard clause
+
+    // Calculate final price based on customizations
+    if (customData.size === "Large") {
+      selectedProduct.price += 1.0;
+    } else if (customData.size === "Bucee's") {
+      selectedProduct.price += 2.0;
+    } else if (customData.size === "Small") {
+      selectedProduct.price -= 0.5;
+    }
+    if (customData.toppings) {
+      selectedProduct.price += 0.75;
+    }
+    const final_price = selectedProduct.price; 
+
+    const newCartItem: CartItem = {
+      cart_id: crypto.randomUUID(),
+      product: selectedProduct,
+      quantity: 1,
+      ...customData,
+      final_price: final_price, 
+    };
+    
+    setCart((prev) => [...prev, newCartItem]);
+    
+    // Close and reset
+    setIsCustomizationModalOpen(false);
+    setSelectedProduct(null);
+    toast.success(`${selectedProduct.product_name} added to order!`);
+  };
+
   const removeFromCart = (id: string) =>
     setCart((prev) => prev.filter((i) => i.cart_id !== id));
+    
   const total = useMemo(
     () => cart.reduce((s, i) => s + i.final_price, 0),
     [cart]
   );
 
-  const submitOrder = async () => {
+  const handleFinalSubmit = async (
+    paymentMethod: "Card" | "Mobile Pay" | "Cash"
+  ) => {
+    // ... (This function is unchanged) ...
+    setIsSubmitting(true);
+    setSubmitError(null);
     const now = new Date();
     const payload: OrderPayload = {
       time: now.toTimeString().split(" ")[0],
@@ -55,7 +259,7 @@ export default function KioskPage() {
       total_price: total,
       tip: 0,
       special_notes: "Kiosk Order",
-      payment_method: "Card",
+      payment_method: paymentMethod,
       items: cart.map((i) => ({
         product_id: i.product.product_id,
         size: i.size,
@@ -65,19 +269,49 @@ export default function KioskPage() {
         price: i.final_price,
       })),
     };
-    const res = await kioskApiFetch("/api/orders", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      // You can use toast for errors, too!
-      toast.error(err.error || "Failed to submit order");
-      throw new Error(err.error || "Failed to submit order");
+    try {
+      const res = await kioskApiFetch("/api/orders", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        const errorText = err.error || "Failed to submit order";
+        toast.error(errorText);
+        setSubmitError(errorText);
+        setIsSubmitting(false);
+        return;
+      }
+      toast.success("Order submitted successfully!");
+      setCart([]);
+      setIsPaymentModalOpen(false);
+    } catch (e: any) {
+      const errorText = e.message || "An unknown error occurred";
+      toast.error(errorText);
+      setSubmitError(errorText);
+    } finally {
+      setIsSubmitting(false);
     }
-    toast.success("Order submitted successfully!");
-    setCart([]);
   };
+
+  const PaymentButton = ({
+    label,
+    onClick,
+    disabled,
+  }: {
+    label: string;
+    onClick: () => void;
+    disabled: boolean;
+  }) => (
+    // ... (This component is unchanged) ...
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="w-full py-4 bg-maroon text-white text-xl font-bold rounded-lg shadow-lg disabled:opacity-50 hover:bg-darkmaroon transition-colors"
+    >
+      <T>{label}</T>
+    </button>
+  );
 
   return (
     <LanguageProvider>
@@ -94,12 +328,13 @@ export default function KioskPage() {
               <KioskProductCard
                 key={p.product_id}
                 product={p}
-                onAddToCart={addToCart}
+                onSelect={openCustomizationModal}
               />
             ))}
           </div>
         </div>
         <div className="w-1/3 bg-white dark:bg-gray-800 shadow-lg p-6 flex flex-col">
+          {/* ... (The cart UI is unchanged) ... */}
           <h2 className="text-3xl font-bold mb-4 dark:text-white">
             <T>Your Order</T>
           </h2>
@@ -123,10 +358,10 @@ export default function KioskPage() {
               <span>
                 <T>Total</T>:
               </span>
-              <span>${total}</span>
+              <span>${total.toFixed(2)}</span> {/* <-- ADDED .toFixed(2) */}
             </div>
             <button
-              onClick={submitOrder}
+              onClick={() => setIsPaymentModalOpen(true)}
               disabled={cart.length === 0}
               className="w-full py-4 bg-maroon text-white text-xl font-bold rounded-lg shadow-lg disabled:opacity-50 hover:bg-darkmaroon"
             >
@@ -134,6 +369,59 @@ export default function KioskPage() {
             </button>
           </div>
         </div>
+        
+        {/* --- Payment Modal (Unchanged) --- */}
+        <Modal
+          isOpen={isPaymentModalOpen}
+          onClose={() => setIsPaymentModalOpen(false)}
+          title="Select Payment Method"
+        >
+          {/* ... (all the payment modal JSX is unchanged) ... */}
+          <div className="flex flex-col gap-4">
+            <p className="text-xl text-center">
+              <T>Your total is</T>:
+              <span className="font-bold ml-2">${total.toFixed(2)}</span>
+            </p>
+            <PaymentButton
+              label="Card"
+              onClick={() => handleFinalSubmit("Card")}
+              disabled={isSubmitting}
+            />
+            <PaymentButton
+              label="Mobile Pay"
+              onClick={() => handleFinalSubmit("Mobile Pay")}
+              disabled={isSubmitting}
+            />
+            <PaymentButton
+              label="Cash (Pay at Counter)"
+              onClick={() => handleFinalSubmit("Cash")}
+              disabled={isSubmitting}
+            />
+            {isSubmitting && <Spinner />}
+            {submitError && (
+              <p className="text-red-500 text-center font-semibold">
+                {submitError}
+              </p>
+            )}
+          </div>
+        </Modal>
+
+        {/* --- ADD THIS NEW CUSTOMIZATION MODAL --- */}
+        {selectedProduct && (
+          <Modal
+            isOpen={isCustomizationModalOpen}
+            onClose={() => {
+              setIsCustomizationModalOpen(false);
+              setSelectedProduct(null);
+            }}
+            title="Customize Your Drink"
+          >
+            <CustomizationForm 
+              product={selectedProduct}
+              onSubmit={handleAddToCart}
+            />
+          </Modal>
+        )}
       </div>
     </LanguageProvider>
   );

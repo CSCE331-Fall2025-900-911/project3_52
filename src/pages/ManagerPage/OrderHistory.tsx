@@ -133,6 +133,12 @@ export default function OrderHistory() {
   const [totalCount, setTotalCount] = useState(0);
   const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
 
+  // --- State for page input ---
+  const [pageInput, setPageInput] = useState(currentPage);
+
+  // --- State for editing page number inline ---
+  const [isEditingPage, setIsEditingPage] = useState(false);
+
   const handleSort = (field: "order_id" | "total_price") => {
     if (sortField === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -185,6 +191,17 @@ export default function OrderHistory() {
 
   const closeModal = () => {
     setSelectedOrder(null);
+  };
+
+  // --- Page jump handler ---
+  const handlePageJump = () => {
+    const pageNum = Number(pageInput);
+    if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
+      setCurrentPage(pageNum);
+    } else {
+      setPageInput(currentPage);
+    }
+    setIsEditingPage(false);
   };
 
   // --- Render Logic ---
@@ -321,7 +338,36 @@ export default function OrderHistory() {
               Previous
             </button>
             <span className="text-sm text-gray-600">
-              Page {currentPage} of {totalPages}
+              Page{" "}
+              {isEditingPage ? (
+                <input
+                  type="number"
+                  min={1}
+                  max={totalPages}
+                  value={pageInput}
+                  onChange={(e) => setPageInput(Number(e.target.value))}
+                  onBlur={handlePageJump}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handlePageJump();
+                    }
+                  }}
+                  className="w-16 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-maroon text-center"
+                  autoFocus
+                />
+              ) : (
+                <button
+                  onClick={() => {
+                    setPageInput(currentPage);
+                    setIsEditingPage(true);
+                  }}
+                  className="underline cursor-pointer"
+                  aria-label="Edit page number"
+                >
+                  {currentPage}
+                </button>
+              )}{" "}
+              of {totalPages}
             </span>
             <button
               onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}

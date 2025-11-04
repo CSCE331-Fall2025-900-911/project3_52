@@ -361,7 +361,7 @@ export default function OrderHistory() {
                     handlePageJump();
                   }
                 }}
-                className="w-16 p-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-maroon text-center"
+                className="px-3 py-1 bg-white text-darkmaroon rounded disabled:opacity-50 hover:bg-gray-100 border border-darkmaroon"
                 
               />{" "}
               of {totalPages}
@@ -369,7 +369,7 @@ export default function OrderHistory() {
             <button
               onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 bg-gray-200 text-gray-800 rounded disabled:opacity-50 hover:bg-gray-300"
+              className="px-3 py-1 bg-white text-darkmaroon rounded disabled:opacity-50 hover:bg-gray-100 border border-darkmaroon"
             >
               Next
             </button>

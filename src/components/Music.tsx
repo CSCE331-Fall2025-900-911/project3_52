@@ -22,7 +22,7 @@ export default function BackgroundMusic() {
     <div className="flex items-center gap-2 opacity-70 hover:opacity-100 transition-opacity">
       <button
         onClick={() => setIsPlaying(!isPlaying)}
-        className={`text-l w-12 h-12 rounded-full flex items-center justify-center ${
+        className={`text-l w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${
           isPlaying
             ? "bg-green-300 animate-pulse"
             : "bg-gray-300 hover:bg-gray-400"

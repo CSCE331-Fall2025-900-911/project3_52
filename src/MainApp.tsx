@@ -38,7 +38,7 @@ const MainApp = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => setPage("home")}
-            className="text-xl sm:text-2xl font-bold text-maroon hover:text-red-700 truncate max-w-[60vw] sm:max-w-none"
+            className="text-xl sm:text-2xl lg:text-4xl font-bold text-maroon hover:text-red-700 truncate max-w-[60vw] sm:max-w-none"
           >
             MomTea POS
           </button>

@@ -72,6 +72,7 @@ export type OrderHistoryRecord = {
   day: number;
   month: number;
   year: number;
+  tip: number;
   total_price: number;
   payment_method: string;
   special_notes: string;

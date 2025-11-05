@@ -97,12 +97,14 @@ const OrderDetailsModal = ({
           <strong>Payment:</strong> {order.payment_method}
         </p>
         <p>
+          <strong>Tip:</strong> ${order.tip ?? 0}
+        </p>
+        <p>
           <strong>Special Notes:</strong> {order.special_notes}
         </p>
         <p className="text-xl font-bold mt-2">
           Total: ${order.total_price ?? 0}
         </p>
-
       </div>
       <div className="max-h-64 overflow-y-auto">{renderContent()}</div>
     </Modal>
@@ -366,7 +368,6 @@ export default function OrderHistory() {
                   }
                 }}
                 className="px-3 py-1 bg-white text-darkmaroon rounded disabled:opacity-50 hover:bg-gray-100 border border-darkmaroon"
-                
               />{" "}
               of {totalPages}
             </span>

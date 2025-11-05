@@ -23,7 +23,7 @@ export default function KioskHeader({
       <div className="flex w-full sm:w-auto gap-2">
         <button
           onClick={() => setIsHighContrast(!isHighContrast)}
-          className="w-1/2 sm:w-auto p-3 bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow text-base sm:text-lg"
+          className="w-1/2 sm:w-auto min-w-[10rem] p-3 bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow text-base sm:text-lg"
         >
           <T>{isHighContrast ? "Standard Contrast" : "High Contrast"}</T>
         </button>

@@ -12,7 +12,7 @@ export default function KioskHeader({
   return (
     <div className="mb-4 flex justify-between items-center">
       <div>
-        <h1 className="text-4xl font-bold dark:text-white">
+        <h1 className="text-4xl font-bold dark:text-white sm:mr-2">
           <T>Welcome to MomTea</T>
         </h1>
         <p className="text-lg text-gray-600 dark:text-gray-300">

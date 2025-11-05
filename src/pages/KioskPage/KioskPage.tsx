@@ -12,6 +12,7 @@ import { CustomizationData } from "../../types/models";
 import { Elements } from "@stripe/react-stripe-js";
 import PaymentForm from "../../components/PaymentForm";
 import { loadStripe } from "@stripe/stripe-js";
+import PayPalCheckout from "../../components/PaypalCheckout";
 
 const AVAILABLE_TOPPINGS = [
   "Boba",
@@ -199,13 +200,16 @@ export default function KioskPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
+  const [isPayPalModalOpen, setIsPayPalModalOpen] = useState(false);
 
   // --- NEW STATE for customization modal ---
   const [isCustomizationModalOpen, setIsCustomizationModalOpen] =
     useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const stripePromise = loadStripe("pk_test_51SQ9h8HxLrRxAwUAXhDDu2tC5tKVWITYIGhCfr8Jjjkq9IFhjnUoOCaDUa4gNy9BRaOHTRNuLrZ39piTTYCD5Hyv00Y0s0Vcsq");
+  const stripePromise = loadStripe(
+    "pk_test_51SQ9h8HxLrRxAwUAXhDDu2tC5tKVWITYIGhCfr8Jjjkq9IFhjnUoOCaDUa4gNy9BRaOHTRNuLrZ39piTTYCD5Hyv00Y0s0Vcsq"
+  );
 
   useEffect(() => {
     localStorage.setItem("kiosk.highContrast", isHighContrast.toString());
@@ -269,13 +273,19 @@ export default function KioskPage() {
   const handleFinalSubmit = async (
     paymentMethod: "Card" | "Mobile Pay" | "Cash"
   ) => {
+    // Handle special payment flows first
     if (paymentMethod === "Card") {
-      // Open Stripe payment modal instead of submitting directly
       setIsStripeModalOpen(true);
       return;
     }
 
-    // Normal flow for non-card methods
+    if (paymentMethod === "Mobile Pay") {
+      // Open PayPal modal instead of direct order
+      setIsPayPalModalOpen(true);
+      return;
+    }
+
+    // Normal flow for non-digital payments
     setIsSubmitting(true);
     setSubmitError(null);
 
@@ -304,6 +314,7 @@ export default function KioskPage() {
         method: "POST",
         body: JSON.stringify(payload),
       });
+
       if (!res.ok) {
         const err = await res.json();
         const errorText = err.error || "Failed to submit order";
@@ -311,6 +322,7 @@ export default function KioskPage() {
         setSubmitError(errorText);
         return;
       }
+
       toast.success("Order submitted successfully!");
       setCart([]);
       setIsPaymentModalOpen(false);
@@ -454,7 +466,7 @@ export default function KioskPage() {
                 disabled={isSubmitting}
               />
               <PaymentButton
-                label="Mobile Pay"
+                label="PayPal (Mobile Pay)"
                 onClick={() => handleFinalSubmit("Mobile Pay")}
                 disabled={isSubmitting}
               />
@@ -509,6 +521,23 @@ export default function KioskPage() {
                   }}
                 />
               </Elements>
+            </Modal>
+          )}
+
+          {isPayPalModalOpen && (
+            <Modal
+              isOpen={isPayPalModalOpen}
+              onClose={() => setIsPayPalModalOpen(false)}
+              title="Pay with PayPal"
+            >
+              <PayPalCheckout
+                total={total}
+                onSuccess={() => {
+                  toast.success("Payment successful via PayPal!");
+                  setIsPayPalModalOpen(false);
+                  handleFinalSubmit("Cash"); // record order after PayPal
+                }}
+              />
             </Modal>
           )}
         </div>

@@ -5,6 +5,8 @@ export default function WeatherDisplay() {
   const [weather, setWeather] = useState<any>(null);
 
   useEffect(() => {
+    if (window.innerWidth < 640) return; // Tailwind "sm" breakpoint ≈ 640px
+
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -16,13 +18,14 @@ export default function WeatherDisplay() {
             .catch(() => {});
         },
         () => {
-          // Do nothing if permission denied or error
+          // silently fail if permission denied or error
         }
       );
     }
-  }, []); 
+  }, []);
 
   if (!weather) return null;
+
   const iconUrl = `https://openweathermap.org/img/wn/${weather.icon}@2x.png`;
 
   return (

@@ -12,7 +12,7 @@ import {
 import ProductManager from "./ProductManager";
 import StaffManager from "./StaffManager";
 import InventoryManager from "./InventoryManager";
-import OrderHistory from "./OrderHistory"; // Assuming you have this component
+import OrderHistory from "./OrderHistory"; 
 
 export default function ManagerPage() {
   const { user } = useAuth();
@@ -54,9 +54,15 @@ export default function ManagerPage() {
 
   return (
     <div className="flex flex-col sm:flex-row h-screen bg-gray-100">
+      {isMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 sm:hidden z-40"
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
       {/* Sidebar / Mobile Menu */}
       <nav
-        className={`${isMenuOpen ? "block" : "hidden"} sm:block fixed left-0 top-20 w-64 bg-white shadow-md flex flex-col h-[calc(100vh-5rem)] overflow-y-auto`}
+        className={`${isMenuOpen ? "block" : "hidden"} sm:block fixed left-0 top-20 w-64 bg-white shadow-md flex flex-col h-full overflow-y-auto z-50`}
       >
         {/* Sticky header inside sidebar */}
         <div className="p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
@@ -68,25 +74,37 @@ export default function ManagerPage() {
           <ManagerNavLink
             icon={<IconBox />}
             label="Products"
-            onClick={() => setView("products")}
+            onClick={() => {
+              setView("products");
+              setIsMenuOpen(false);
+            }}
             active={view === "products"}
           />
           <ManagerNavLink
             icon={<IconUsers />}
             label="Staff"
-            onClick={() => setView("staff")}
+            onClick={() => {
+              setView("staff");
+              setIsMenuOpen(false);
+            }}
             active={view === "staff"}
           />
           <ManagerNavLink
             icon={<IconList />}
             label="Inventory"
-            onClick={() => setView("inventory")}
+            onClick={() => {
+              setView("inventory");
+              setIsMenuOpen(false);
+            }}
             active={view === "inventory"}
           />
           <ManagerNavLink
             icon={<IconReceipt />}
             label="Orders"
-            onClick={() => setView("orders")}
+            onClick={() => {
+              setView("orders");
+              setIsMenuOpen(false);
+            }}
             active={view === "orders"}
           />
         </ul>

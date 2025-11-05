@@ -6,7 +6,7 @@ import WeatherDisplay from "./components/WeatherDisplay";
 import LoginButton from "./components/LoginButton";
 import { AuthProvider } from "./contexts/AuthContext";
 import { useState, useEffect } from "react";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 
 const MainApp = () => {
   const [page, setPage] = useState(
@@ -38,11 +38,13 @@ const MainApp = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => setPage("home")}
-            className="text-2xl font-bold text-maroon hover:text-red-700"
+            className="text-xl sm:text-2xl font-bold text-maroon hover:text-red-700 truncate max-w-[60vw] sm:max-w-none"
           >
             MomTea POS
           </button>
-          <WeatherDisplay />
+          <div className="hidden xs:block sm:block">
+            <WeatherDisplay />
+          </div>
         </div>
 
         {/* Right group: login */}

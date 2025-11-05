@@ -325,110 +325,144 @@ export default function KioskPage() {
 
   return (
     <LanguageProvider>
-      <div className={`flex h-screen ${isHighContrast ? "dark" : ""}`}>
-        <div className="w-2/3 p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900">
-          <KioskHeader
-            isHighContrast={isHighContrast}
-            setIsHighContrast={setIsHighContrast}
-          />
-          {isLoading && <Spinner />}{" "}
-          {error && <p className="text-red-500">{error}</p>}
-          {Object.entries(
-            products.reduce((groups, product) => {
-              const category = product.category || "Other";
-              if (!groups[category]) groups[category] = [];
-              groups[category].push(product);
-              return groups;
-            }, {} as Record<string, typeof products>)
-          ).map(([category, group]) => (
-            <div key={category} className="mb-8">
-              <h2 className="text-2xl font-bold mb-3 text-maroon dark:text-white border-b pb-2">
-                {String(category).toUpperCase()}
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {group.map((p) => (
-                  <KioskProductCard
-                    key={p.product_id}
-                    product={p}
-                    onSelect={openCustomizationModal}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="fixed top-20 right-0 w-1/3 bg-white dark:bg-gray-800 shadow-lg p-6 flex flex-col h-[calc(100vh-5rem)]">
-          {/* ... (The cart UI is unchanged) ... */}
-          <h2 className="text-3xl font-bold mb-4 dark:text-white">
-            <T>Your Order</T>
-          </h2>
-          <div className="flex-grow overflow-y-auto">
-            {cart.length === 0 ? (
-              <p className="text-gray-500 dark:text-gray-400">
-                <T>Your cart is empty.</T>
-              </p>
-            ) : (
-              cart.map((item) => (
-                <KioskCartItem
-                  key={item.cart_id}
-                  item={item}
-                  onRemove={removeFromCart}
-                />
-              ))
-            )}
-          </div>
-          <div className="border-t pt-4 mt-4 dark:border-gray-700">
-            <div className="flex justify-between items-center text-2xl font-bold mb-4 dark:text-white">
-              <span>
-                <T>Total</T>:
-              </span>
-              <span>${total.toFixed(2)}</span> {/* <-- ADDED .toFixed(2) */}
-            </div>
-            <button
-              onClick={() => setIsPaymentModalOpen(true)}
-              disabled={cart.length === 0}
-              className="w-full py-4 bg-maroon text-white text-xl font-bold rounded-lg shadow-lg disabled:opacity-50 hover:bg-darkmaroon"
-            >
-              <T>Pay Now</T>
-            </button>
-          </div>
-        </div>
-
-        {/* --- Payment Modal (Unchanged) --- */}
-        <Modal
-          isOpen={isPaymentModalOpen}
-          onClose={() => setIsPaymentModalOpen(false)}
-          title="Select Payment Method"
+      <div className={`relative h-screen ${isHighContrast ? "dark" : ""}`}>
+        <div
+          className={`flex flex-col lg:flex-row h-screen ${
+            isHighContrast ? "dark" : ""
+          }`}
         >
-          {/* ... (all the payment modal JSX is unchanged) ... */}
-          <div className="flex flex-col gap-4">
-            <p className="text-xl text-center">
-              <T>Your total is</T>:
-              <span className="font-bold ml-2">${total.toFixed(2)}</span>
-            </p>
-            <PaymentButton
-              label="Card"
-              onClick={() => handleFinalSubmit("Card")}
-              disabled={isSubmitting}
+          {/* --- LEFT: Products --- */}
+          <div className="w-full lg:w-2/3 p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+            <KioskHeader
+              isHighContrast={isHighContrast}
+              setIsHighContrast={setIsHighContrast}
             />
-            <PaymentButton
-              label="Mobile Pay"
-              onClick={() => handleFinalSubmit("Mobile Pay")}
-              disabled={isSubmitting}
-            />
-            <PaymentButton
-              label="Cash (Pay at Counter)"
-              onClick={() => handleFinalSubmit("Cash")}
-              disabled={isSubmitting}
-            />
-            {isSubmitting && <Spinner />}
-            {submitError && (
-              <p className="text-red-500 text-center font-semibold">
-                {submitError}
-              </p>
-            )}
+
+            {isLoading && <Spinner />}
+            {error && <p className="text-red-500">{error}</p>}
+
+            {Object.entries(
+              products.reduce((groups, product) => {
+                const category = product.category || "Other";
+                if (!groups[category]) groups[category] = [];
+                groups[category].push(product);
+                return groups;
+              }, {} as Record<string, typeof products>)
+            ).map(([category, group]) => (
+              <div key={category} className="mb-8">
+                <h2 className="text-2xl font-bold mb-3 text-maroon dark:text-white border-b pb-2">
+                  {String(category).toUpperCase()}
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
+                  {group.map((p) => (
+                    <KioskProductCard
+                      key={p.product_id}
+                      product={p}
+                      onSelect={openCustomizationModal}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
-        </Modal>
+
+          {/* --- RIGHT: Cart --- */}
+          <div
+            className="
+      w-full lg:w-1/3 
+      bg-white dark:bg-gray-800 shadow-lg p-6 flex flex-col
+      border-t lg:border-t-0
+      lg:fixed lg:top-20 lg:right-0 lg:h-[calc(100vh-5rem)]
+    "
+          >
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 dark:text-white text-center lg:text-left">
+              <T>Your Order</T>
+            </h2>
+
+            <div className="flex-grow overflow-y-auto mb-4">
+              {cart.length === 0 ? (
+                <p className="text-gray-500 dark:text-gray-400 text-center lg:text-left">
+                  <T>Your cart is empty.</T>
+                </p>
+              ) : (
+                cart.map((item) => (
+                  <KioskCartItem
+                    key={item.cart_id}
+                    item={item}
+                    onRemove={removeFromCart}
+                  />
+                ))
+              )}
+            </div>
+
+            <div className="border-t pt-4 mt-2 dark:border-gray-700">
+              <div className="flex justify-between items-center text-xl md:text-2xl font-bold mb-4 dark:text-white">
+                <span>
+                  <T>Total</T>:
+                </span>
+                <span>${total.toFixed(2)}</span>
+              </div>
+              <button
+                onClick={() => setIsPaymentModalOpen(true)}
+                disabled={cart.length === 0}
+                className="w-full py-3 md:py-4 bg-maroon text-white text-lg md:text-xl font-bold rounded-lg shadow-lg disabled:opacity-50 hover:bg-darkmaroon"
+              >
+                <T>Pay Now</T>
+              </button>
+            </div>
+          </div>
+
+          {/* --- Payment Modal --- */}
+          <Modal
+            isOpen={isPaymentModalOpen}
+            onClose={() => setIsPaymentModalOpen(false)}
+            title="Select Payment Method"
+          >
+            <div className="flex flex-col gap-4">
+              <p className="text-lg md:text-xl text-center">
+                <T>Your total is</T>:
+                <span className="font-bold ml-2">${total.toFixed(2)}</span>
+              </p>
+              <PaymentButton
+                label="Card"
+                onClick={() => handleFinalSubmit("Card")}
+                disabled={isSubmitting}
+              />
+              <PaymentButton
+                label="Mobile Pay"
+                onClick={() => handleFinalSubmit("Mobile Pay")}
+                disabled={isSubmitting}
+              />
+              <PaymentButton
+                label="Cash (Pay at Counter)"
+                onClick={() => handleFinalSubmit("Cash")}
+                disabled={isSubmitting}
+              />
+              {isSubmitting && <Spinner />}
+              {submitError && (
+                <p className="text-red-500 text-center font-semibold">
+                  {submitError}
+                </p>
+              )}
+            </div>
+          </Modal>
+
+          {selectedProduct && (
+            <Modal
+              isOpen={isCustomizationModalOpen}
+              onClose={() => {
+                setIsCustomizationModalOpen(false);
+                setSelectedProduct(null);
+              }}
+              title="Customize Your Drink"
+            >
+              <CustomizationForm
+                product={selectedProduct}
+                onSubmit={handleAddToCart}
+              />
+            </Modal>
+          )}
+        </div>
 
         {selectedProduct && (
           <Modal

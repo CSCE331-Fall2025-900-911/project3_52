@@ -236,111 +236,113 @@ export default function OrderHistory() {
             }}
           />
         </div>
-        <div className="bg-white shadow-md rounded-lg overflow-x-auto">
-          <table className="w-full min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th
-                  onClick={() => handleSort("order_id")}
-                  className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>Order ID</span>
-                    <span className=" w-3">
-                      {sortField === "order_id"
-                        ? sortOrder === "asc"
-                          ? "▲"
-                          : "▼"
-                        : ""}
-                    </span>
-                  </div>
-                </th>
+        <div className="bg-white shadow-md rounded-lg">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th
+                    onClick={() => handleSort("order_id")}
+                    className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>Order ID</span>
+                      <span className=" w-3">
+                        {sortField === "order_id"
+                          ? sortOrder === "asc"
+                            ? "▲"
+                            : "▼"
+                          : ""}
+                      </span>
+                    </div>
+                  </th>
 
-                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                  Date
-                </th>
+                  <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                    Date
+                  </th>
 
-                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                  Time
-                </th>
+                  <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                    Time
+                  </th>
 
-                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                  Payment Method
-                </th>
+                  <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                    Payment Method
+                  </th>
 
-                <th
-                  onClick={() => handleSort("total_price")}
-                  className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>Total Price</span>
-                    <span className="inline-block w-3 text-center">
-                      {sortField === "total_price"
-                        ? sortOrder === "asc"
-                          ? "▲"
-                          : "▼"
-                        : ""}
-                    </span>
-                  </div>
-                </th>
+                  <th
+                    onClick={() => handleSort("total_price")}
+                    className="p-4 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none"
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>Total Price</span>
+                      <span className="inline-block w-3 text-center">
+                        {sortField === "total_price"
+                          ? sortOrder === "asc"
+                            ? "▲"
+                            : "▼"
+                          : ""}
+                      </span>
+                    </div>
+                  </th>
 
-                <th className="p-4 text-right text-xs font-medium text-gray-500 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedOrders
-                .sort((a, b) => {
-                  if (!sortField) return 0;
+                  <th className="p-4 text-right text-xs font-medium text-gray-500 uppercase">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {paginatedOrders
+                  .sort((a, b) => {
+                    if (!sortField) return 0;
 
-                  const parseId = (id: string | number) => {
-                    const str = String(id);
-                    const num = parseInt(str.replace(/\D/g, ""), 10);
-                    return isNaN(num) ? 0 : num;
-                  };
+                    const parseId = (id: string | number) => {
+                      const str = String(id);
+                      const num = parseInt(str.replace(/\D/g, ""), 10);
+                      return isNaN(num) ? 0 : num;
+                    };
 
-                  let valA: number, valB: number;
+                    let valA: number, valB: number;
 
-                  if (sortField === "order_id") {
-                    valA = parseId(a.order_id);
-                    valB = parseId(b.order_id);
-                  } else {
-                    valA = a.total_price ?? 0;
-                    valB = b.total_price ?? 0;
-                  }
+                    if (sortField === "order_id") {
+                      valA = parseId(a.order_id);
+                      valB = parseId(b.order_id);
+                    } else {
+                      valA = a.total_price ?? 0;
+                      valB = b.total_price ?? 0;
+                    }
 
-                  return sortOrder === "asc" ? valA - valB : valB - valA;
-                })
-                .map((order) => (
-                  <tr key={order.order_id}>
-                    <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      #{order.order_id}
-                    </td>
-                    <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                      {order.month}/{order.day}/{order.year}
-                    </td>
-                    <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                      {order.time}
-                    </td>
-                    <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                      {order.payment_method}
-                    </td>
-                    <td className="p-4 whitespace-nowrap text-sm text-gray-500">
-                      ${order.total_price ?? 0}
-                    </td>
-                    <td className="p-4 whitespace-nowrap text-sm font-medium text-right">
-                      <button
-                        onClick={() => openDetailsModal(order)}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+                    return sortOrder === "asc" ? valA - valB : valB - valA;
+                  })
+                  .map((order) => (
+                    <tr key={order.order_id}>
+                      <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        #{order.order_id}
+                      </td>
+                      <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                        {order.month}/{order.day}/{order.year}
+                      </td>
+                      <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                        {order.time}
+                      </td>
+                      <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                        {order.payment_method}
+                      </td>
+                      <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                        ${order.total_price ?? 0}
+                      </td>
+                      <td className="p-4 whitespace-nowrap text-sm font-medium text-right">
+                        <button
+                          onClick={() => openDetailsModal(order)}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
           <div className="flex justify-between items-center p-4 bg-gray-50">
             <button
               onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}

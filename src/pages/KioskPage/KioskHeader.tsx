@@ -11,8 +11,8 @@ export default function KioskHeader({
   const { lang, setLang } = useTranslation();
   return (
     <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-2">
-      <div className="flex-1 text-center sm:text-left">
-        <h1 className="text-2xl sm:text-4xl font-bold dark:text-white leading-tight">
+      <div className="flex-1 text-left">
+        <h1 className="text-2xl sm:text-3xl font-bold dark:text-white leading-tight">
           <T>Welcome to MomTea</T>
         </h1>
         <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mt-1">

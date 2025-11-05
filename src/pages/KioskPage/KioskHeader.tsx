@@ -10,19 +10,20 @@ export default function KioskHeader({
 }) {
   const { lang, setLang } = useTranslation();
   return (
-    <div className="mb-4 flex justify-between items-center">
-      <div>
-        <h1 className="text-4xl font-bold dark:text-white sm:mr-2">
+    <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-2">
+      <div className="flex-1 text-center sm:text-left">
+        <h1 className="text-2xl sm:text-4xl font-bold dark:text-white leading-tight">
           <T>Welcome to MomTea</T>
         </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-300">
+        <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mt-1">
           <T>Tap an item to start your order.</T>
         </p>
       </div>
-      <div className="flex flex-col sm:flex-row gap-2">
+
+      <div className="flex w-full sm:w-auto gap-2">
         <button
           onClick={() => setIsHighContrast(!isHighContrast)}
-          className="min-w-[10rem] p-3 bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow"
+          className="w-1/2 sm:w-auto p-3 bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow text-base sm:text-lg"
         >
           {isHighContrast ? "Standard Contrast" : "High Contrast"}
         </button>
@@ -30,7 +31,7 @@ export default function KioskHeader({
         <select
           value={lang}
           onChange={(e) => setLang(e.target.value as Lang)}
-          className="p-2 bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow cursor-pointer"
+          className="w-1/2 sm:w-auto p-3 bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow cursor-pointer text-base sm:text-lg"
         >
           <option value="en">English</option>
           <option value="zh-CN">中文（简体）</option>

@@ -12,7 +12,7 @@ import {
 import ProductManager from "./ProductManager";
 import StaffManager from "./StaffManager";
 import InventoryManager from "./InventoryManager";
-import OrderHistory from "./OrderHistory"; 
+import OrderHistory from "./OrderHistory";
 
 export default function ManagerPage() {
   const { user } = useAuth();
@@ -62,7 +62,9 @@ export default function ManagerPage() {
       )}
       {/* Sidebar / Mobile Menu */}
       <nav
-        className={`${isMenuOpen ? "block" : "hidden"} sm:block fixed left-0 top-20 w-64 bg-white shadow-md flex flex-col h-full overflow-y-auto z-50`}
+        className={`${
+          isMenuOpen ? "block" : "hidden"
+        } sm:block fixed left-0 top-20 w-64 bg-white shadow-md flex flex-col h-full overflow-y-auto z-50`}
       >
         {/* Sticky header inside sidebar */}
         <div className="p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
@@ -122,7 +124,7 @@ export default function ManagerPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 sm:p-8 overflow-y-auto mt-16 sm:mt-0 sm:ml-64">
+      <main className="flex-1 p-4 sm:p-8 overflow-x-auto overflow-y-auto mt-4 sm:mt-0 sm:ml-64">
         {renderView()}
       </main>
     </div>

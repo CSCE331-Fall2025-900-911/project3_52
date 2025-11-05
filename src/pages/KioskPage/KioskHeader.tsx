@@ -33,7 +33,8 @@ export default function KioskHeader({
           className="p-2 bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow cursor-pointer"
         >
           <option value="en">English</option>
-          <option value="zh">中文</option>
+          <option value="zh-CN">中文（简体）</option>
+          <option value="zh-TW">中文（繁體）</option>
           <option value="es">Español</option>
           <option value="fr">Français</option>
           <option value="ko">한국어</option>
@@ -43,8 +44,9 @@ export default function KioskHeader({
           <option value="ru">Русский</option>
           <option value="pt">Português</option>
           <option value="ar">العربية</option>
+          <option value="hi">हिन्दी</option>
+          <option value="cs">Čeština</option>
         </select>
-        
       </div>
     </div>
   );

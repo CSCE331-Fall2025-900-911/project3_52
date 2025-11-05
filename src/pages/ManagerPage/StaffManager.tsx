@@ -327,7 +327,7 @@ export default function StaffManager() {
     if (isLoading) return <Spinner />;
     if (error) return <p className="text-red-500 text-center">{error}</p>;
     return (
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
+      <div className="bg-white shadow-md rounded-lg overflow-x-auto">
         <table className="w-full min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

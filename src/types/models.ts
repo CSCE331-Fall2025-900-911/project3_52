@@ -31,7 +31,7 @@ export type CartItem = {
 
 export type OrderItem = {
   product_id: number;
-  size: "Small" | "Medium" | "Large"| "Bucee's";
+  size: "Small" | "Medium" | "Large" | "Bucee's";
   sugar_level: "0" | "50" | "75" | "100";
   ice_level: "0" | "50" | "75" | "100";
   toppings: string;
@@ -77,11 +77,24 @@ export type OrderHistoryRecord = {
 };
 
 export type CustomizationData = {
-  size: 'Small' | 'Medium' | 'Large' | "Bucee's";
-  sugar_level: '0' | '50' | '75' | '100';
-  ice_level: '0' | '50' | '75' | '100';
+  size: "Small" | "Medium" | "Large" | "Bucee's";
+  sugar_level: "0" | "50" | "75" | "100";
+  ice_level: "0" | "50" | "75" | "100";
   toppings: string;
 };
 
-
-export type Lang = "en" | "es" | "fr" | "ko" | "zh"| "de" | "ja" | "it" | "ru" | "pt" | "ar";
+export type Lang =
+  | "en"
+  | "es"
+  | "fr"
+  | "ko"
+  | "zh-CN"
+  | "zh-TW"
+  | "de"
+  | "ja"
+  | "it"
+  | "ru"
+  | "pt"
+  | "ar"
+  | "hi"
+  | "cs";

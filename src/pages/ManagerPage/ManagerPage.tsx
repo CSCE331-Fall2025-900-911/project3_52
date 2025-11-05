@@ -56,54 +56,37 @@ export default function ManagerPage() {
     <div className="flex flex-col sm:flex-row h-screen bg-gray-100">
       {/* Sidebar / Mobile Menu */}
       <nav
-        className={`${
-          isMenuOpen ? "block" : "hidden"
-        } sm:block fixed sm:static top-0 left-0 w-64 sm:w-64 h-full sm:h-auto bg-white shadow-md p-6 z-50 transition-transform`}
+        className={`${isMenuOpen ? "block" : "hidden"} sm:block fixed left-0 top-20 w-64 bg-white shadow-md flex flex-col h-[calc(100vh-5rem)] overflow-y-auto`}
       >
-        <div className="flex justify-between items-center mb-6 sm:mb-8">
+        {/* Sticky header inside sidebar */}
+        <div className="p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
           <h2 className="text-2xl font-bold">Manager Portal</h2>
-          <button
-            className="sm:hidden text-gray-600 hover:text-gray-900 text-2xl"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            &times;
-          </button>
         </div>
-        <ul className="space-y-3">
+
+        {/* Sidebar navigation section */}
+        <ul className="flex-1 p-6 space-y-3">
           <ManagerNavLink
             icon={<IconBox />}
             label="Products"
-            onClick={() => {
-              setView("products");
-              setIsMenuOpen(false);
-            }}
+            onClick={() => setView("products")}
             active={view === "products"}
           />
           <ManagerNavLink
             icon={<IconUsers />}
             label="Staff"
-            onClick={() => {
-              setView("staff");
-              setIsMenuOpen(false);
-            }}
+            onClick={() => setView("staff")}
             active={view === "staff"}
           />
           <ManagerNavLink
             icon={<IconList />}
             label="Inventory"
-            onClick={() => {
-              setView("inventory");
-              setIsMenuOpen(false);
-            }}
+            onClick={() => setView("inventory")}
             active={view === "inventory"}
           />
           <ManagerNavLink
             icon={<IconReceipt />}
             label="Orders"
-            onClick={() => {
-              setView("orders");
-              setIsMenuOpen(false);
-            }}
+            onClick={() => setView("orders")}
             active={view === "orders"}
           />
         </ul>
@@ -121,7 +104,7 @@ export default function ManagerPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 sm:p-8 overflow-y-auto mt-16 sm:mt-0">
+      <main className="flex-1 p-4 sm:p-8 overflow-y-auto mt-16 sm:mt-0 sm:ml-64">
         {renderView()}
       </main>
     </div>

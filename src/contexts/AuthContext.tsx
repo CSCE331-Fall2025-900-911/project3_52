@@ -45,6 +45,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
     localStorage.removeItem("momtea.page");
     localStorage.removeItem("momtea.tab");
+    localStorage.removeItem("kiosk.highContrast");
     window.location.reload();
   };
 

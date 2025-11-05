@@ -92,11 +92,11 @@ export const IconReceipt = () => (
 );
 
 // src/components/icons.tsx
-export const IconLogin = () => (
+export const IconLogin = ({ size = 20 }: { size?: number }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="20"
-    height="20"
+    width={size}
+    height={size}
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -110,11 +110,11 @@ export const IconLogin = () => (
   </svg>
 );
 
-export const IconLogout = () => (
+export const IconLogout = ({ size = 20 }: { size?: number }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="20"
-    height="20"
+    width={size}
+    height={size}
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"

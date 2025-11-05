@@ -189,7 +189,9 @@ export default function KioskPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isHighContrast, setIsHighContrast] = useState(false);
+  const [isHighContrast, setIsHighContrast] = useState(
+    localStorage.getItem("kiosk.highContrast") === "true"
+  );
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -198,6 +200,10 @@ export default function KioskPage() {
   const [isCustomizationModalOpen, setIsCustomizationModalOpen] =
     useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem("kiosk.highContrast", isHighContrast.toString());
+  }, [isHighContrast]);
 
   useEffect(() => {
     kioskApiFetch("/api/products")
@@ -323,14 +329,18 @@ export default function KioskPage() {
     </button>
   );
 
+  useEffect(() => {
+    if (isHighContrast) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isHighContrast]);
+
   return (
     <LanguageProvider>
-      <div className={`relative h-screen ${isHighContrast ? "dark" : ""}`}>
-        <div
-          className={`flex flex-col lg:flex-row h-screen ${
-            isHighContrast ? "dark" : ""
-          }`}
-        >
+      <div className="relative h-screen">
+        <div className="flex flex-col lg:flex-row h-screen">
           {/* --- LEFT: Products --- */}
           <div className="w-full lg:w-2/3 p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900">
             <KioskHeader
@@ -412,17 +422,20 @@ export default function KioskPage() {
             </div>
           </div>
 
-          {/* --- Payment Modal --- */}
           <Modal
             isOpen={isPaymentModalOpen}
             onClose={() => setIsPaymentModalOpen(false)}
             title="Select Payment Method"
+            isDarkMode={isHighContrast}
           >
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 dark:bg-gray-900 dark:text-gray-100 p-4 rounded-lg transition-colors">
               <p className="text-lg md:text-xl text-center">
                 <T>Your total is</T>:
-                <span className="font-bold ml-2">${total.toFixed(2)}</span>
+                <span className="font-bold ml-2 text-maroon dark:text-yellow-300">
+                  ${total.toFixed(2)}
+                </span>
               </p>
+
               <PaymentButton
                 label="Card"
                 onClick={() => handleFinalSubmit("Card")}
@@ -438,6 +451,7 @@ export default function KioskPage() {
                 onClick={() => handleFinalSubmit("Cash")}
                 disabled={isSubmitting}
               />
+
               {isSubmitting && <Spinner />}
               {submitError && (
                 <p className="text-red-500 text-center font-semibold">
@@ -455,30 +469,17 @@ export default function KioskPage() {
                 setSelectedProduct(null);
               }}
               title="Customize Your Drink"
+              isDarkMode={isHighContrast}
             >
-              <CustomizationForm
-                product={selectedProduct}
-                onSubmit={handleAddToCart}
-              />
+              <div className="dark:bg-gray-900 dark:text-gray-100 p-4 rounded-lg transition-colors">
+                <CustomizationForm
+                  product={selectedProduct}
+                  onSubmit={handleAddToCart}
+                />
+              </div>
             </Modal>
           )}
         </div>
-
-        {selectedProduct && (
-          <Modal
-            isOpen={isCustomizationModalOpen}
-            onClose={() => {
-              setIsCustomizationModalOpen(false);
-              setSelectedProduct(null);
-            }}
-            title="Customize Your Drink"
-          >
-            <CustomizationForm
-              product={selectedProduct}
-              onSubmit={handleAddToCart}
-            />
-          </Modal>
-        )}
       </div>
     </LanguageProvider>
   );

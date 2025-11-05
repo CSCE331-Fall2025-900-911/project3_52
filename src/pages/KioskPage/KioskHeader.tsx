@@ -25,7 +25,7 @@ export default function KioskHeader({
           onClick={() => setIsHighContrast(!isHighContrast)}
           className="w-1/2 sm:w-auto p-3 bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow text-base sm:text-lg"
         >
-          {isHighContrast ? "Standard Contrast" : "High Contrast"}
+          <T>{isHighContrast ? "Standard Contrast" : "High Contrast"}</T>
         </button>
 
         <select

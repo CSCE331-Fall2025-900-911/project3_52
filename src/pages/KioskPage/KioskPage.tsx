@@ -263,7 +263,6 @@ export default function KioskPage() {
   const handleFinalSubmit = async (
     paymentMethod: "Card" | "Mobile Pay" | "Cash"
   ) => {
-    // ... (This function is unchanged) ...
     setIsSubmitting(true);
     setSubmitError(null);
     const now = new Date();
@@ -319,7 +318,6 @@ export default function KioskPage() {
     onClick: () => void;
     disabled: boolean;
   }) => (
-    // ... (This component is unchanged) ...
     <button
       onClick={onClick}
       disabled={disabled}
@@ -361,7 +359,7 @@ export default function KioskPage() {
             ).map(([category, group]) => (
               <div key={category} className="mb-8">
                 <h2 className="text-2xl font-bold mb-3 text-maroon dark:text-white border-b pb-2">
-                  {String(category).toUpperCase()}
+                  <T>{String(category).toUpperCase()}</T>
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
                   {group.map((p) => (

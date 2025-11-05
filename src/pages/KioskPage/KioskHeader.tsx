@@ -19,7 +19,7 @@ export default function KioskHeader({
           <T>Tap an item to start your order.</T>
         </p>
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <button
           onClick={() => setIsHighContrast(!isHighContrast)}
           className="min-w-[10rem] p-3 bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow"

@@ -74,6 +74,7 @@ export type OrderHistoryRecord = {
   year: number;
   total_price: number;
   payment_method: string;
+  special_notes: string;
 };
 
 export type CustomizationData = {

@@ -96,9 +96,13 @@ const OrderDetailsModal = ({
         <p>
           <strong>Payment:</strong> {order.payment_method}
         </p>
+        <p>
+          <strong>Special Notes:</strong> {order.special_notes}
+        </p>
         <p className="text-xl font-bold mt-2">
           Total: ${order.total_price ?? 0}
         </p>
+
       </div>
       <div className="max-h-64 overflow-y-auto">{renderContent()}</div>
     </Modal>
@@ -155,7 +159,6 @@ export default function OrderHistory() {
         throw new Error("Failed to fetch order history.");
       }
       const result = await response.json();
-      console.log("Fetched orders result:", result);
       const ordersData = result?.orders ?? result;
       const orders: OrderHistoryRecord[] = Array.isArray(ordersData)
         ? ordersData
@@ -165,7 +168,6 @@ export default function OrderHistory() {
 
       setOrders(orders);
       setTotalCount(result.count ?? 0);
-      console.log("Fetched orders count:", orders.length);
     } catch (err: any) {
       setError(err.message);
     } finally {

@@ -9,6 +9,9 @@ import KioskCartItem from "./KioskCartItem";
 import { toast } from "react-hot-toast";
 import Modal from "../../components/Modal";
 import { CustomizationData } from "../../types/models";
+import { Elements } from "@stripe/react-stripe-js";
+import PaymentForm from "../../components/PaymentForm";
+import { loadStripe } from "@stripe/stripe-js";
 
 const AVAILABLE_TOPPINGS = [
   "Boba",
@@ -195,11 +198,14 @@ export default function KioskPage() {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
 
   // --- NEW STATE for customization modal ---
   const [isCustomizationModalOpen, setIsCustomizationModalOpen] =
     useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const stripePromise = loadStripe("pk_test_51SQ9h8HxLrRxAwUAXhDDu2tC5tKVWITYIGhCfr8Jjjkq9IFhjnUoOCaDUa4gNy9BRaOHTRNuLrZ39piTTYCD5Hyv00Y0s0Vcsq");
 
   useEffect(() => {
     localStorage.setItem("kiosk.highContrast", isHighContrast.toString());
@@ -263,8 +269,16 @@ export default function KioskPage() {
   const handleFinalSubmit = async (
     paymentMethod: "Card" | "Mobile Pay" | "Cash"
   ) => {
+    if (paymentMethod === "Card") {
+      // Open Stripe payment modal instead of submitting directly
+      setIsStripeModalOpen(true);
+      return;
+    }
+
+    // Normal flow for non-card methods
     setIsSubmitting(true);
     setSubmitError(null);
+
     const now = new Date();
     const payload: OrderPayload = {
       time: now.toTimeString().split(" ")[0],
@@ -284,6 +298,7 @@ export default function KioskPage() {
         price: i.final_price,
       })),
     };
+
     try {
       const res = await kioskApiFetch("/api/orders", {
         method: "POST",
@@ -294,7 +309,6 @@ export default function KioskPage() {
         const errorText = err.error || "Failed to submit order";
         toast.error(errorText);
         setSubmitError(errorText);
-        setIsSubmitting(false);
         return;
       }
       toast.success("Order submitted successfully!");
@@ -475,6 +489,26 @@ export default function KioskPage() {
                   onSubmit={handleAddToCart}
                 />
               </div>
+            </Modal>
+          )}
+
+          {isStripeModalOpen && (
+            <Modal
+              isOpen={isStripeModalOpen}
+              onClose={() => setIsStripeModalOpen(false)}
+              title="Card Payment"
+              isDarkMode={isHighContrast}
+            >
+              <Elements stripe={stripePromise}>
+                <PaymentForm
+                  total={total}
+                  isDarkMode={isHighContrast}
+                  onSuccess={async () => {
+                    setIsStripeModalOpen(false);
+                    await handleFinalSubmit("Cash"); // reuse existing backend logic to save order
+                  }}
+                />
+              </Elements>
             </Modal>
           )}
         </div>

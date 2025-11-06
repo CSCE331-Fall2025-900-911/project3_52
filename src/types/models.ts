@@ -99,4 +99,5 @@ export type Lang =
   | "pt"
   | "ar"
   | "hi"
-  | "cs";
+  | "cs"
+  | "tr";

@@ -47,6 +47,7 @@ export default function KioskHeader({
           <option value="ar">العربية</option>
           <option value="hi">हिन्दी</option>
           <option value="cs">Čeština</option>
+          <option value="tr">Türkçe</option>
         </select>
       </div>
     </div>

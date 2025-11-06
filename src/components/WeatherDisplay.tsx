@@ -6,38 +6,35 @@ export default function WeatherDisplay() {
   const [weather, setWeather] = useState<any>(null);
 
   useEffect(() => {
-    // Define a function for the fallback (default) weather
     const fetchDefaultWeather = () => {
       apiFetch("/api/weather")
         .then((r) => (r.ok ? r.json() : null))
         .then(setWeather)
-        .catch(() => {}); // Fail silently per original code
+        .catch(() => {});
     };
 
-    // Check if geolocation is available in the browser
-    if ("geolocation" in navigator) {
-      // Try to get the user's current position
+    // Detect screen size once on mount
+    const isMediumOrLarger = window.matchMedia("(min-width: 768px)").matches;
+
+    // Only fetch location on md and larger
+    if (isMediumOrLarger && "geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
-        // Success callback: We got the location
         (position) => {
           const { latitude, longitude } = position.coords;
-
-          // Fetch weather using the new coordinates
           apiFetch(`/api/weather?lat=${latitude}&lon=${longitude}`)
             .then((r) => (r.ok ? r.json() : null))
             .then(setWeather)
-            .catch(fetchDefaultWeather); // If location-based fetch fails, try default
+            .catch(fetchDefaultWeather);
         },
-        // Error callback: User denied permission or it failed
         () => {
           fetchDefaultWeather();
         }
       );
     } else {
-      // Geolocation is not available in this browser
+      // Small screens → use default weather
       fetchDefaultWeather();
     }
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
   if (!weather) return null;
 

@@ -8,7 +8,7 @@ export default function LoginButton() {
 
   return user ? (
     <div className="flex items-center sm:gap-4">
-      <span className="text-gray-700 text-sm sm:text-base hidden xs:inline">
+      <span className="text-gray-700 text-sm sm:text-base hidden md:block xs:inline">
         Welcome, {user.name}
       </span>
       <button
@@ -16,7 +16,7 @@ export default function LoginButton() {
         className="flex items-center px-2 sm:px-4 py-1.5 sm:py-2 bg-maroon text-white rounded-lg shadow hover:bg-darkmaroon text-sm sm:text-base gap-1 sm:gap-2"
       >
         <IconLogout />
-        <span >Logout</span>
+        <span>Logout</span>
       </button>
     </div>
   ) : (
@@ -24,7 +24,7 @@ export default function LoginButton() {
       onClick={login}
       className="flex items-center px-2 sm:px-4 py-1.5 sm:py-2 bg-maroon text-white rounded-lg shadow hover:bg-darkmaroon text-sm sm:text-base gap-1 sm:gap-2"
     >
-      <IconLogin  />
+      <IconLogin />
       <span>Staff Login</span>
     </button>
   );

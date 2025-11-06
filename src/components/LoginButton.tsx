@@ -9,7 +9,7 @@ export default function LoginButton() {
   return user ? (
     <div className="flex items-center sm:gap-4">
       <span className="text-gray-700 text-sm sm:text-base hidden lg:block xs:inline">
-        Welcome, {user.role} {user.name}
+        Welcome, {user.name}
       </span>
       <button
         onClick={logout}

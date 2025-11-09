@@ -73,7 +73,8 @@ npm test
 - **React** 19
 - **TypeScript**
 - **TailwindCSS** 3
-- **Express** 5
+- **Stripe & PayPal SDKs** for payment integration
+- **React Hot Toast** for notifications
 
 ---
 

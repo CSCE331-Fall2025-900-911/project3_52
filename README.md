@@ -1,4 +1,4 @@
-# MomTea POS (Point of Sale System)
+# MomTea POS
 
 ## Overview
 
@@ -6,7 +6,7 @@ MomTea POS is a full-stack Point of Sale web application designed for efficient 
 
 ---
 
-## 🌐 **Live Demo:** [Link](https://momtea-pos.shop)
+## 🌐 [Live Demo](https://momtea-pos.shop)
 
 ---
 

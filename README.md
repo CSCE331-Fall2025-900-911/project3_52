@@ -6,6 +6,10 @@ MomTea POS is a full-stack Point of Sale web application designed for efficient 
 
 ---
 
+## 🌐 **Live Demo:** [Link](https://momtea-pos.shop)
+
+---
+
 ## Installation
 
 1. Clone the repository:
@@ -20,7 +24,7 @@ MomTea POS is a full-stack Point of Sale web application designed for efficient 
    ```bash
    npm install
    ```
-
+---
 ## Development
 
 To start the development server with hot-reloading:

@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useState,
+  useRef,
 } from "react";
 import { User } from "../types/models";
 import { apiFetch, API_BASE_URL } from "../api/http";
@@ -20,6 +21,7 @@ const AuthContext = createContext<IAuthContext | null>(null);
 export const AuthProvider = ({ children, setPage }: { children: React.ReactNode; setPage: (page: string) => void }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const hasLoadedOnce = useRef(false);
 
   const refetchUser = useCallback(async () => {
     setIsLoading(true);
@@ -27,23 +29,29 @@ export const AuthProvider = ({ children, setPage }: { children: React.ReactNode;
       const res = await apiFetch("/api/auth/me");
       const fetchedUser = res.ok ? await res.json() : null;
       setUser(fetchedUser);
-      if (fetchedUser === null) {
-        setPage("kiosk");
-      } else if (fetchedUser.role === "Manager") {
-        setPage("manager");
-      } else {
-        setPage("cashier");
+      if (hasLoadedOnce.current) {
+        if (fetchedUser === null) {
+          setPage("kiosk");
+        } else if (fetchedUser.role === "Manager") {
+          setPage("manager");
+        } else {
+          setPage("cashier");
+        }
       }
     } catch {
       setUser(null);
-      setPage("kiosk");
+      if (hasLoadedOnce.current) {
+        setPage("kiosk");
+      }
     } finally {
       setIsLoading(false);
     }
   }, [setPage]);
 
   useEffect(() => {
-    refetchUser();
+    refetchUser().then(() => {
+      hasLoadedOnce.current = true;
+    });
   }, [refetchUser]);
 
   const login = () => {

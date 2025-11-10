@@ -21,8 +21,7 @@ export default function ManagerPage() {
   const [view, setView] = useState<
     "dashboard" | "products" | "staff" | "inventory" | "orders"
   >(
-    () =>
-      (localStorage.getItem("momtea.managerView") as any) || "dashboard" // ← default to dashboard
+    () => (localStorage.getItem("momtea.managerView") as any) || "dashboard" // ← default to dashboard
   );
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -128,7 +127,7 @@ export default function ManagerPage() {
           className="text-gray-600 hover:text-gray-900 text-2xl"
           onClick={() => setIsMenuOpen(true)}
         >
-          Menu
+          ≡
         </button>
       </header>
 

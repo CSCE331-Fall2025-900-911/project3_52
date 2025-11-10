@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -17,34 +17,8 @@ import {
 import { apiFetch } from "../../api/http";
 import Spinner from "../../components/Spinner";
 import { toast } from "react-hot-toast";
+import {DashboardData} from "../../types/models";
 
-type DashboardData = {
-  summary: {
-    totalRevenue30Days: number;
-    totalOrders30Days: number;
-    totalHoursWorked: number;
-    lowStockItems: number;
-    today: {
-      orders: number;
-      revenue: number;
-      avg_order: number;
-    };
-  };
-  charts: {
-    revenueOverTime: { date: string; revenue: number }[];
-    topProducts: { name: string; units_sold: number; revenue: number }[];
-    categoryBreakdown: { category: string; sold: number }[];
-    hourlyOrders: { hour: number; count: number }[];
-    staffPerformance: {
-      name: string;
-      role: string;
-      hours: number;
-      salary: number;
-      hourly_rate: number;
-    }[];
-    lowStockAlerts: { name: string; remaining: number; servings_left: number }[];
-  };
-};
 const COLORS = [
   "#E91E63",  // Deep Pink (vibrant, visible on dark/light)
   "#9C27B0",  // Rich Purple

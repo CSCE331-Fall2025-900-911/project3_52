@@ -8,7 +8,7 @@ import { LanguageProvider, T } from "../../contexts/LangContext";
 import Spinner from "../../components/Spinner";
 import CashierHeader from "./CashierHeader";
 import CashierProductCard from "./CashierProductCard";
-import KioskCartItem from "../KioskPage/KioskCartItem";
+import KioskCartItem from "../KioskPage/CartItem";
 import { toast } from "react-hot-toast";
 import Modal from "../../components/Modal";
 import { CustomizationData } from "../../types/models";

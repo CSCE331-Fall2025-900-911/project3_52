@@ -5,7 +5,7 @@ import { LanguageProvider, T } from "../../contexts/LangContext";
 import Spinner from "../../components/Spinner";
 import KioskHeader from "./KioskHeader";
 import KioskProductCard from "./KioskProductCard";
-import KioskCartItem from "./KioskCartItem";
+import KioskCartItem from "./CartItem";
 import { toast } from "react-hot-toast";
 import Modal from "../../components/Modal";
 import { CustomizationData } from "../../types/models";
@@ -13,16 +13,6 @@ import { Elements } from "@stripe/react-stripe-js";
 import PaymentForm from "../../components/PaymentForm";
 import { loadStripe } from "@stripe/stripe-js";
 import PayPalCheckout from "../../components/PaypalCheckout";
-
-const AVAILABLE_CATEGORIES = [
-  //the category names must match the db
-  //this is just a list to be used to create the category buttons tab
-  "Specialty",
-  "fruit",
-  "hot",
-  "milk",
-  "Seasonal"
-];
 
 const AVAILABLE_TOPPINGS = [
   "Boba",
@@ -211,7 +201,16 @@ export default function KioskPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
   const [isPayPalModalOpen, setIsPayPalModalOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string>("Specialty"); //default opened category tab
+  const [activeCategory, setActiveCategory] = useState<string | null>(null); // will set after products load
+  // Set initial activeCategory to first available category after products load
+  useEffect(() => {
+    if (products.length > 0 && !activeCategory) {
+      const uniqueCategories = [...new Set(products.map((p) => p.category))];
+      if (uniqueCategories.length > 0) {
+        setActiveCategory(uniqueCategories[0]);
+      }
+    }
+  }, [products, activeCategory]);
 
   // --- NEW STATE for customization modal ---
   const [isCustomizationModalOpen, setIsCustomizationModalOpen] =
@@ -247,7 +246,7 @@ export default function KioskPage() {
     if (!selectedProduct) return; // Guard clause
 
     //shallow product copy to avoid mutating original
-    const productCopy = { ...selectedProduct }; 
+    const productCopy = { ...selectedProduct };
 
     let final_price = productCopy.price;
 
@@ -378,6 +377,19 @@ export default function KioskPage() {
     }
   }, [isHighContrast]);
 
+  useEffect(() => {
+    if (products.length > 0 && !activeCategory) {
+      const savedCategory = localStorage.getItem("kiosk.activeCategory");
+      const uniqueCategories = [...new Set(products.map((p) => p.category))];
+
+      if (savedCategory && uniqueCategories.includes(savedCategory)) {
+        setActiveCategory(savedCategory);
+      } else if (uniqueCategories.length > 0) {
+        setActiveCategory(uniqueCategories[0]);
+      }
+    }
+  }, [products, activeCategory]);
+
   //sort the drinks according to category, for display later in the button tab
   const groupedProducts = useMemo(() => {
     return products.reduce((groups, product) => {
@@ -401,40 +413,46 @@ export default function KioskPage() {
 
             {/* Category buttons tab*/}
             <div className="flex flex-wrap justify-center gap-2 mb-6 mt-2">
-              {AVAILABLE_CATEGORIES.map((category) => (
+              {[...new Set(products.map((p) => p.category))].map((category) => (
                 <button
                   key={category}
-                  onClick={() => setActiveCategory(category)}
+                  onClick={() => {
+                    setActiveCategory(category);
+                    localStorage.setItem("kiosk.activeCategory", category);
+                  }}
                   className={`px-4 py-2 rounded-lg font-semibold transition-colors
-                    ${activeCategory === category
-                      ? "bg-maroon text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200"
+                    ${
+                      activeCategory === category
+                        ? "bg-maroon text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200"
                     }`}
                 >
                   <T>{category.toUpperCase()}</T>
                 </button>
               ))}
             </div>
-            
+
             {/* Products */}
             {isLoading && <Spinner />}
             {error && <p className="text-red-500">{error}</p>}
 
-            {!isLoading && !error && (
+            {!isLoading && !error && activeCategory && (
               <div key={activeCategory} className="mb-8 animate-fadeIn">
                 <h2 className="text-xl sm:text-2xl font-bold mb-3 text-maroon dark:text-white border-b pb-2">
                   <T>{String(activeCategory).toUpperCase()}</T>
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
                   {(groupedProducts[activeCategory] || [])
-                  .filter((p) => p.product_name.toUpperCase() !== "CUSTOM TEA") //specifically excludes CUSTOM TEA drink
-                  .map((p) => (
-                    <KioskProductCard
-                      key={p.product_id}
-                      product={p}
-                      onSelect={openCustomizationModal}
+                    .filter(
+                      (p) => p.product_name.toUpperCase() !== "CUSTOM TEA"
+                    ) //specifically excludes CUSTOM TEA drink
+                    .map((p) => (
+                      <KioskProductCard
+                        key={p.product_id}
+                        product={p}
+                        onSelect={openCustomizationModal}
                       />
-                  ))}
+                    ))}
                 </div>
               </div>
             )}

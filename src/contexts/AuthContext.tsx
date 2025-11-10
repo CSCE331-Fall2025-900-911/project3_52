@@ -4,7 +4,6 @@ import React, {
   useContext,
   useEffect,
   useState,
-  useRef,
 } from "react";
 import { User } from "../types/models";
 import { apiFetch, API_BASE_URL } from "../api/http";
@@ -18,10 +17,15 @@ interface IAuthContext {
 }
 const AuthContext = createContext<IAuthContext | null>(null);
 
-export const AuthProvider = ({ children, setPage }: { children: React.ReactNode; setPage: (page: string) => void }) => {
+export const AuthProvider = ({
+  children,
+  setPage,
+}: {
+  children: React.ReactNode;
+  setPage: (page: string) => void;
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const hasLoadedOnce = useRef(false);
 
   const refetchUser = useCallback(async () => {
     setIsLoading(true);
@@ -29,41 +33,42 @@ export const AuthProvider = ({ children, setPage }: { children: React.ReactNode;
       const res = await apiFetch("/api/auth/me");
       const fetchedUser = res.ok ? await res.json() : null;
       setUser(fetchedUser);
-      if (hasLoadedOnce.current) {
-        if (fetchedUser === null) {
-          setPage("kiosk");
-        } else if (fetchedUser.role === "Manager") {
-          setPage("manager");
-        } else {
-          setPage("cashier");
-        }
+
+      // ✅ Detect first load after Google OAuth redirect
+      if (localStorage.getItem("justLoggedIn") && fetchedUser) {
+        localStorage.removeItem("justLoggedIn");
+        if (fetchedUser.role === "Manager") setPage("manager");
+        else setPage("cashier");
       }
     } catch {
       setUser(null);
-      if (hasLoadedOnce.current) {
-        setPage("kiosk");
-      }
     } finally {
       setIsLoading(false);
     }
   }, [setPage]);
 
   useEffect(() => {
-    refetchUser().then(() => {
-      hasLoadedOnce.current = true;
-    });
+    refetchUser();
   }, [refetchUser]);
 
   const login = () => {
+    setIsLoading(true);
+    localStorage.removeItem("momtea.page");
+    localStorage.removeItem("momtea.tab");
+    localStorage.removeItem("kiosk.highContrast");
+    localStorage.removeItem("kiosk.activeCategory");
+    localStorage.setItem("justLoggedIn", "true");
     window.location.href = `${API_BASE_URL}/api/auth/login`;
   };
+
   const logout = async () => {
     await apiFetch("/api/auth/logout");
     setUser(null);
     localStorage.removeItem("momtea.page");
     localStorage.removeItem("momtea.tab");
     localStorage.removeItem("kiosk.highContrast");
-    setPage("kiosk");
+    localStorage.removeItem("justLoggedIn");
+    localStorage.removeItem("kiosk.activeCategory")
     window.location.reload();
   };
 

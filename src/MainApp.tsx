@@ -8,7 +8,13 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 
-const MainApp = ({ page, setPage }: { page: string; setPage: React.Dispatch<React.SetStateAction<string>> }) => {
+const MainApp = ({
+  page,
+  setPage,
+}: {
+  page: string;
+  setPage: React.Dispatch<React.SetStateAction<string>>;
+}) => {
   const renderPage = () => {
     switch (page) {
       case "home":
@@ -20,7 +26,7 @@ const MainApp = ({ page, setPage }: { page: string; setPage: React.Dispatch<Reac
       case "manager":
         return <ManagerPage />;
       default:
-        return <HomePage setPage={setPage} />;
+        return <KioskPage />;
     }
   };
 
@@ -47,7 +53,9 @@ const MainApp = ({ page, setPage }: { page: string; setPage: React.Dispatch<Reac
 };
 
 export default function App() {
-  const [page, setPage] = useState(() => localStorage.getItem("momtea.page") || "home");
+  const [page, setPage] = useState(
+    () => localStorage.getItem("momtea.page") || "kiosk"
+  );
 
   useEffect(() => {
     localStorage.setItem("momtea.page", page);

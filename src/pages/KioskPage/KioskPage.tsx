@@ -202,15 +202,23 @@ export default function KioskPage() {
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
   const [isPayPalModalOpen, setIsPayPalModalOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null); // will set after products load
+  // Dynamically derive available categories from products
+  const availableCategories = useMemo(() => {
+    if (!products || products.length === 0) return [];
+    const categories = Array.from(new Set(products.map((p) => p.category)));
+    return categories;
+  }, [products]);
+
   // Set initial activeCategory to first available category after products load
   useEffect(() => {
-    if (products.length > 0 && !activeCategory) {
-      const uniqueCategories = [...new Set(products.map((p) => p.category))];
-      if (uniqueCategories.length > 0) {
-        setActiveCategory(uniqueCategories[0]);
-      }
+    if (
+      products.length > 0 &&
+      availableCategories.length > 0 &&
+      !activeCategory
+    ) {
+      setActiveCategory(availableCategories[0]);
     }
-  }, [products, activeCategory]);
+  }, [products, availableCategories, activeCategory]);
 
   // --- NEW STATE for customization modal ---
   const [isCustomizationModalOpen, setIsCustomizationModalOpen] =
@@ -377,19 +385,6 @@ export default function KioskPage() {
     }
   }, [isHighContrast]);
 
-  useEffect(() => {
-    if (products.length > 0 && !activeCategory) {
-      const savedCategory = localStorage.getItem("kiosk.activeCategory");
-      const uniqueCategories = [...new Set(products.map((p) => p.category))];
-
-      if (savedCategory && uniqueCategories.includes(savedCategory)) {
-        setActiveCategory(savedCategory);
-      } else if (uniqueCategories.length > 0) {
-        setActiveCategory(uniqueCategories[0]);
-      }
-    }
-  }, [products, activeCategory]);
-
   //sort the drinks according to category, for display later in the button tab
   const groupedProducts = useMemo(() => {
     return products.reduce((groups, product) => {
@@ -411,25 +406,41 @@ export default function KioskPage() {
               setIsHighContrast={setIsHighContrast}
             />
 
-            {/* Category buttons tab*/}
-            <div className="flex flex-wrap justify-center gap-2 mb-6 mt-2">
-              {[...new Set(products.map((p) => p.category))].map((category) => (
-                <button
-                  key={category}
-                  onClick={() => {
-                    setActiveCategory(category);
-                    localStorage.setItem("kiosk.activeCategory", category);
-                  }}
-                  className={`px-4 py-2 rounded-lg font-semibold transition-colors
-                    ${
-                      activeCategory === category
-                        ? "bg-maroon text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200"
-                    }`}
+            {/* Category selector: dropdown on small screens, buttons on sm+ */}
+            {/* Dropdown for small screens */}
+            <div className="mb-2 mt-4">
+              <div className="sm:hidden flex w-full">
+                <select
+                  className="block w-full p-3 rounded-lg border bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 text-center text-lg font-semibold"
+                  value={activeCategory ?? ""}
+                  onChange={(e) => setActiveCategory(e.target.value)}
                 >
-                  <T>{category.toUpperCase()}</T>
-                </button>
-              ))}
+                  {availableCategories.map((category) => (
+                    <option key={category} value={category}>
+                      {category.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {/* Buttons for sm+ screens */}
+              <div className="hidden sm:flex w-full overflow-x-auto">
+                <div className="flex w-full justify-between gap-1 sm:gap-2">
+                  {availableCategories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setActiveCategory(category)}
+                      className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-colors
+                        ${
+                          activeCategory === category
+                            ? "bg-maroon text-white"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200"
+                        }`}
+                    >
+                      <T>{category.toUpperCase()}</T>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* Products */}

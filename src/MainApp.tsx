@@ -10,7 +10,7 @@ import { Toaster } from "react-hot-toast";
 
 const MainApp = () => {
   const [page, setPage] = useState(
-    () => localStorage.getItem("momtea.page") || "home"
+    () => localStorage.getItem("momtea.page") || "home" //set to home
   );
 
   useEffect(() => {

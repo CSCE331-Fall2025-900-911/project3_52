@@ -14,6 +14,16 @@ import PaymentForm from "../../components/PaymentForm";
 import { loadStripe } from "@stripe/stripe-js";
 import PayPalCheckout from "../../components/PaypalCheckout";
 
+const AVAILABLE_CATEGORIES = [
+  //the category names must match the db
+  //this is just a list to be used to create the category buttons tab
+  "Specialty",
+  "fruit",
+  "hot",
+  "milk",
+  "Seasonal"
+];
+
 const AVAILABLE_TOPPINGS = [
   "Boba",
   "Lychee Jelly",
@@ -201,6 +211,7 @@ export default function KioskPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
   const [isPayPalModalOpen, setIsPayPalModalOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string>("Specialty"); //default opened category tab
 
   // --- NEW STATE for customization modal ---
   const [isCustomizationModalOpen, setIsCustomizationModalOpen] =
@@ -230,21 +241,27 @@ export default function KioskPage() {
   };
 
   // --- NEW: This is the new "Add to Cart" handler, called by the form ---
+  // MODIFIED: issue with original implementation where price was directly mutated, affecting subsequent purchases of the same drink
+  //fix so the original/base price doesn't change after alterations are made
   const handleAddToCart = (customData: CustomizationData) => {
     if (!selectedProduct) return; // Guard clause
 
+    //shallow product copy to avoid mutating original
+    const productCopy = { ...selectedProduct }; 
+
+    let final_price = productCopy.price;
+
     // Calculate final price based on customizations
     if (customData.size === "Large") {
-      selectedProduct.price += 1.0;
+      final_price += 1.0;
     } else if (customData.size === "Bucee's") {
-      selectedProduct.price += 2.0;
+      final_price += 2.0;
     } else if (customData.size === "Small") {
-      selectedProduct.price -= 0.5;
+      final_price -= 0.5;
     }
     if (customData.toppings) {
-      selectedProduct.price += 0.75;
+      final_price += 0.75;
     }
-    const final_price = selectedProduct.price;
 
     const newCartItem: CartItem = {
       cart_id: crypto.randomUUID(),
@@ -361,6 +378,16 @@ export default function KioskPage() {
     }
   }, [isHighContrast]);
 
+  //sort the drinks according to category, for display later in the button tab
+  const groupedProducts = useMemo(() => {
+    return products.reduce((groups, product) => {
+      const category = product.category || "Other";
+      if (!groups[category]) groups[category] = [];
+      groups[category].push(product);
+      return groups;
+    }, {} as Record<string, Product[]>);
+  }, [products]);
+
   return (
     <LanguageProvider>
       <div className="relative h-screen">
@@ -372,32 +399,45 @@ export default function KioskPage() {
               setIsHighContrast={setIsHighContrast}
             />
 
+            {/* Category buttons tab*/}
+            <div className="flex flex-wrap justify-center gap-2 mb-6 mt-2">
+              {AVAILABLE_CATEGORIES.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setActiveCategory(category)}
+                  className={`px-4 py-2 rounded-lg font-semibold transition-colors
+                    ${activeCategory === category
+                      ? "bg-maroon text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200"
+                    }`}
+                >
+                  <T>{category.toUpperCase()}</T>
+                </button>
+              ))}
+            </div>
+            
+            {/* Products */}
             {isLoading && <Spinner />}
             {error && <p className="text-red-500">{error}</p>}
 
-            {Object.entries(
-              products.reduce((groups, product) => {
-                const category = product.category || "Other";
-                if (!groups[category]) groups[category] = [];
-                groups[category].push(product);
-                return groups;
-              }, {} as Record<string, typeof products>)
-            ).map(([category, group]) => (
-              <div key={category} className="mb-8">
+            {!isLoading && !error && (
+              <div key={activeCategory} className="mb-8 animate-fadeIn">
                 <h2 className="text-xl sm:text-2xl font-bold mb-3 text-maroon dark:text-white border-b pb-2">
-                  <T>{String(category).toUpperCase()}</T>
+                  <T>{String(activeCategory).toUpperCase()}</T>
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
-                  {group.map((p) => (
+                  {(groupedProducts[activeCategory] || [])
+                  .filter((p) => p.product_name.toUpperCase() !== "CUSTOM TEA") //specifically excludes CUSTOM TEA drink
+                  .map((p) => (
                     <KioskProductCard
                       key={p.product_id}
                       product={p}
                       onSelect={openCustomizationModal}
-                    />
+                      />
                   ))}
                 </div>
               </div>
-            ))}
+            )}
           </div>
 
           {/* --- RIGHT: Cart --- */}

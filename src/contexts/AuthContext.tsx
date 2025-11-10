@@ -17,7 +17,7 @@ interface IAuthContext {
 }
 const AuthContext = createContext<IAuthContext | null>(null);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider = ({ children, setPage }: { children: React.ReactNode; setPage: (page: string) => void }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -25,13 +25,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(true);
     try {
       const res = await apiFetch("/api/auth/me");
-      setUser(res.ok ? await res.json() : null);
+      const fetchedUser = res.ok ? await res.json() : null;
+      setUser(fetchedUser);
+      if (fetchedUser === null) {
+        setPage("kiosk");
+      } else if (fetchedUser.role === "Manager") {
+        setPage("manager");
+      } else {
+        setPage("cashier");
+      }
     } catch {
       setUser(null);
+      setPage("kiosk");
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [setPage]);
 
   useEffect(() => {
     refetchUser();
@@ -46,6 +55,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("momtea.page");
     localStorage.removeItem("momtea.tab");
     localStorage.removeItem("kiosk.highContrast");
+    setPage("kiosk");
     window.location.reload();
   };
 

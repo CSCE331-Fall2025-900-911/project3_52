@@ -1,22 +1,21 @@
-import { useAuth } from "../contexts/AuthContext";
-import AccessDenied from "../components/AccessDenied";
+import { useAuth } from "../../contexts/AuthContext";
+import AccessDenied from "../../components/AccessDenied";
 
 import { useEffect, useMemo, useState } from "react";
-import { kioskApiFetch } from "../api/http";
-import { CartItem, OrderPayload, Product } from "../types/models";
-import { LanguageProvider, T } from "../contexts/LangContext";
-import Spinner from "../components/Spinner";
-import KioskHeader from "./KioskPage/KioskHeader";
-import KioskProductCard from "./KioskPage/KioskProductCard";
-import KioskCartItem from "./KioskPage/KioskCartItem";
+import { kioskApiFetch } from "../../api/http";
+import { CartItem, OrderPayload, Product } from "../../types/models";
+import { LanguageProvider, T } from "../../contexts/LangContext";
+import Spinner from "../../components/Spinner";
+import CashierHeader from "./CashierHeader";
+import CashierProductCard from "./CashierProductCard";
+import KioskCartItem from "../KioskPage/KioskCartItem";
 import { toast } from "react-hot-toast";
-import Modal from "../components/Modal";
-import { CustomizationData } from "../types/models";
+import Modal from "../../components/Modal";
+import { CustomizationData } from "../../types/models";
 import { Elements } from "@stripe/react-stripe-js";
-import PaymentForm from "../components/PaymentForm";
+import PaymentForm from "../../components/PaymentForm";
 import { loadStripe } from "@stripe/stripe-js";
-import PayPalCheckout from "../components/PaypalCheckout";
-
+import PayPalCheckout from "../../components/PaypalCheckout";
 
 // export default function CashierPage() {
 //   const { user } = useAuth();
@@ -252,7 +251,7 @@ export default function CashierPage() {
     if (!selectedProduct) return; // Guard clause
 
     //shallow product copy to avoid mutating original
-    const productCopy = { ...selectedProduct }; 
+    const productCopy = { ...selectedProduct };
 
     let final_price = productCopy.price;
 
@@ -393,7 +392,7 @@ export default function CashierPage() {
         <div className="flex flex-col lg:flex-row h-screen">
           {/* --- LEFT: Products --- */}
           <div className="w-full lg:w-2/3 p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900">
-            <KioskHeader
+            <CashierHeader
               isHighContrast={isHighContrast}
               setIsHighContrast={setIsHighContrast}
             />
@@ -415,7 +414,7 @@ export default function CashierPage() {
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
                   {group.map((p) => (
-                    <KioskProductCard
+                    <CashierProductCard
                       key={p.product_id}
                       product={p}
                       onSelect={openCustomizationModal}

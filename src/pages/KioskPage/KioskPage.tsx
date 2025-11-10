@@ -201,7 +201,11 @@ export default function KioskPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
   const [isPayPalModalOpen, setIsPayPalModalOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null); // will set after products load
+  // Initialize activeCategory from localStorage if available, else null (will set after products load)
+  const [activeCategory, setActiveCategory] = useState<string | null>(() => {
+    const stored = localStorage.getItem("kiosk.activeCategory");
+    return stored ? stored : null;
+  });
   // Dynamically derive available categories from products
   const availableCategories = useMemo(() => {
     if (!products || products.length === 0) return [];
@@ -209,14 +213,19 @@ export default function KioskPage() {
     return categories;
   }, [products]);
 
-  // Set initial activeCategory to first available category after products load
+  // Set initial activeCategory to stored value (if present), else to first available category after products load
   useEffect(() => {
     if (
       products.length > 0 &&
       availableCategories.length > 0 &&
       !activeCategory
     ) {
-      setActiveCategory(availableCategories[0]);
+      const stored = localStorage.getItem("kiosk.activeCategory");
+      if (stored && availableCategories.includes(stored)) {
+        setActiveCategory(stored);
+      } else {
+        setActiveCategory(availableCategories[0]);
+      }
     }
   }, [products, availableCategories, activeCategory]);
 
@@ -408,12 +417,15 @@ export default function KioskPage() {
 
             {/* Category selector: dropdown on small screens, buttons on sm+ */}
             {/* Dropdown for small screens */}
-            <div className="mb-2 mt-4">
+            <div className="mb-4 mt-4">
               <div className="sm:hidden flex w-full">
                 <select
                   className="block w-full p-3 rounded-lg border bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 text-center text-lg font-semibold"
                   value={activeCategory ?? ""}
-                  onChange={(e) => setActiveCategory(e.target.value)}
+                  onChange={(e) => {
+                    setActiveCategory(e.target.value);
+                    localStorage.setItem("kiosk.activeCategory", e.target.value);
+                  }}
                 >
                   {availableCategories.map((category) => (
                     <option key={category} value={category}>
@@ -423,12 +435,15 @@ export default function KioskPage() {
                 </select>
               </div>
               {/* Buttons for sm+ screens */}
-              <div className="hidden sm:flex w-full overflow-x-auto">
+              <div className="hidden sm:flex w-full overflow-x-auto mb-4">
                 <div className="flex w-full justify-between gap-1 sm:gap-2">
                   {availableCategories.map((category) => (
                     <button
                       key={category}
-                      onClick={() => setActiveCategory(category)}
+                      onClick={() => {
+                        setActiveCategory(category);
+                        localStorage.setItem("kiosk.activeCategory", category);
+                      }}
                       className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-colors
                         ${
                           activeCategory === category
@@ -449,9 +464,6 @@ export default function KioskPage() {
 
             {!isLoading && !error && activeCategory && (
               <div key={activeCategory} className="mb-8 animate-fadeIn">
-                <h2 className="text-xl sm:text-2xl font-bold mb-3 text-maroon dark:text-white border-b pb-2">
-                  <T>{String(activeCategory).toUpperCase()}</T>
-                </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
                   {(groupedProducts[activeCategory] || [])
                     .filter(

@@ -11,7 +11,7 @@ import Orange from "../assets/orange_tea.jpg";
 import FruityBoba from "../assets/fruity_boba_tea.jpg";
 import ApricotAmaretto from "../assets/apricot_amaretto_tea.jpg";
 import HibiscusBlossom from "../assets/hibiscus_blossom_tea.jpg";
-import Green from "../assets/green_tea.jpg";
+import Green from "../assets/green_milk_tea.jpg";
 import Camamile from "../assets/camamile_tea.jpg";
 import EarlGrey from "../assets/earl_grey_tea.jpg";
 import Oolong from "../assets/oolong_tea.jpg";
@@ -42,10 +42,10 @@ export const productImages: Record<string, string> = {
     "Fruity Boba Tea": FruityBoba,
     "Apricot Amaretto Tea": ApricotAmaretto,
     "Hibiscus Blossom Tea": HibiscusBlossom,
-    "Green Tea": Green,
+    "Green Milk Tea": Green,
     "Camamile Tea": Camamile,
     "Earl Grey Tea": EarlGrey,
-    "oolong Tea": Oolong,
+    "Oolong Tea": Oolong,
     "Peppermint Tea": Peppermint,
     "Black Tea": Black,
     "Rooibos Tea": Rooibos,
@@ -53,7 +53,7 @@ export const productImages: Record<string, string> = {
     "Darjelinge Quince Tea": DarjelingeQuince,
     "Dr. Pepper": DrPepper,
     "Taro Tea": Taro,
-    "Caremel Nougat Tea": CaramelNougat,
+    "Caramel Nougat Tea": CaramelNougat,
     "Chocolate Fondue Tea": ChocolateFondue,
     "Cherry Cosmo Tea": CherryCosmo,
     "Honey Hojicha Tea": HoneyHojicha,

@@ -74,7 +74,7 @@ export default function ManagerPage() {
         <ul className="flex-1 p-6 space-y-3">
           <ManagerNavLink
             icon={<IconDashboard />}
-            label="Dashboard"
+            label="Analytics"
             onClick={() => {
               setView("dashboard");
               setIsMenuOpen(false);

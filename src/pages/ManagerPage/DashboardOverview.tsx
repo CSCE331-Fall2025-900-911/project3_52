@@ -54,7 +54,7 @@ export default function DashboardOverview() {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-3xl font-bold text-gray-800">Dashboard Overview</h2>
+      <h2 className="text-3xl font-bold text-gray-800">Data Analytics</h2>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

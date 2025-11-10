@@ -85,6 +85,38 @@ export type CustomizationData = {
   toppings: string;
 };
 
+export type DashboardData = {
+  summary: {
+    totalRevenue30Days: number;
+    totalOrders30Days: number;
+    totalHoursWorked: number;
+    lowStockItems: number;
+    today: {
+      orders: number;
+      revenue: number;
+      avg_order: number;
+    };
+  };
+  charts: {
+    revenueOverTime: { date: string; revenue: number }[];
+    topProducts: { name: string; units_sold: number; revenue: number }[];
+    categoryBreakdown: { category: string; sold: number }[];
+    hourlyOrders: { hour: number; count: number }[];
+    staffPerformance: {
+      name: string;
+      role: string;
+      hours: number;
+      salary: number;
+      hourly_rate: number;
+    }[];
+    lowStockAlerts: {
+      name: string;
+      remaining: number;
+      servings_left: number;
+    }[];
+  };
+};
+
 export type Lang =
   | "en"
   | "es"

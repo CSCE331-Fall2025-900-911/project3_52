@@ -1,8 +1,12 @@
-# MomTea POS (Point of Sale System)
+# MomTea POS Frontend
 
 ## Overview
 
-MomTea POS is a full-stack Point of Sale web application designed for efficient and seamless retail operations. This project leverages modern technologies including React, TypeScript, Express, and TailwindCSS to deliver a responsive and scalable solution.
+MomTea POS is a full-stack Point of Sale web application designed for efficient and seamless retail operations. This project leverages modern technologies including React, TypeScript, Express, and TailwindCSS to deliver a responsive and scalable solution. [Link to Backend](https://github.com/CSCE331-Fall2025-900-911/project3_52_server)
+
+---
+
+## 🌐 [Live Demo](https://momtea-pos.shop)
 
 ---
 
@@ -11,7 +15,7 @@ MomTea POS is a full-stack Point of Sale web application designed for efficient 
 1. Clone the repository:
 
    ```bash
-   git clone <repository-url>
+   git clone git@github.com:CSCE331-Fall2025-900-911/project3_52.git
    cd pos-app
    ```
 
@@ -20,6 +24,8 @@ MomTea POS is a full-stack Point of Sale web application designed for efficient 
    ```bash
    npm install
    ```
+
+---
 
 ## Development
 
@@ -73,7 +79,9 @@ npm test
 - **React** 19
 - **TypeScript**
 - **TailwindCSS** 3
-- **Express** 5
+- **Recharts**
+- **Stripe & PayPal SDKs** for payment integration
+- **React Hot Toast** for notifications
 
 ---
 

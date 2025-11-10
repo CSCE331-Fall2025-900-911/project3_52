@@ -6,6 +6,7 @@ import {
   IconList,
   IconUsers,
   IconReceipt,
+  IconDashboard, // ← NEW
 } from "../../components/Icons";
 
 // Import the sub-pages
@@ -13,18 +14,14 @@ import ProductManager from "./ProductManager";
 import StaffManager from "./StaffManager";
 import InventoryManager from "./InventoryManager";
 import OrderHistory from "./OrderHistory";
+import DashboardOverview from "./DashboardOverview"; // ← NEW
 
 export default function ManagerPage() {
   const { user } = useAuth();
   const [view, setView] = useState<
-    "products" | "staff" | "inventory" | "orders"
+    "dashboard" | "products" | "staff" | "inventory" | "orders"
   >(
-    () =>
-      (localStorage.getItem("momtea.managerView") as
-        | "products"
-        | "staff"
-        | "inventory"
-        | "orders") || "products"
+    () => (localStorage.getItem("momtea.managerView") as any) || "dashboard" // ← default to dashboard
   );
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -39,6 +36,8 @@ export default function ManagerPage() {
 
   const renderView = () => {
     switch (view) {
+      case "dashboard":
+        return <DashboardOverview />;
       case "products":
         return <ProductManager />;
       case "staff":
@@ -48,7 +47,7 @@ export default function ManagerPage() {
       case "orders":
         return <OrderHistory />;
       default:
-        return <ProductManager />;
+        return <DashboardOverview />;
     }
   };
 
@@ -60,7 +59,7 @@ export default function ManagerPage() {
           onClick={() => setIsMenuOpen(false)}
         />
       )}
-      {/* Sidebar / Mobile Menu */}
+
       <nav
         className={`${
           isMenuOpen ? "block" : "hidden"
@@ -73,6 +72,15 @@ export default function ManagerPage() {
 
         {/* Sidebar navigation section */}
         <ul className="flex-1 p-6 space-y-3">
+          <ManagerNavLink
+            icon={<IconDashboard />}
+            label="Analytics"
+            onClick={() => {
+              setView("dashboard");
+              setIsMenuOpen(false);
+            }}
+            active={view === "dashboard"}
+          />
           <ManagerNavLink
             icon={<IconBox />}
             label="Products"
@@ -119,7 +127,7 @@ export default function ManagerPage() {
           className="text-gray-600 hover:text-gray-900 text-2xl"
           onClick={() => setIsMenuOpen(true)}
         >
-          ☰
+          ≡
         </button>
       </header>
 
@@ -131,6 +139,7 @@ export default function ManagerPage() {
   );
 }
 
+// ManagerNavLink stays exactly the same
 const ManagerNavLink = ({
   icon,
   label,

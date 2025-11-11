@@ -175,7 +175,7 @@ export default function ReportsManager() {
             </div>
           </>
         ) : (
-          <p className="text-gray-500 italic">Click “Generate X Report”.</p>
+          <p className="text-gray-500 italic"></p>
         )}
       </div>
 
@@ -271,7 +271,7 @@ export default function ReportsManager() {
             </div>
           </>
         ) : (
-          <p className="text-gray-500 italic">Preview Z to see what will be closed.</p>
+          <p className="text-gray-500 italic"></p>
         )}
 
         {zClosed && (

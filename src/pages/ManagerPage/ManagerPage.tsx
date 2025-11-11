@@ -6,6 +6,7 @@ import {
   IconList,
   IconUsers,
   IconReceipt,
+  IconReport,
   IconDashboard, // ← NEW
 } from "../../components/Icons";
 
@@ -122,7 +123,7 @@ export default function ManagerPage() {
             active={view === "orders"}
           />
           <ManagerNavLink
-            icon={<IconReceipt />}
+            icon={<IconReport />}
             label="Reports"
             onClick={() => {
               setView("reports");

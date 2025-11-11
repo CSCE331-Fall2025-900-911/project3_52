@@ -4,8 +4,16 @@ import Spinner from "../../components/Spinner";
 import { apiFetch } from "../../api/http";
 import {
   ResponsiveContainer,
-  PieChart, Pie, Cell,
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
 } from "recharts";
 import type { PieLabelRenderProps } from "recharts";
 
@@ -18,8 +26,17 @@ type Summary = {
 type PaymentRow = { payment_method: string; orders: number; revenue: number };
 type HourRow = { hour: string; orders: number; revenue: number; tips?: number };
 type XResp = { summary: Summary; by_payment: PaymentRow[]; by_hour: HourRow[] };
-type ZPrevResp = { last_z: string | null; summary: Summary; by_payment: PaymentRow[] };
-type ZCloseResp = { closed_at: string | null; since_last_z: string | null; summary: Summary; by_payment: PaymentRow[] };
+type ZPrevResp = {
+  last_z: string | null;
+  summary: Summary;
+  by_payment: PaymentRow[];
+};
+type ZCloseResp = {
+  closed_at: string | null;
+  since_last_z: string | null;
+  summary: Summary;
+  by_payment: PaymentRow[];
+};
 
 export default function ReportsManager() {
   const [xData, setXData] = useState<XResp | null>(null);
@@ -57,31 +74,36 @@ export default function ReportsManager() {
   };
 
   const closeZ = async () => {
-  if (!window.confirm("Run Z Report and close the day? This will reset the counter.")) return;
+    if (
+      !window.confirm(
+        "Run Z Report and close the day? This will reset the counter."
+      )
+    )
+      return;
 
-  setClosingZ(true);
-  try {
-        // ✅ Always make the API call, even if zClosed already exists
-        const res = await apiFetch("/api/reports/z/close", { method: "POST" });
-        const data = await res.json();
+    setClosingZ(true);
+    try {
+      // ✅ Always make the API call, even if zClosed already exists
+      const res = await apiFetch("/api/reports/z/close", { method: "POST" });
+      const data = await res.json();
 
-        // ✅ Handle backend refusal properly
-        if (!res.ok || data.success === false || data.error) {
-            toast.error(data.message || data.error || "Z-report already run today.");
-            return;
-        }
+      // ✅ Handle backend refusal properly
+      if (!res.ok || data.success === false || data.error) {
+        toast.error(
+          data.message || data.error || "Z-report already run today."
+        );
+        return;
+      }
 
-        // ✅ Successful close
-        setZClosed(data);
-        toast.success("Z Report closed");
+      // ✅ Successful close
+      setZClosed(data);
+      toast.success("Z Report closed");
     } catch (e: any) {
-        toast.error(e.message || "Failed to close Z report");
+      toast.error(e.message || "Failed to close Z report");
     } finally {
-        setClosingZ(false);
+      setClosingZ(false);
     }
   };
-
-
 
   const COLORS = ["#E91E63", "#3D5AFE", "#FFC107", "#4CAF50", "#FF5722"];
 
@@ -112,7 +134,9 @@ export default function ReportsManager() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
               <div className="bg-gray-800 text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Total Orders</p>
-                <p className="text-3xl font-bold">{xData.summary.total_orders ?? 0}</p>
+                <p className="text-3xl font-bold">
+                  {xData.summary.total_orders ?? 0}
+                </p>
               </div>
               <div className="bg-green-600 text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Revenue</p>
@@ -132,9 +156,13 @@ export default function ReportsManager() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
               {/* Pie Chart */}
               <div className="bg-white p-6 rounded-xl shadow-md">
-                <h4 className="text-lg font-semibold mb-4">Revenue by Payment Method</h4>
+                <h4 className="text-lg font-semibold mb-4">
+                  Revenue by Payment Method
+                </h4>
                 <ResponsiveContainer width="100%" height={350}>
-                  <PieChart margin={{ top: 30, right: 30, left: 30, bottom: 30 }}>
+                  <PieChart
+                    margin={{ top: 30, right: 30, left: 30, bottom: 30 }}
+                  >
                     <Pie
                       data={xData.by_payment}
                       dataKey="revenue"
@@ -148,10 +176,15 @@ export default function ReportsManager() {
                       }}
                     >
                       {xData.by_payment.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
+                    <Tooltip
+                      formatter={(value: number) => `$${value.toFixed(2)}`}
+                    />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
@@ -159,16 +192,32 @@ export default function ReportsManager() {
 
               {/* Line Chart */}
               <div className="bg-white p-6 rounded-xl shadow-md">
-                <h4 className="text-lg font-semibold mb-4">Revenue and Tips by Hour</h4>
+                <h4 className="text-lg font-semibold mb-4">
+                  Revenue and Tips by Hour
+                </h4>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={xData.by_hour}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="hour" />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
+                    <Tooltip
+                      formatter={(value: number) => `$${value.toFixed(2)}`}
+                    />
                     <Legend />
-                    <Line type="monotone" dataKey="revenue" stroke="#8B1A1A" strokeWidth={3} name="Revenue" />
-                    <Line type="monotone" dataKey="tips" stroke="#2196F3" strokeWidth={3} name="Tips" />
+                    <Line
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="#8B1A1A"
+                      strokeWidth={3}
+                      name="Revenue"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="tips"
+                      stroke="#2196F3"
+                      strokeWidth={3}
+                      name="Tips"
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -188,30 +237,36 @@ export default function ReportsManager() {
               onClick={previewZ}
               disabled={loadingZPrev}
               className={`px-4 py-2 rounded-lg font-medium ${
-                loadingZPrev ? "bg-gray-400" : "bg-gray-700 hover:bg-black text-white"
+                loadingZPrev
+                  ? "bg-gray-400"
+                  : "bg-gray-700 hover:bg-black text-white"
               }`}
             >
               {loadingZPrev ? "Loading..." : "Preview"}
             </button>
             <button
-                onClick={closeZ}
-                disabled={
-                    !!(
-                    closingZ ||
-                    (zClosed?.closed_at &&
-                        new Date(zClosed.closed_at).toDateString() === new Date().toDateString())
-                    )
-                }
-                className={`px-4 py-2 rounded-lg font-medium ${
-                    closingZ ? "bg-gray-400" : "bg-maroon hover:bg-red-800 text-white"
-                }`}
+              onClick={closeZ}
+              disabled={
+                !!(
+                  closingZ ||
+                  (zClosed?.closed_at &&
+                    new Date(zClosed.closed_at).toDateString() ===
+                      new Date().toDateString())
+                )
+              }
+              className={`px-4 py-2 rounded-lg font-medium ${
+                closingZ
+                  ? "bg-gray-400"
+                  : "bg-maroon hover:bg-red-800 text-white"
+              }`}
             >
-                {closingZ
-                    ? "Closing..."
-                    : zClosed?.closed_at &&
-                        new Date(zClosed.closed_at).toDateString() === new Date().toDateString()
-                    ? "Z Report Closed"
-                    : "Run Z Report"}
+              {closingZ
+                ? "Closing..."
+                : zClosed?.closed_at &&
+                  new Date(zClosed.closed_at).toDateString() ===
+                    new Date().toDateString()
+                ? "Z Report Closed"
+                : "Run Z Report"}
             </button>
           </div>
         </div>
@@ -221,18 +276,20 @@ export default function ReportsManager() {
         ) : zPrev ? (
           <>
             <p className="text-sm text-gray-600 mb-3">
-                Since last Z:{" "}
-                <span className="font-mono">
-                    {zPrev.last_z
-                        ? zPrev.last_z.replace("T", " ").split(".")[0]
-                        : "N/A"}
-                </span>
+              Since last Z:{" "}
+              <span className="font-mono">
+                {zPrev.last_z
+                  ? zPrev.last_z.replace("T", " ").split(".")[0]
+                  : "N/A"}
+              </span>
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
               <div className="bg-gray-800 text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Orders</p>
-                <p className="text-3xl font-bold">{zPrev.summary.total_orders ?? 0}</p>
+                <p className="text-3xl font-bold">
+                  {zPrev.summary.total_orders ?? 0}
+                </p>
               </div>
               <div className="bg-green-600 text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Revenue</p>
@@ -278,21 +335,24 @@ export default function ReportsManager() {
           <div className="mt-6 border-t pt-4">
             <h4 className="font-semibold mb-2">Z Closed</h4>
             <p className="text-sm text-gray-600 mb-2">
-                Closed at:{" "}
-                <span className="font-mono">
-                    {zClosed.closed_at
-                    ? zClosed.closed_at.replace("T", " ").split(".")[0]
-                    : "N/A"}
-                </span>{" "}
-                (since{" "}
-                {zClosed.since_last_z
-                    ? zClosed.since_last_z.replace("T", " ").split(".")[0]
-                    : "N/A"})
+              Closed at:{" "}
+              <span className="font-mono">
+                {zClosed.closed_at
+                  ? zClosed.closed_at.replace("T", " ").split(".")[0]
+                  : "N/A"}
+              </span>{" "}
+              (since{" "}
+              {zClosed.since_last_z
+                ? zClosed.since_last_z.replace("T", " ").split(".")[0]
+                : "N/A"}
+              )
             </p>
 
             <ul className="list-disc ml-6">
               <li>Orders: {zClosed?.summary?.total_orders ?? 0}</li>
-              <li>Revenue: ${(zClosed?.summary?.total_orders ?? 0).toFixed(2)}</li>
+              <li>
+                Revenue: ${(zClosed?.summary?.total_orders ?? 0).toFixed(2)}
+              </li>
               <li>Tips: ${(zClosed?.summary?.total_orders ?? 0).toFixed(2)}</li>
             </ul>
           </div>

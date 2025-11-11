@@ -16,7 +16,7 @@ export default function KioskHeader({
           <T>Welcome to MomTea</T>
         </h1>
         <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mt-1">
-          <T>Tap an item to start your order.</T>
+          <T>Tap an item to start your order</T>
         </p>
       </div>
 
@@ -29,6 +29,7 @@ export default function KioskHeader({
         </button>
 
         <select
+          title="Select Language" //added for accessibility, remove warning
           value={lang}
           onChange={(e) => setLang(e.target.value as Lang)}
           className="w-1/2 sm:w-auto p-3 bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow cursor-pointer text-base sm:text-lg"

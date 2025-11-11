@@ -14,12 +14,13 @@ import ProductManager from "./ProductManager";
 import StaffManager from "./StaffManager";
 import InventoryManager from "./InventoryManager";
 import OrderHistory from "./OrderHistory";
+import ReportsManager from "./ReportsManager";
 import DashboardOverview from "./DashboardOverview"; // ← NEW
 
 export default function ManagerPage() {
   const { user } = useAuth();
   const [view, setView] = useState<
-    "dashboard" | "products" | "staff" | "inventory" | "orders"
+    "dashboard" | "products" | "staff" | "inventory" | "orders" | "reports"
   >(
     () => (localStorage.getItem("momtea.managerView") as any) || "dashboard" // ← default to dashboard
   );
@@ -46,6 +47,8 @@ export default function ManagerPage() {
         return <InventoryManager />;
       case "orders":
         return <OrderHistory />;
+      case "reports":
+        return <ReportsManager />;
       default:
         return <DashboardOverview />;
     }
@@ -108,6 +111,7 @@ export default function ManagerPage() {
             }}
             active={view === "inventory"}
           />
+          
           <ManagerNavLink
             icon={<IconReceipt />}
             label="Orders"
@@ -116,6 +120,15 @@ export default function ManagerPage() {
               setIsMenuOpen(false);
             }}
             active={view === "orders"}
+          />
+          <ManagerNavLink
+            icon={<IconReceipt />}
+            label="Reports"
+            onClick={() => {
+              setView("reports");
+              setIsMenuOpen(false);
+            }}
+            active={view === "reports"}
           />
         </ul>
       </nav>

@@ -124,7 +124,7 @@ export default function ManagerPage() {
           />
           <ManagerNavLink
             icon={<IconReport />}
-            label="Reports"
+            label="X/Z Reports"
             onClick={() => {
               setView("reports");
               setIsMenuOpen(false);

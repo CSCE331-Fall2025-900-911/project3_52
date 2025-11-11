@@ -109,7 +109,7 @@ export default function ReportsManager() {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">Reports</h2>
+      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">X/Z Reports</h2>
 
       {/* X Report */}
       <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg">

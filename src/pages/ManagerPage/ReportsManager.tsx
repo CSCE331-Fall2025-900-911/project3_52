@@ -316,7 +316,7 @@ export default function ReportsManager() {
         {zClosedToday && (
           <p className="text-sm text-gray-500 font-semibold mb-3">
             {zClosedStatus?.closed_at
-              ? `Z Report has been closed for today at ${new Date(
+              ? `Z Report has been closed today at ${new Date(
                   zClosedStatus.closed_at
                 ).toLocaleTimeString([], {
                   hour: "numeric",

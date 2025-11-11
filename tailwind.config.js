@@ -8,6 +8,10 @@ export default {
         maroon: "#730000",
         darkmaroon: "#500000",
       },
+      
+      screens: {
+        print: { 'raw': 'print' },
+      },
     },
   },
   plugins: [],

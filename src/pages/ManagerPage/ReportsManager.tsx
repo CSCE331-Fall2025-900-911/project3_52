@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import Spinner from "../../components/Spinner";
 import { apiFetch } from "../../api/http";
@@ -25,7 +25,12 @@ type Summary = {
 
 type PaymentRow = { payment_method: string; orders: number; revenue: number };
 type HourRow = { hour: string; orders: number; revenue: number; tips?: number };
-type XResp = { summary: Summary; by_payment: PaymentRow[]; by_hour: HourRow[] };
+type XResp = {
+  summary: Summary;
+  by_payment: PaymentRow[];
+  by_hour: HourRow[];
+  start_time?: string;
+};
 type ZPrevResp = {
   last_z: string | null;
   summary: Summary;
@@ -45,6 +50,32 @@ export default function ReportsManager() {
   const [loadingX, setLoadingX] = useState(false);
   const [loadingZPrev, setLoadingZPrev] = useState(false);
   const [closingZ, setClosingZ] = useState(false);
+  const [zClosedToday, setZClosedToday] = useState(false);
+  const [zClosedStatus, setZClosedStatus] = useState<{
+    closed_at?: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    checkZClosedToday();
+  }, []);
+
+  useEffect(() => {
+    if (zClosed) {
+      window.print();
+    }
+  }, [zClosed]);
+
+  const checkZClosedToday = async () => {
+    try {
+      const res = await apiFetch("/api/reports/z/status");
+      if (!res.ok) throw new Error("Failed to fetch Z report status");
+      const data = await res.json();
+      setZClosedToday(data.z_closed_today === true);
+      setZClosedStatus(data);
+    } catch (e: any) {
+      toast.error(e.message || "Failed to fetch Z report status");
+    }
+  };
 
   const loadX = async () => {
     setLoadingX(true);
@@ -97,6 +128,7 @@ export default function ReportsManager() {
 
       // ✅ Successful close
       setZClosed(data);
+      setZClosedToday(true);
       toast.success("Z Report closed");
     } catch (e: any) {
       toast.error(e.message || "Failed to close Z report");
@@ -109,7 +141,9 @@ export default function ReportsManager() {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">X/Z Reports</h2>
+      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+        X/Z Reports
+      </h2>
 
       {/* X Report */}
       <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg">
@@ -117,11 +151,11 @@ export default function ReportsManager() {
           <h3 className="text-xl font-semibold">X Report</h3>
           <button
             onClick={loadX}
-            disabled={loadingX}
-            className={`px-5 py-2 rounded-lg font-medium ${
+            disabled={xData !== null || loadingX}
+            className={`min-w-[8rem]  px-5 py-2 rounded-lg font-medium ${
               loadingX
-                ? "bg-gray-400"
-                : "bg-maroon hover:bg-darkmaroon text-white"
+                ? "opacity-50 bg-gray-200"
+                : "bg-maroon hover:bg-darkmaroon text-white disabled:opacity-50"
             }`}
           >
             {loadingX ? "Loading..." : "Generate"}
@@ -132,8 +166,21 @@ export default function ReportsManager() {
           <Spinner />
         ) : xData ? (
           <>
+            <p className="text-sm text-gray-600 mb-3">
+              Since:{" "}
+              {xData.start_time
+                ? new Date(xData.start_time).toLocaleString([], {
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true,
+                  }) + " Today"
+                : "N/A"}
+            </p>
             {/* KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div
+              id="xReport"
+              className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 print:w-[80mm] print:leading-tight"
+            >
               <div className="bg-gray-800 text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Total Orders</p>
                 <p className="text-2xl sm:text-3xl font-bold">
@@ -243,53 +290,58 @@ export default function ReportsManager() {
           <div className="flex gap-3 flex-wrap">
             <button
               onClick={previewZ}
-              disabled={loadingZPrev}
-              className={`px-4 py-2 rounded-lg font-medium ${
+              disabled={loadingZPrev || zPrev !== null || zClosedToday}
+              className={`min-w-[8rem] px-4 py-2 rounded-lg font-medium ${
                 loadingZPrev
-                  ? "bg-gray-200"
-                  : "bg-white text-darkmaroon hover:bg-gray-100 border border-darkmaroon"
+                  ? "bg-gray-200 ocapacity-50"
+                  : "bg-white text-darkmaroon hover:bg-gray-100 border border-darkmaroon disabled:opacity-50"
               }`}
             >
               {loadingZPrev ? "Loading..." : "Preview"}
             </button>
             <button
               onClick={closeZ}
-              disabled={
-                !!(
-                  closingZ ||
-                  (zClosed?.closed_at &&
-                    new Date(zClosed.closed_at).toDateString() ===
-                      new Date().toDateString())
-                )
-              }
-              className={`px-4 py-2 rounded-lg font-medium ${
-                closingZ
-                  ? "bg-gray-400"
-                  : "bg-maroon hover:bg-darkmaroon text-white"
+              disabled={closingZ || zClosedToday}
+              className={`min-w-[8rem] px-4 py-2 rounded-lg font-medium ${
+                closingZ || zClosedToday
+                  ? "opacity-50 bg-gray-200"
+                  : "bg-maroon hover:bg-darkmaroon text-white disabled:opacity-50"
               }`}
             >
-              {closingZ
-                ? "Closing..."
-                : zClosed?.closed_at &&
-                  new Date(zClosed.closed_at).toDateString() ===
-                    new Date().toDateString()
-                ? "Z Report Closed"
-                : "Generate"}
+              {closingZ ? "Closing..." : zClosedToday ? "Closed" : "Generate"}
             </button>
           </div>
         </div>
 
+        {zClosedToday && (
+          <p className="text-sm text-gray-500 font-semibold mb-3">
+            {zClosedStatus?.closed_at
+              ? `Z Report has been closed for today at ${new Date(
+                  zClosedStatus.closed_at
+                ).toLocaleTimeString([], {
+                  hour: "numeric",
+                  minute: "2-digit",
+                })}`
+              : ""}
+          </p>
+        )}
+
         {loadingZPrev ? (
           <Spinner />
-        ) : zPrev ? (
+        ) : zPrev && !zClosed ? (
           <>
             <p className="text-sm text-gray-600 mb-3">
-              Since last Z:{" "}
-              <span className="font-mono">
-                {zPrev.last_z
-                  ? zPrev.last_z.replace("T", " ").split(".")[0]
-                  : "N/A"}
-              </span>
+              Since Last Z:{" "}
+              {zPrev.last_z
+                ? new Date(zPrev.last_z).toLocaleString([], {
+                    month: "2-digit",
+                    day: "2-digit",
+                    year: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true,
+                  })
+                : "N/A"}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
@@ -340,30 +392,80 @@ export default function ReportsManager() {
         )}
 
         {zClosed && (
-          <div className="mt-6 border-t pt-4">
-            <h4 className="font-semibold mb-2">Z Closed</h4>
-            <p className="text-sm text-gray-600 mb-2">
-              Closed at:{" "}
-              <span className="font-mono">
-                {zClosed.closed_at
-                  ? zClosed.closed_at.replace("T", " ").split(".")[0]
+          <>
+            <div
+              id="zReport"
+              className="font-mono border-t-2 pt-6 text-sm print:w-[80mm] print:leading-tight"
+            >
+              <h4 className="font-semibold mb-2">Z Report</h4>
+              <p className="text-sm text-gray-600 mb-2">
+                Closed at:{" "}
+                <span className="font-mono">
+                  {zClosed.closed_at
+                    ? new Date(zClosed.closed_at).toLocaleString([], {
+                        month: "2-digit",
+                        day: "2-digit",
+                        year: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
+                      })
+                    : "N/A"}
+                </span>{" "}
+                (since{" "}
+                {zClosed.since_last_z
+                  ? new Date(zClosed.since_last_z).toLocaleString([], {
+                      month: "2-digit",
+                      day: "2-digit",
+                      year: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
+                    })
                   : "N/A"}
-              </span>{" "}
-              (since{" "}
-              {zClosed.since_last_z
-                ? zClosed.since_last_z.replace("T", " ").split(".")[0]
-                : "N/A"}
-              )
-            </p>
+                )
+              </p>
 
-            <ul className="list-disc ml-6">
-              <li>Orders: {zClosed?.summary?.total_orders ?? 0}</li>
-              <li>
-                Revenue: ${(zClosed?.summary?.total_revenue ?? 0).toFixed(2)}
-              </li>
-              <li>Tips: ${(zClosed?.summary?.total_tips ?? 0).toFixed(2)}</li>
-            </ul>
-          </div>
+              <ul className="list-disc ml-6">
+                <li>Orders: {zClosed?.summary?.total_orders ?? 0}</li>
+                <li>
+                  Revenue: ${(zClosed?.summary?.total_revenue ?? 0).toFixed(2)}
+                </li>
+                <li>Tips: ${(zClosed?.summary?.total_tips ?? 0).toFixed(2)}</li>
+              </ul>
+
+              {/* Revenue by Payment Method */}
+              <h5 className="font-semibold mt-6 mb-2">
+                Revenue by Payment Method
+              </h5>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-full text-xs print:text-xs">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="p-2 text-left">Method</th>
+                      <th className="p-2 text-left">Orders</th>
+                      <th className="p-2 text-left">Revenue</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {zClosed.by_payment.map((r, i) => (
+                      <tr key={i}>
+                        <td className="p-2">{r.payment_method}</td>
+                        <td className="p-2">{r.orders}</td>
+                        <td className="p-2">${r.revenue.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <button
+              onClick={() => window.print()}
+              className="mt-4 px-4 py-2 bg-maroon text-white rounded-lg hover:bg-darkmaroon"
+            >
+              Print
+            </button>
+          </>
         )}
       </div>
     </div>

@@ -16,14 +16,14 @@ import StaffManager from "./StaffManager";
 import InventoryManager from "./InventoryManager";
 import OrderHistory from "./OrderHistory";
 import ReportsManager from "./ReportsManager";
-import DashboardOverview from "./DashboardOverview"; // ← NEW
+import AnalyticsDashboard from "./AnalyticsDashboard"; // ← NEW
 
 export default function ManagerPage() {
   const { user } = useAuth();
   const [view, setView] = useState<
-    "dashboard" | "products" | "staff" | "inventory" | "orders" | "reports"
+    "analytics" | "products" | "staff" | "inventory" | "orders" | "reports"
   >(
-    () => (localStorage.getItem("momtea.managerView") as any) || "dashboard" // ← default to dashboard
+    () => (localStorage.getItem("momtea.managerView") as any) || "analytics" // ← default to analytics
   );
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -38,8 +38,8 @@ export default function ManagerPage() {
 
   const renderView = () => {
     switch (view) {
-      case "dashboard":
-        return <DashboardOverview />;
+      case "analytics":
+        return <AnalyticsDashboard />;
       case "products":
         return <ProductManager />;
       case "staff":
@@ -51,7 +51,7 @@ export default function ManagerPage() {
       case "reports":
         return <ReportsManager />;
       default:
-        return <DashboardOverview />;
+        return <AnalyticsDashboard />;
     }
   };
 
@@ -80,10 +80,20 @@ export default function ManagerPage() {
             icon={<IconDashboard />}
             label="Analytics"
             onClick={() => {
-              setView("dashboard");
+              setView("analytics");
               setIsMenuOpen(false);
             }}
-            active={view === "dashboard"}
+            active={view === "analytics"}
+          />
+
+          <ManagerNavLink
+            icon={<IconReport />}
+            label="X/Z Reports"
+            onClick={() => {
+              setView("reports");
+              setIsMenuOpen(false);
+            }}
+            active={view === "reports"}
           />
           <ManagerNavLink
             icon={<IconBox />}
@@ -112,7 +122,7 @@ export default function ManagerPage() {
             }}
             active={view === "inventory"}
           />
-          
+
           <ManagerNavLink
             icon={<IconReceipt />}
             label="Orders"
@@ -121,15 +131,6 @@ export default function ManagerPage() {
               setIsMenuOpen(false);
             }}
             active={view === "orders"}
-          />
-          <ManagerNavLink
-            icon={<IconReport />}
-            label="X/Z Reports"
-            onClick={() => {
-              setView("reports");
-              setIsMenuOpen(false);
-            }}
-            active={view === "reports"}
           />
         </ul>
       </nav>

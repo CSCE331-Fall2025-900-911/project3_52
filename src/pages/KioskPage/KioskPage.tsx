@@ -201,6 +201,12 @@ export default function KioskPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
   const [isPayPalModalOpen, setIsPayPalModalOpen] = useState(false);
+  const [isTipModalOpen, setIsTipModalOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<
+    "Card" | "Mobile Pay" | null
+  >(null);
+  const [customTip, setCustomTip] = useState<number>(0);
+
   // Initialize activeCategory from localStorage if available, else null (will set after products load)
   const [activeCategory, setActiveCategory] = useState<string | null>(() => {
     const stored = localStorage.getItem("kiosk.activeCategory");
@@ -303,21 +309,7 @@ export default function KioskPage() {
     [cart]
   );
 
-  const handleFinalSubmit = async (
-    paymentMethod: "Card" | "Mobile Pay" | "Cash"
-  ) => {
-    // Handle special payment flows first
-    if (paymentMethod === "Card") {
-      setIsStripeModalOpen(true);
-      return;
-    }
-
-    if (paymentMethod === "Mobile Pay") {
-      // Open PayPal modal instead of direct order
-      setIsPayPalModalOpen(true);
-      return;
-    }
-
+  const handleFinalSubmit = async (tipAmount: number = 0) => {
     // Normal flow for non-digital payments
     setIsSubmitting(true);
     setSubmitError(null);
@@ -329,9 +321,9 @@ export default function KioskPage() {
       month: now.getMonth() + 1,
       year: now.getFullYear(),
       total_price: total,
-      tip: 0,
+      tip: tipAmount,
       special_notes: "Kiosk Order",
-      payment_method: paymentMethod,
+      payment_method: paymentMethod ? paymentMethod : "Unknown",
       items: cart.map((i) => ({
         product_id: i.product.product_id,
         size: i.size,
@@ -341,6 +333,8 @@ export default function KioskPage() {
         price: i.final_price,
       })),
     };
+
+    console.log("Submitting order payload:", payload);
 
     try {
       const res = await kioskApiFetch("/api/orders", {
@@ -420,12 +414,15 @@ export default function KioskPage() {
             <div className="mb-4 mt-4">
               <div className="sm:hidden flex w-full">
                 <select
-                  title = "Select Category" //added for accessibility, remove warning
+                  title="Select Category" //added for accessibility, remove warning
                   className="block w-full p-3 rounded-lg border bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 text-center text-lg font-semibold"
                   value={activeCategory ?? ""}
                   onChange={(e) => {
                     setActiveCategory(e.target.value);
-                    localStorage.setItem("kiosk.activeCategory", e.target.value);
+                    localStorage.setItem(
+                      "kiosk.activeCategory",
+                      e.target.value
+                    );
                   }}
                 >
                   {availableCategories.map((category) => (
@@ -544,17 +541,18 @@ export default function KioskPage() {
 
               <PaymentButton
                 label="Card"
-                onClick={() => handleFinalSubmit("Card")}
+                onClick={() => {
+                  setIsStripeModalOpen(true);
+                  setPaymentMethod("Card");
+                }}
                 disabled={isSubmitting}
               />
               <PaymentButton
                 label="PayPal (Mobile Pay)"
-                onClick={() => handleFinalSubmit("Mobile Pay")}
-                disabled={isSubmitting}
-              />
-              <PaymentButton
-                label="Cash (Pay at Counter)"
-                onClick={() => handleFinalSubmit("Cash")}
+                onClick={() => {
+                  setIsPayPalModalOpen(true);
+                  setPaymentMethod("Mobile Pay");
+                }}
                 disabled={isSubmitting}
               />
 
@@ -599,7 +597,7 @@ export default function KioskPage() {
                   isDarkMode={isHighContrast}
                   onSuccess={async () => {
                     setIsStripeModalOpen(false);
-                    await handleFinalSubmit("Cash"); // reuse existing backend logic to save order
+                    setIsTipModalOpen(true);
                   }}
                 />
               </Elements>
@@ -617,9 +615,68 @@ export default function KioskPage() {
                 onSuccess={() => {
                   toast.success("Payment successful via PayPal!");
                   setIsPayPalModalOpen(false);
-                  handleFinalSubmit("Cash"); // record order after PayPal
+                  setIsTipModalOpen(true);
                 }}
               />
+            </Modal>
+          )}
+
+          {isTipModalOpen && (
+            <Modal
+              isOpen={isTipModalOpen}
+              onClose={() => setIsTipModalOpen(false)}
+              title="Would you like to add a tip?"
+              isDarkMode={isHighContrast}
+            >
+              <div className="p-4 flex flex-col items-center gap-4">
+                <p className="text-lg text-center dark:text-gray-200">
+                  Your total is{" "}
+                  <span className="font-bold">${total.toFixed(2)}</span>
+                </p>
+
+                {/* --- Tip Percentage Buttons --- */}
+                <div className="flex flex-wrap justify-center gap-2">
+                  {[15, 20, 25].map((percent) => {
+                    const tipValue = parseFloat(
+                      ((percent / 100) * total).toFixed(2)
+                    );
+                    return (
+                      <button
+                        key={percent}
+                        onClick={() => {
+                          setIsTipModalOpen(false);
+                          handleFinalSubmit(tipValue);
+                        }}
+                        className="px-4 py-2 bg-maroon text-white rounded-lg font-bold hover:bg-darkmaroon"
+                      >
+                        {`${percent}% ($${tipValue.toFixed(2)})`}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex flex-row items-center gap-2">
+                  <input
+                    type="number"
+                    placeholder="Custom Tip"
+                    className="border rounded-lg p-2 responsive text-center dark:bg-gray-700 dark:text-white"
+                    onChange={(e) => setCustomTip(parseFloat(e.target.value))}
+                  />
+                  <button
+                    onClick={() => {
+                      if (!isNaN(customTip) && customTip >= 0) {
+                        setIsTipModalOpen(false);
+                        handleFinalSubmit(customTip);
+                      } else {
+                        toast.error("Please enter a valid tip amount.");
+                      }
+                    }}
+                    className="px-6 py-2 bg-white text-darkmaroon rounded-lg font-bold hover:bg-gray-100 border border-darkmaroon"
+                  >
+                    Confirm
+                  </button>
+                </div>
+                
+              </div>
             </Modal>
           )}
         </div>

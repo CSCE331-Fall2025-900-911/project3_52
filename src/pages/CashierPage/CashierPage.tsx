@@ -1,7 +1,7 @@
 import { useAuth } from "../../contexts/AuthContext";
 import AccessDenied from "../../components/AccessDenied";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { kioskApiFetch } from "../../api/http";
 import { CartItem, OrderPayload, Product } from "../../types/models";
 import { LanguageProvider, T } from "../../contexts/LangContext";
@@ -218,6 +218,11 @@ export default function CashierPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
   const [isPayPalModalOpen, setIsPayPalModalOpen] = useState(false);
+  const [isTipModalOpen, setIsTipModalOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<
+    "Card" | "Mobile Pay" | null
+  >(null);
+  const [customTip, setCustomTip] = useState<number>(0);
 
   // --- NEW STATE for customization modal ---
   const [isCustomizationModalOpen, setIsCustomizationModalOpen] =
@@ -227,6 +232,24 @@ export default function CashierPage() {
   const stripePromise = loadStripe(
     "pk_test_51SQ9h8HxLrRxAwUAXhDDu2tC5tKVWITYIGhCfr8Jjjkq9IFhjnUoOCaDUa4gNy9BRaOHTRNuLrZ39piTTYCD5Hyv00Y0s0Vcsq"
   );
+
+  const autoSubmitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+// eslint-disable-next-line react-hooks/exhaustive-deps
+useEffect(() => {
+  if (isTipModalOpen) {
+    autoSubmitTimeoutRef.current = setTimeout(() => {
+      setIsTipModalOpen(false);
+      handleFinalSubmit(0);
+      toast("No response — continuing with no tip.");
+    }, 60000);
+
+    return () => {
+      if (autoSubmitTimeoutRef.current)
+        clearTimeout(autoSubmitTimeoutRef.current);
+    };
+  }
+}, [isTipModalOpen]);
 
   useEffect(() => {
     localStorage.setItem("kiosk.highContrast", isHighContrast.toString());
@@ -291,21 +314,7 @@ export default function CashierPage() {
     [cart]
   );
 
-  const handleFinalSubmit = async (
-    paymentMethod: "Card" | "Mobile Pay" | "Cash"
-  ) => {
-    // Handle special payment flows first
-    if (paymentMethod === "Card") {
-      setIsStripeModalOpen(true);
-      return;
-    }
-
-    if (paymentMethod === "Mobile Pay") {
-      // Open PayPal modal instead of direct order
-      setIsPayPalModalOpen(true);
-      return;
-    }
-
+  const handleFinalSubmit = async (tipAmount: number = 0) => {
     // Normal flow for non-digital payments
     setIsSubmitting(true);
     setSubmitError(null);
@@ -317,9 +326,9 @@ export default function CashierPage() {
       month: now.getMonth() + 1,
       year: now.getFullYear(),
       total_price: total,
-      tip: 0,
+      tip: tipAmount,
       special_notes: "Kiosk Order",
-      payment_method: paymentMethod,
+      payment_method: paymentMethod ? paymentMethod : "Cash",
       items: cart.map((i) => ({
         product_id: i.product.product_id,
         size: i.size,
@@ -329,6 +338,8 @@ export default function CashierPage() {
         price: i.final_price,
       })),
     };
+
+    console.log("Submitting order payload:", payload);
 
     try {
       const res = await kioskApiFetch("/api/orders", {
@@ -353,6 +364,8 @@ export default function CashierPage() {
       setSubmitError(errorText);
     } finally {
       setIsSubmitting(false);
+      setPaymentMethod(null);
+      setCustomTip(0);
     }
   };
 
@@ -487,17 +500,23 @@ export default function CashierPage() {
 
               <PaymentButton
                 label="Card"
-                onClick={() => handleFinalSubmit("Card")}
+                onClick={() => {
+                  setIsStripeModalOpen(true);
+                  setPaymentMethod("Card");
+                }}
                 disabled={isSubmitting}
               />
               <PaymentButton
                 label="PayPal (Mobile Pay)"
-                onClick={() => handleFinalSubmit("Mobile Pay")}
+                onClick={() => {
+                  setIsPayPalModalOpen(true);
+                  setPaymentMethod("Mobile Pay");
+                }}
                 disabled={isSubmitting}
               />
               <PaymentButton
-                label="Cash (Pay at Counter)"
-                onClick={() => handleFinalSubmit("Cash")}
+                label="Cash"
+                onClick={() => handleFinalSubmit()}
                 disabled={isSubmitting}
               />
 
@@ -540,9 +559,9 @@ export default function CashierPage() {
                 <PaymentForm
                   total={total}
                   isDarkMode={isHighContrast}
-                  onSuccess={async () => {
+                  onSuccess={() => {
                     setIsStripeModalOpen(false);
-                    await handleFinalSubmit("Cash"); // reuse existing backend logic to save order
+                    setIsTipModalOpen(true);
                   }}
                 />
               </Elements>
@@ -560,9 +579,75 @@ export default function CashierPage() {
                 onSuccess={() => {
                   toast.success("Payment successful via PayPal!");
                   setIsPayPalModalOpen(false);
-                  handleFinalSubmit("Cash"); // record order after PayPal
+                  setIsTipModalOpen(true);
                 }}
               />
+            </Modal>
+          )}
+
+          {isTipModalOpen && (
+            <Modal
+              isOpen={isTipModalOpen}
+              onClose={() => {}} // ✅ Disable manual closing
+              title="Would you like to add a tip?"
+              isDarkMode={isHighContrast}
+            >
+              <div className="p-4 flex flex-col items-center gap-4">
+                <p className="text-lg text-center dark:text-gray-200">
+                  Your total is{" "}
+                  <span className="font-bold">${total.toFixed(2)}</span>
+                </p>
+
+                {/* --- Tip Percentage Buttons --- */}
+                <div className="flex flex-wrap justify-center gap-2">
+                  {[15, 20, 25].map((percent) => {
+                    const tipValue = parseFloat(
+                      ((percent / 100) * total).toFixed(2)
+                    );
+                    return (
+                      <button
+                        key={percent}
+                        onClick={() => {
+                          if (autoSubmitTimeoutRef.current) {
+                            clearTimeout(autoSubmitTimeoutRef.current);
+                          }
+                          setIsTipModalOpen(false);
+                          handleFinalSubmit(tipValue);
+                        }}
+                        className="px-4 py-2 bg-maroon text-white rounded-lg font-bold hover:bg-darkmaroon"
+                      >
+                        {`${percent}% ($${tipValue.toFixed(2)})`}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* --- Custom Tip Input --- */}
+                <div className="flex flex-row items-center gap-2">
+                  <input
+                    type="number"
+                    placeholder="Custom Tip"
+                    className="border rounded-lg p-2 text-center dark:bg-gray-700 dark:text-white"
+                    onChange={(e) => setCustomTip(parseFloat(e.target.value))}
+                  />
+                  <button
+                    onClick={() => {
+                      if (!isNaN(customTip) && customTip >= 0) {
+                        if (autoSubmitTimeoutRef.current) {
+                          clearTimeout(autoSubmitTimeoutRef.current);
+                        }
+                        setIsTipModalOpen(false);
+                        handleFinalSubmit(customTip);
+                      } else {
+                        toast.error("Please enter a valid tip amount.");
+                      }
+                    }}
+                    className="px-6 py-2 bg-white text-darkmaroon rounded-lg font-bold hover:bg-gray-100 border border-darkmaroon"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
             </Modal>
           )}
         </div>

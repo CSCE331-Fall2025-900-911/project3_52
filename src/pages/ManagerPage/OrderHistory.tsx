@@ -287,6 +287,10 @@ export default function OrderHistory() {
                     </div>
                   </th>
 
+                  <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
+                    Tip
+                  </th>
+
                   <th className="p-4 text-right text-xs font-medium text-gray-500 uppercase">
                     Actions
                   </th>
@@ -331,6 +335,9 @@ export default function OrderHistory() {
                       </td>
                       <td className="p-4 whitespace-nowrap text-sm text-gray-500">
                         ${order.total_price ?? 0}
+                      </td>
+                      <td className="p-4 whitespace-nowrap text-sm text-gray-500">
+                        ${order.tip ?? 0}
                       </td>
                       <td className="p-4 whitespace-nowrap text-sm font-medium text-right">
                         <button

@@ -47,7 +47,7 @@ export default function PaymentForm({
       if (result.error) {
         toast.error(result.error.message || "Payment failed");
       } else if (result.paymentIntent?.status === "succeeded") {
-        toast.success("Payment successful!");
+        toast.success("Payment successful via Card!");
         onSuccess(); // proceed to order creation
       } else {
         toast("Payment not completed. Please try again.", {

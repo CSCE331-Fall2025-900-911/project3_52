@@ -1,8 +1,9 @@
 // components/Magnifier.tsx
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useRef, useState, useEffect } from "react";
 import { useMagnifier, MagnifierOptions } from "../hooks/useMagnifier";
+import html2canvas from "html2canvas";
 
 type Props = {
   children: ReactNode;
@@ -10,9 +11,30 @@ type Props = {
 };
 
 export const Magnifier = ({ children, options }: Props) => {
-  const { lensRef, rootRef, enabled } = useMagnifier(options);
+  const { lensRef, rootRef, enabled } = useMagnifier(options ?? {});
+  const [snapshot, setSnapshot] = useState<string>("");
   const { zoom = 2.5, size = 180 } = options ?? {};
-  const currentElement = rootRef.current as HTMLDivElement | null;
+
+  useEffect(() => {
+    if (!enabled || !rootRef.current) {
+        setSnapshot("");
+        return;
+    }
+
+    let cancelled = false;
+    html2canvas(rootRef.current!, {
+        scale: window.devicePixelRatio,
+        useCORS: true,           // Allows cross-origin images
+        allowTaint: true,        // Fallback if CORS fails
+        logging: false,
+    }).then((canvas) => {
+        if (!cancelled) setSnapshot(canvas.toDataURL());
+    }).catch(() => {
+        if (!cancelled) setSnapshot("");
+    });
+
+    return () => { cancelled = true; };
+  }, [enabled]);
 
   return (
     <>
@@ -23,18 +45,17 @@ export const Magnifier = ({ children, options }: Props) => {
       {enabled && (
         <div
           ref={lensRef}
-          className={`fixed pointer-events-none rounded-full border-4 border-white shadow-2xl ${options?.className ?? ""}`}
+          className={`fixed pointer-events-none rounded-full border-4 border-white shadow-2xl will-change-transform ${options?.className ?? ""}`}
           style={{
             width: size,
             height: size,
-            backgroundImage: currentElement
-              ? `url(${getSnapshot(currentElement)})`
-              : "none",
-            backgroundSize: `${(currentElement?.offsetWidth ?? 0) * zoom}px ${
-              (currentElement?.offsetHeight ?? 0) * zoom
-            }px`,
+            backgroundImage: snapshot ? `url(${snapshot})` : "none",
+            backgroundSize: `${
+              (rootRef.current?.offsetWidth ?? 0) * zoom
+            }px ${(rootRef.current?.offsetHeight ?? 0) * zoom}px`,
             backgroundRepeat: "no-repeat",
             zIndex: 9999,
+            transform: "translateZ(0)",
             boxShadow:
               "inset 0 0 20px rgba(0,0,0,0.3), 0 0 30px rgba(0,0,0,0.4)",
           }}
@@ -43,10 +64,3 @@ export const Magnifier = ({ children, options }: Props) => {
     </>
   );
 };
-
-function getSnapshot(el: HTMLElement): string {
-  // Lazy load to reduce bundle size
-  const html2canvas = require("html2canvas");
-  const canvas = html2canvas(el, { scale: window.devicePixelRatio });
-  return (canvas as HTMLCanvasElement).toDataURL();
-}

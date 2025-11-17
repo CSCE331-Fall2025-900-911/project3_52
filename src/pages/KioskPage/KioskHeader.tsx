@@ -1,5 +1,7 @@
+// components/KioskHeader.tsx
 import { useTranslation, T } from "../../contexts/LangContext";
 import { Lang } from "../../types/models";
+import { useMagnifierControl } from "../../contexts/MagnifierContext";
 
 export default function KioskHeader({
   isHighContrast,
@@ -9,6 +11,8 @@ export default function KioskHeader({
   setIsHighContrast: (v: boolean) => void;
 }) {
   const { lang, setLang } = useTranslation();
+  const { isMagnifierEnabled, toggleMagnifier } = useMagnifierControl();
+
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-2">
       <div className="flex-1 text-left">
@@ -22,6 +26,26 @@ export default function KioskHeader({
 
       <div className="flex w-full sm:w-auto gap-2">
         <button
+          onClick={toggleMagnifier}
+          aria-pressed={isMagnifierEnabled}
+          className={`p-3 rounded-full shadow-lg transition-all ${
+            isMagnifierEnabled
+              ? "bg-blue-600 text-white scale-110"
+              : "bg-white dark:bg-gray-700 dark:text-white"
+          }`}
+          title={isMagnifierEnabled ? "Disable Magnifier" : "Enable Magnifier"}
+        >
+          {isMagnifierEnabled ? (
+            <span aria-hidden="true">Zoom Out</span>
+          ) : (
+            <span aria-hidden="true">Magnifying Glass</span>
+          )}
+          <span className="sr-only">
+            {isMagnifierEnabled ? "Magnifier On" : "Magnifier Off"}
+          </span>
+        </button>
+
+        <button
           onClick={() => setIsHighContrast(!isHighContrast)}
           className="w-1/2 sm:w-auto min-w-[10rem] p-3 bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow text-base sm:text-lg"
         >
@@ -29,7 +53,7 @@ export default function KioskHeader({
         </button>
 
         <select
-          title="Select Language" //added for accessibility, remove warning
+          title="Select Language"
           value={lang}
           onChange={(e) => setLang(e.target.value as Lang)}
           className="w-1/2 sm:w-auto p-3 bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow cursor-pointer text-base sm:text-lg"
@@ -50,6 +74,13 @@ export default function KioskHeader({
           <option value="cs">Čeština</option>
           <option value="tr">Türkçe</option>
         </select>
+      </div>
+
+      <div
+        aria-live="polite"
+        className="sr-only"
+      >
+        {isMagnifierEnabled ? "Magnifier enabled" : "Magnifier disabled"}
       </div>
     </div>
   );

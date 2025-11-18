@@ -305,21 +305,7 @@ export default function KioskPage() {
     [cart]
   );
 
-  const handleFinalSubmit = async (
-    paymentMethod: "Card" | "Mobile Pay" | "Cash"
-  ) => {
-    // Handle special payment flows first
-    if (paymentMethod === "Card") {
-      setIsStripeModalOpen(true);
-      return;
-    }
-
-    if (paymentMethod === "Mobile Pay") {
-      // Open PayPal modal instead of direct order
-      setIsPayPalModalOpen(true);
-      return;
-    }
-
+  const handleFinalSubmit = async (paymentMethod: "Card" | "Mobile Pay") => {
     // Normal flow for non-digital payments
     setIsSubmitting(true);
     setSubmitError(null);
@@ -411,8 +397,8 @@ export default function KioskPage() {
       <MagnifierProvider>
         <Magnifier
           options={{
-            zoom: 2,           // adjust as needed
-            size: 220,         // lens diameter in px
+            zoom: 2, // adjust as needed
+            size: 220, // lens diameter in px
           }}
         >
           <div className="relative h-screen">
@@ -429,12 +415,15 @@ export default function KioskPage() {
                 <div className="mb-4 mt-4">
                   <div className="sm:hidden flex w-full">
                     <select
-                      title = "Select Category" //added for accessibility, remove warning
+                      title="Select Category" //added for accessibility, remove warning
                       className="block w-full p-3 rounded-lg border bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 text-center text-lg font-semibold"
                       value={activeCategory ?? ""}
                       onChange={(e) => {
                         setActiveCategory(e.target.value);
-                        localStorage.setItem("kiosk.activeCategory", e.target.value);
+                        localStorage.setItem(
+                          "kiosk.activeCategory",
+                          e.target.value
+                        );
                       }}
                     >
                       {availableCategories.map((category) => (
@@ -452,7 +441,10 @@ export default function KioskPage() {
                           key={category}
                           onClick={() => {
                             setActiveCategory(category);
-                            localStorage.setItem("kiosk.activeCategory", category);
+                            localStorage.setItem(
+                              "kiosk.activeCategory",
+                              category
+                            );
                           }}
                           className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-colors
                             ${
@@ -553,17 +545,12 @@ export default function KioskPage() {
 
                   <PaymentButton
                     label="Card"
-                    onClick={() => handleFinalSubmit("Card")}
+                    onClick={() => setIsStripeModalOpen(true)}
                     disabled={isSubmitting}
                   />
                   <PaymentButton
                     label="PayPal (Mobile Pay)"
-                    onClick={() => handleFinalSubmit("Mobile Pay")}
-                    disabled={isSubmitting}
-                  />
-                  <PaymentButton
-                    label="Cash (Pay at Counter)"
-                    onClick={() => handleFinalSubmit("Cash")}
+                    onClick={() => setIsPayPalModalOpen(true)}
                     disabled={isSubmitting}
                   />
 
@@ -608,7 +595,7 @@ export default function KioskPage() {
                       isDarkMode={isHighContrast}
                       onSuccess={async () => {
                         setIsStripeModalOpen(false);
-                        await handleFinalSubmit("Cash"); // reuse existing backend logic to save order
+                        await handleFinalSubmit("Card"); // reuse existing backend logic to save order
                       }}
                     />
                   </Elements>
@@ -626,7 +613,7 @@ export default function KioskPage() {
                     onSuccess={() => {
                       toast.success("Payment successful via PayPal!");
                       setIsPayPalModalOpen(false);
-                      handleFinalSubmit("Cash"); // record order after PayPal
+                      handleFinalSubmit("Mobile Pay"); // record order after PayPal
                     }}
                   />
                 </Modal>

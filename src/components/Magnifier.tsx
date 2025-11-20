@@ -1,7 +1,7 @@
 // components/Magnifier.tsx
 "use client";
 
-import { ReactNode, useRef, useState, useEffect } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { useMagnifier, MagnifierOptions } from "../hooks/useMagnifier";
 import html2canvas from "html2canvas";
 
@@ -34,7 +34,7 @@ export const Magnifier = ({ children, options }: Props) => {
     });
 
     return () => { cancelled = true; };
-  }, [enabled]);
+  }, [enabled, rootRef]);
 
   return (
     <>

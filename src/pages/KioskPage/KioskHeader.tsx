@@ -28,9 +28,9 @@ export default function KioskHeader({
         <button
           onClick={toggleMagnifier}
           aria-pressed={isMagnifierEnabled}
-          className={`p-3 rounded-full shadow-lg transition-all ${
+          className={`w-1/2 sm:w-auto min-w-[10rem] p-3 dark:text-white rounded-lg shadow text-base sm:text-lg ${
             isMagnifierEnabled
-              ? "bg-blue-600 text-white scale-110"
+              ? "bg-slate-400 text-white"
               : "bg-white dark:bg-gray-700 dark:text-white"
           }`}
           title={isMagnifierEnabled ? "Disable Magnifier" : "Enable Magnifier"}
@@ -76,10 +76,7 @@ export default function KioskHeader({
         </select>
       </div>
 
-      <div
-        aria-live="polite"
-        className="sr-only"
-      >
+      <div aria-live="polite" className="sr-only">
         {isMagnifierEnabled ? "Magnifier enabled" : "Magnifier disabled"}
       </div>
     </div>

@@ -32,3 +32,26 @@
     width: 100%;
   }
 }
+
+.magnifier {
+  font-size: 1rem; /* Base font size increase */
+}
+
+.magnifier * {
+  min-height: 1rem; /* Better tap targets */
+}
+
+.magnifier button,
+.magnifier select,
+.magnifier input,
+.magnifier label {
+  font-size: 1.5rem !important;
+  
+  transition: font-size 0.4s ease;
+}
+
+/* Optional: slight zoom on interactive containers */
+.magnifier .magnifier-card {
+  transform: scale(1);
+  transition: transform 0.4s ease;
+}

@@ -13,7 +13,6 @@ import { Elements } from "@stripe/react-stripe-js";
 import PaymentForm from "../../components/PaymentForm";
 import { loadStripe } from "@stripe/stripe-js";
 import PayPalCheckout from "../../components/PaypalCheckout";
-import { Magnifier } from "../../components/Magnifier";
 import { MagnifierProvider } from "../../contexts/MagnifierContext";
 
 const AVAILABLE_TOPPINGS = [
@@ -305,7 +304,21 @@ export default function KioskPage() {
     [cart]
   );
 
-  const handleFinalSubmit = async (paymentMethod: "Card" | "Mobile Pay") => {
+  const handleFinalSubmit = async (
+    paymentMethod: "Card" | "Mobile Pay" | "Cash"
+  ) => {
+    // Handle special payment flows first
+    if (paymentMethod === "Card") {
+      setIsStripeModalOpen(true);
+      return;
+    }
+
+    if (paymentMethod === "Mobile Pay") {
+      // Open PayPal modal instead of direct order
+      setIsPayPalModalOpen(true);
+      return;
+    }
+
     // Normal flow for non-digital payments
     setIsSubmitting(true);
     setSubmitError(null);
@@ -393,235 +406,236 @@ export default function KioskPage() {
   }, [products]);
 
   return (
-    <LanguageProvider>
-      <MagnifierProvider>
-        <Magnifier
-          options={{
-            zoom: 2, // adjust as needed
-            size: 220, // lens diameter in px
-          }}
-        >
-          <div className="relative h-screen">
-            <div className="flex flex-col lg:flex-row h-screen">
-              {/* --- LEFT: Products --- */}
-              <div className="w-full lg:w-2/3 p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900">
-                <KioskHeader
-                  isHighContrast={isHighContrast}
-                  setIsHighContrast={setIsHighContrast}
-                />
+    <MagnifierProvider>
+      <LanguageProvider>
+        <div className="relative h-screen">
+          <div className="flex flex-col lg:flex-row h-screen">
+            {/* --- LEFT: Products --- */}
+            <div className="w-full lg:w-2/3 p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+              <KioskHeader
+                isHighContrast={isHighContrast}
+                setIsHighContrast={setIsHighContrast}
+              />
 
-                {/* Category selector: dropdown on small screens, buttons on sm+ */}
-                {/* Dropdown for small screens */}
-                <div className="mb-4 mt-4">
-                  <div className="sm:hidden flex w-full">
-                    <select
-                      title="Select Category" //added for accessibility, remove warning
-                      className="block w-full p-3 rounded-lg border bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 text-center text-lg font-semibold"
-                      value={activeCategory ?? ""}
-                      onChange={(e) => {
-                        setActiveCategory(e.target.value);
-                        localStorage.setItem(
-                          "kiosk.activeCategory",
-                          e.target.value
-                        );
-                      }}
-                    >
-                      {availableCategories.map((category) => (
-                        <option key={category} value={category}>
-                          {category.toUpperCase()}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  {/* Buttons for sm+ screens */}
-                  <div className="hidden sm:flex w-full overflow-x-auto mb-4">
-                    <div className="flex w-full justify-between gap-1 sm:gap-2">
-                      {availableCategories.map((category) => (
-                        <button
-                          key={category}
-                          onClick={() => {
-                            setActiveCategory(category);
-                            localStorage.setItem(
-                              "kiosk.activeCategory",
-                              category
-                            );
-                          }}
-                          className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-colors
-                            ${
-                              activeCategory === category
-                                ? "bg-maroon text-white"
-                                : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200"
-                            }`}
-                        >
-                          <T>{category.toUpperCase()}</T>
-                        </button>
-                      ))}
-                    </div>
+              {/* Category selector: dropdown on small screens, buttons on sm+ */}
+              {/* Dropdown for small screens */}
+              <div className="mb-4 mt-4">
+                <div className="sm:hidden flex w-full">
+                  <select
+                    title = "Select Category" //added for accessibility, remove warning
+                    className="block w-full p-3 rounded-lg border bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 text-center text-lg font-semibold"
+                    value={activeCategory ?? ""}
+                    onChange={(e) => {
+                      setActiveCategory(e.target.value);
+                      localStorage.setItem("kiosk.activeCategory", e.target.value);
+                    }}
+                  >
+                    {availableCategories.map((category) => (
+                      <option key={category} value={category}>
+                        {category.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {/* Buttons for sm+ screens */}
+                <div className="hidden sm:flex w-full overflow-x-auto mb-4">
+                  <div className="flex w-full justify-between gap-1 sm:gap-2">
+                    {availableCategories.map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => {
+                          setActiveCategory(category);
+                          localStorage.setItem("kiosk.activeCategory", category);
+                        }}
+                        className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-colors
+                          ${
+                            activeCategory === category
+                              ? "bg-maroon text-white"
+                              : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200"
+                          }`}
+                      >
+                        <T>{category.toUpperCase()}</T>
+                      </button>
+                    ))}
                   </div>
                 </div>
+              </div>
 
-                {/* Products */}
-                {isLoading && <Spinner />}
-                {error && <p className="text-red-500">{error}</p>}
+              {/* Products */}
+              {isLoading && <Spinner />}
+              {error && <p className="text-red-500">{error}</p>}
 
-                {!isLoading && !error && activeCategory && (
-                  <div key={activeCategory} className="mb-8 animate-fadeIn">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
-                      {(groupedProducts[activeCategory] || [])
-                        .filter(
-                          (p) => p.product_name.toUpperCase() !== "CUSTOM TEA"
-                        ) //specifically excludes CUSTOM TEA drink
-                        .map((p) => (
-                          <KioskProductCard
-                            key={p.product_id}
-                            product={p}
-                            onSelect={openCustomizationModal}
-                          />
-                        ))}
-                    </div>
+              {!isLoading && !error && activeCategory && (
+                <div key={activeCategory} className="mb-8 animate-fadeIn">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 magnifier:grid-cols-3">
+                    {(groupedProducts[activeCategory] || [])
+                      .filter(
+                        (p) => p.product_name.toUpperCase() !== "CUSTOM TEA"
+                      ) //specifically excludes CUSTOM TEA drink
+                      .map((p) => (
+                        <KioskProductCard
+                          key={p.product_id}
+                          product={p}
+                          onSelect={openCustomizationModal}
+                        />
+                      ))}
                   </div>
+                </div>
+              )}
+            </div>
+
+            {/* --- RIGHT: Cart --- */}
+            <div
+              className="
+                w-full lg:w-1/3 
+                bg-white dark:bg-gray-800 shadow-lg p-6 flex flex-col
+                border-t lg:border-t-0
+                lg:fixed lg:top-20 lg:right-0 lg:h-[calc(100vh-5rem)]
+                "
+            >
+              <h2 className="text-2xl magnifier:text-5xl md:text-3xl font-bold mb-4 dark:text-white text-center lg:text-left">
+                <T>Your Order</T>
+              </h2>
+
+              <div className="flex-grow overflow-y-auto mb-4">
+                {cart.length === 0 ? (
+                  <p className="text-gray-500 dark:text-gray-400 text-center lg:text-left">
+                    <T>Your cart is empty.</T>
+                  </p>
+                ) : (
+                  cart.map((item) => (
+                    <KioskCartItem
+                      key={item.cart_id}
+                      item={item}
+                      onRemove={removeFromCart}
+                    />
+                  ))
                 )}
               </div>
 
-              {/* --- RIGHT: Cart --- */}
-              <div
-                className="
-          w-full lg:w-1/3 
-          bg-white dark:bg-gray-800 shadow-lg p-6 flex flex-col
-          border-t lg:border-t-0
-          lg:fixed lg:top-20 lg:right-0 lg:h-[calc(100vh-5rem)]
-          "
-              >
-                <h2 className="text-2xl md:text-3xl font-bold mb-4 dark:text-white text-center lg:text-left">
-                  <T>Your Order</T>
-                </h2>
-
-                <div className="flex-grow overflow-y-auto mb-4">
-                  {cart.length === 0 ? (
-                    <p className="text-gray-500 dark:text-gray-400 text-center lg:text-left">
-                      <T>Your cart is empty.</T>
-                    </p>
-                  ) : (
-                    cart.map((item) => (
-                      <KioskCartItem
-                        key={item.cart_id}
-                        item={item}
-                        onRemove={removeFromCart}
-                      />
-                    ))
-                  )}
+              <div className="border-t pt-4 mt-2 dark:border-gray-700">
+                <div className="flex justify-between items-center text-xl md:text-2xl magnifier:text-5xl font-bold mb-4 dark:text-white">
+                  <span>
+                    <T>Total</T>:
+                  </span>
+                  <span>${total.toFixed(2)}</span>
                 </div>
-
-                <div className="border-t pt-4 mt-2 dark:border-gray-700">
-                  <div className="flex justify-between items-center text-xl md:text-2xl font-bold mb-4 dark:text-white">
-                    <span>
-                      <T>Total</T>:
-                    </span>
-                    <span>${total.toFixed(2)}</span>
-                  </div>
-                  <button
-                    onClick={() => setIsPaymentModalOpen(true)}
-                    disabled={cart.length === 0}
-                    className="w-full py-3 md:py-4 bg-maroon text-white text-lg md:text-xl font-bold rounded-lg shadow-lg disabled:opacity-50 hover:bg-darkmaroon"
-                  >
-                    <T>Pay Now</T>
-                  </button>
-                </div>
+                <button
+                  onClick={() => {setIsPaymentModalOpen(true);}}
+                  disabled={cart.length === 0}
+                  className="w-full py-3 md:py-4 bg-maroon text-white text-lg md:text-xl font-bold rounded-lg shadow-lg disabled:opacity-50 hover:bg-darkmaroon"
+                >
+                  <T>Pay Now</T>
+                </button>
               </div>
+            </div>
 
+            <Modal
+              isOpen={isPaymentModalOpen}
+              onClose={() => {setIsPaymentModalOpen(false);
+                          }}
+              title="Select Payment Method"
+              isDarkMode={isHighContrast}
+            >
+              <div className="flex flex-col gap-4 dark:bg-gray-900 dark:text-gray-100 p-4 rounded-lg transition-colors">
+                <p className="text-lg md:text-xl text-center">
+                  <T>Your total is</T>:
+                  <span className="font-bold ml-2 text-maroon dark:text-yellow-300">
+                    ${total.toFixed(2)}
+                  </span>
+                </p>
+
+                <PaymentButton
+                  label="Card"
+                  onClick={() => handleFinalSubmit("Card")}
+                  disabled={isSubmitting}
+                />
+                <PaymentButton
+                  label="PayPal (Mobile Pay)"
+                  onClick={() => handleFinalSubmit("Mobile Pay")}
+                  disabled={isSubmitting}
+                />
+                <PaymentButton
+                  label="Cash (Pay at Counter)"
+                  onClick={() => handleFinalSubmit("Cash")}
+                  disabled={isSubmitting}
+                />
+
+                {isSubmitting && <Spinner />}
+                {submitError && (
+                  <p className="text-red-500 text-center font-semibold">
+                    {submitError}
+                  </p>
+                )}
+              </div>
+            </Modal>
+
+            {selectedProduct && (
               <Modal
-                isOpen={isPaymentModalOpen}
-                onClose={() => setIsPaymentModalOpen(false)}
-                title="Select Payment Method"
+                isOpen={isCustomizationModalOpen}
+                onClose={() => {
+                  setIsCustomizationModalOpen(false);
+                  setSelectedProduct(null);
+                }}
+                title="Customize Your Drink"
                 isDarkMode={isHighContrast}
               >
-                <div className="flex flex-col gap-4 dark:bg-gray-900 dark:text-gray-100 p-4 rounded-lg transition-colors">
-                  <p className="text-lg md:text-xl text-center">
-                    <T>Your total is</T>:
-                    <span className="font-bold ml-2 text-maroon dark:text-yellow-300">
-                      ${total.toFixed(2)}
-                    </span>
-                  </p>
-
-                  <PaymentButton
-                    label="Card"
-                    onClick={() => setIsStripeModalOpen(true)}
-                    disabled={isSubmitting}
+                <div className="dark:bg-gray-900 dark:text-gray-100 p-4 rounded-lg transition-colors">
+                  <CustomizationForm
+                    product={selectedProduct}
+                    onSubmit={handleAddToCart}
                   />
-                  <PaymentButton
-                    label="PayPal (Mobile Pay)"
-                    onClick={() => setIsPayPalModalOpen(true)}
-                    disabled={isSubmitting}
-                  />
-
-                  {isSubmitting && <Spinner />}
-                  {submitError && (
-                    <p className="text-red-500 text-center font-semibold">
-                      {submitError}
-                    </p>
-                  )}
                 </div>
               </Modal>
+            )}
 
-              {selectedProduct && (
-                <Modal
-                  isOpen={isCustomizationModalOpen}
-                  onClose={() => {
-                    setIsCustomizationModalOpen(false);
-                    setSelectedProduct(null);
-                  }}
-                  title="Customize Your Drink"
-                  isDarkMode={isHighContrast}
-                >
-                  <div className="dark:bg-gray-900 dark:text-gray-100 p-4 rounded-lg transition-colors">
-                    <CustomizationForm
-                      product={selectedProduct}
-                      onSubmit={handleAddToCart}
-                    />
-                  </div>
-                </Modal>
-              )}
-
-              {isStripeModalOpen && (
-                <Modal
-                  isOpen={isStripeModalOpen}
-                  onClose={() => setIsStripeModalOpen(false)}
-                  title="Card Payment"
-                  isDarkMode={isHighContrast}
-                >
-                  <Elements stripe={stripePromise}>
-                    <PaymentForm
-                      total={total}
-                      isDarkMode={isHighContrast}
-                      onSuccess={async () => {
-                        setIsStripeModalOpen(false);
-                        await handleFinalSubmit("Card"); // reuse existing backend logic to save order
-                      }}
-                    />
-                  </Elements>
-                </Modal>
-              )}
-
-              {isPayPalModalOpen && (
-                <Modal
-                  isOpen={isPayPalModalOpen}
-                  onClose={() => setIsPayPalModalOpen(false)}
-                  title="Pay with PayPal"
-                >
-                  <PayPalCheckout
+            {isStripeModalOpen && (
+              <Modal
+                isOpen={isStripeModalOpen}
+                onClose={() => {
+                  setIsStripeModalOpen(false);
+                  
+                }}
+                title="Card Payment"
+                isDarkMode={isHighContrast}
+              >
+                <Elements stripe={stripePromise}>
+                  <PaymentForm
                     total={total}
-                    onSuccess={() => {
-                      toast.success("Payment successful via PayPal!");
-                      setIsPayPalModalOpen(false);
-                      handleFinalSubmit("Mobile Pay"); // record order after PayPal
+                    isDarkMode={isHighContrast}
+                    onSuccess={async () => {
+                      setIsStripeModalOpen(false);
+                      
+                      await handleFinalSubmit("Cash"); // reuse existing backend logic to save order
                     }}
                   />
-                </Modal>
-              )}
-            </div>
+                </Elements>
+              </Modal>
+            )}
+
+            {isPayPalModalOpen && (
+              <Modal
+                isOpen={isPayPalModalOpen}
+                onClose={() => {
+                  setIsPayPalModalOpen(false);
+                  
+                }}
+                title="Pay with PayPal"
+              >
+                <PayPalCheckout
+                  total={total}
+                  onSuccess={() => {
+                    toast.success("Payment successful via PayPal!");
+                    setIsPayPalModalOpen(false);
+                    
+                    handleFinalSubmit("Cash"); // record order after PayPal
+                  }}
+                />
+              </Modal>
+            )}
           </div>
-        </Magnifier>
-      </MagnifierProvider>
-    </LanguageProvider>
+        </div>
+      </LanguageProvider>
+    </MagnifierProvider>
   );
 }

@@ -1,11 +1,5 @@
-// src/contexts/MagnifierContext.tsx
-import {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  useEffect,
-} from "react";
+// contexts/MagnifierContext.tsx
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 type MagnifierContextType = {
   isMagnifierEnabled: boolean;
@@ -16,14 +10,21 @@ const MagnifierContext = createContext<MagnifierContextType | undefined>(
   undefined
 );
 
-export const MagnifierProvider = ({ children }: { children: ReactNode }) => {
+export function MagnifierProvider({ children }: { children: ReactNode }) {
   const [isMagnifierEnabled, setIsMagnifierEnabled] = useState(() => {
-    const saved = localStorage.getItem("kiosk.magnifierEnabled");
-    return saved === "true";
+    // Persist across sessions
+    return localStorage.getItem("kiosk.magnifier") === "true";
   });
 
   useEffect(() => {
-    localStorage.setItem("kiosk.magnifierEnabled", isMagnifierEnabled.toString());
+    localStorage.setItem("kiosk.magnifier", isMagnifierEnabled.toString());
+    
+    // Apply class to <html> for global control (just like dark mode)
+    if (isMagnifierEnabled) {
+      document.documentElement.classList.add("magnifier");
+    } else {
+      document.documentElement.classList.remove("magnifier");
+    }
   }, [isMagnifierEnabled]);
 
   const toggleMagnifier = () => {
@@ -35,12 +36,12 @@ export const MagnifierProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </MagnifierContext.Provider>
   );
-};
+}
 
-export const useMagnifierControl = (): MagnifierContextType => {
+export function useMagnifierControl() {
   const context = useContext(MagnifierContext);
   if (!context) {
-    throw new Error("useMagnifierControl must be used within a MagnifierProvider");
+    throw new Error("useMagnifierControl must be used within MagnifierProvider");
   }
   return context;
-};
+}

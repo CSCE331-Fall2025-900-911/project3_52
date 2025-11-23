@@ -14,5 +14,11 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addVariant }) {
+      addVariant("magnifier", ".magnifier &");
+      // Optional: hover states too
+      addVariant("magnifier-hover", [".magnifier &:hover", "&:hover.magnifier"]);
+    },
+  ],
 };

@@ -19,13 +19,6 @@ import Spinner from "../../components/Spinner";
 import { toast } from "react-hot-toast";
 import { DashboardData } from "../../types/models";
 
-const COLORS = [
-  "#E91E63", // Deep Pink (vibrant, visible on dark/light)
-  "#9C27B0", // Rich Purple
-  "#3D5AFE", // Electric Indigo Blue
-  "#FF5722", // Deep Orange
-  "#8f140cff", // Amber Gold
-];
 
 export default function AnalyticsDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -53,32 +46,80 @@ export default function AnalyticsDashboard() {
 
   const { summary, charts } = data;
 
+  // REGULAR COLORS
+  // const COLORS = [
+  //   '#4B0082', // Deep Indigo (dark purple)
+  //   '#8B1A1A', // Maroon (your original)
+  //   '#2F4F4F', // Dark Slate Gray
+  //   '#191970', // Midnight Blue
+  //   '#483D8B', // Dark Slate Blue
+  //   '#2E0854', // Deep Violet
+  //   '#800000', // Dark Red/Maroon
+  //   '#006400', // Dark Green
+  //   '#1C2526', // Almost Black (charcoal)
+  //   '#353839'  // Gunmetal Gray
+  // ];
+
+  // FALL COLORS
+  const COLORS = [
+    '#800000', // Maroon
+    '#8B4513', // Saddle Brown
+    '#A0522D', // Sienna
+    '#556B2F',  // Dark Olive Green
+    '#D2691E', // Chocolate
+    '#CD853F', // Peru
+    '#B8860B', // Dark Goldenrod
+    '#FF8C00', // Dark Orange
+    '#B22222', // Firebrick
+    '#654321', // Dark Brown
+  ];
+
+  // FOURTH OF JULY COLORS
+  // const COLORS = [
+  //   '#8C1D40', // Firecracker Crimson
+  //   '#003087', // Midnight Navy
+  //   '#C0C0C0', // Silver Sparkle (fireworks)
+  //   '#A52A2A', // Flag Red
+  //   '#00205B', // Deep Patriot Blue
+  // ];
+
   return (
     <div className="space-y-8">
       <h2 className="text-3xl font-bold text-gray-800">Data Analytics</h2>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-maroon text-white p-6 rounded-xl shadow-lg">
-          <p className="text-4xl font-bold">
-            ${summary.totalRevenue30Days.toFixed(2)}
-          </p>
-          <p className="text-lg opacity-90">Revenue (30d)</p>
-        </div>
-        <div className="bg-gray-800 text-white p-6 rounded-xl shadow-lg">
-          <p className="text-4xl font-bold">{summary.today.orders}</p>
-          <p className="text-lg opacity-90">Orders Today</p>
-        </div>
-        <div className="bg-green-600 text-white p-6 rounded-xl shadow-lg">
-          <p className="text-4xl font-bold">
-            ${summary.today.revenue.toFixed(2)}
-          </p>
-          <p className="text-lg opacity-90">Today's Revenue</p>
-        </div>
-        <div className="bg-red-600 text-white p-6 rounded-xl shadow-lg">
-          <p className="text-4xl font-bold">{summary.lowStockItems}</p>
-          <p className="text-lg opacity-90">Low Stock Alerts</p>
-        </div>
+        {[
+          {
+            bg: COLORS[0],               // Saddle Brown
+            value: `$${summary.totalRevenue30Days.toFixed(2)}`,
+            label: 'Revenue (30d)',
+          },
+          {
+            bg: COLORS[1],               // Sienna
+            value: summary.today.orders,
+            label: 'Orders Today',
+          },
+          {
+            bg: COLORS[2],               // Chocolate
+            value: `$${summary.today.revenue.toFixed(2)}`,
+            label: "Today's Revenue",
+          },
+          {
+            bg: COLORS[3],               // Peru
+            value: summary.lowStockItems,
+            label: 'Low Stock Alerts',
+          },
+        ].map((card, idx) => (
+          <div
+            key={idx}
+            className="p-6 rounded-xl shadow-lg text-white"
+            style={{ backgroundColor: card.bg }}   // <-- dynamic fall color
+          >
+            <p className="text-4xl font-bold">{card.value}</p>
+            <p className="text-lg opacity-90">{card.label}</p>
+          </div>
+        ))}
       </div>
 
       {/* Charts Grid */}
@@ -108,10 +149,14 @@ export default function AnalyticsDashboard() {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={charts.topProducts}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
+              <XAxis dataKey="name" angle={-35} textAnchor="end" height={80} tick={{ fontSize: 10 }} />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="units_sold" fill="#8B1A1A" />
+              <Bar dataKey="units_sold">
+                {charts.topProducts.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -148,13 +193,33 @@ export default function AnalyticsDashboard() {
           <h3 className="text-xl font-semibold mb-4">
             Peak Hours (Last 7 Days)
           </h3>
+
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={charts.hourlyOrders}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="hour" tickFormatter={(h) => `${h}:00`} />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="count" fill="#A0522D" />
+
+              <XAxis
+                dataKey="hour"
+                tickFormatter={(h) => `${h}:00`}
+                tick={{ fontSize: 12 }}
+              />
+
+              <YAxis tick={{ fontSize: 12 }} />
+
+              <Tooltip
+                contentStyle={{ fontSize: 13 }}
+                labelStyle={{ fontSize: 14, fontWeight: 'bold' }}
+              />
+
+              {/* ---------- MULTI-COLOR BAR ---------- */}
+              <Bar dataKey="count">
+                {charts.hourlyOrders.map((entry, idx) => (
+                  <Cell
+                    key={`hour-${idx}`}
+                    fill={COLORS[idx % COLORS.length]}
+                  />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>

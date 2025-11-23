@@ -9,21 +9,35 @@ type MagnifierContextType = {
 const MagnifierContext = createContext<MagnifierContextType | undefined>(undefined);
 
 export function MagnifierProvider({ children }: { children: ReactNode }) {
-  const [isMagnifierEnabled, setIsMagnifierEnabled] = useState(() => {
-    return localStorage.getItem("kiosk.magnifier") === "true";
-  });
+  const [isMagnifierEnabled, setIsMagnifierEnabled] = useState(false);
+
+  // Sync with localStorage on mount AND keep it updated
+  useEffect(() => {
+    const saved = localStorage.getItem("kiosk.magnifier");
+    const enabled = saved === "true";
+    setIsMagnifierEnabled(enabled);
+
+    // Optionally: dispatch a custom event so external scripts can react
+    window.dispatchEvent(new Event("magnifier-toggle"));
+  }, []);
+
+  // Keep localStorage in sync whenever state changes
+  useEffect(() => {
+    localStorage.setItem("kiosk.magnifier", isMagnifierEnabled.toString());
+    
+    // This is crucial: notify any external magnifier scripts
+    window.dispatchEvent(new CustomEvent("magnifier-change", { 
+      detail: { enabled: isMagnifierEnabled } 
+    }));
+  }, [isMagnifierEnabled]);
 
   const toggleMagnifier = () => {
-    setIsMagnifierEnabled((prev) => {
-      const newValue = !prev;
-      localStorage.setItem("kiosk.magnifier", newValue.toString());
-      return newValue;
-    });
+    setIsMagnifierEnabled(prev => !prev);
   };
 
   return (
     <MagnifierContext.Provider value={{ isMagnifierEnabled, toggleMagnifier }}>
-      {/* Apply magnifier class ONLY to children (i.e. KioskPage) */}
+      {/* Apply class to trigger CSS-based magnifiers */}
       <div className={isMagnifierEnabled ? "magnifier" : ""}>
         {children}
       </div>

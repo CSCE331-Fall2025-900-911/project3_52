@@ -38,7 +38,7 @@ export default function KioskHeader({
           {isMagnifierEnabled ? (
             <span aria-hidden="true">Zoom Out</span>
           ) : (
-            <span aria-hidden="true">Magnifying Glass</span>
+            <span aria-hidden="true">Zoom In</span>
           )}
           <span className="sr-only">
             {isMagnifierEnabled ? "Magnifier On" : "Magnifier Off"}

@@ -33,19 +33,12 @@
   }
 }
 
-.magnifier {
-  font-size: 1rem; /* Base font size increase */
-}
-
-.magnifier * {
-  min-height: 1rem; /* Better tap targets */
-}
 
 .magnifier button,
 .magnifier select,
 .magnifier input,
 .magnifier label {
-  font-size: 1.5rem !important;
+  font-size: 1.4rem !important;
   
   transition: font-size 0.4s ease;
 }

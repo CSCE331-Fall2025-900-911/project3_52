@@ -6,34 +6,27 @@ type MagnifierContextType = {
   toggleMagnifier: () => void;
 };
 
-const MagnifierContext = createContext<MagnifierContextType | undefined>(
-  undefined
-);
+const MagnifierContext = createContext<MagnifierContextType | undefined>(undefined);
 
 export function MagnifierProvider({ children }: { children: ReactNode }) {
   const [isMagnifierEnabled, setIsMagnifierEnabled] = useState(() => {
-    // Persist across sessions
     return localStorage.getItem("kiosk.magnifier") === "true";
   });
 
-  useEffect(() => {
-    localStorage.setItem("kiosk.magnifier", isMagnifierEnabled.toString());
-    
-    // Apply class to <html> for global control (just like dark mode)
-    if (isMagnifierEnabled) {
-      document.documentElement.classList.add("magnifier");
-    } else {
-      document.documentElement.classList.remove("magnifier");
-    }
-  }, [isMagnifierEnabled]);
-
   const toggleMagnifier = () => {
-    setIsMagnifierEnabled((prev) => !prev);
+    setIsMagnifierEnabled((prev) => {
+      const newValue = !prev;
+      localStorage.setItem("kiosk.magnifier", newValue.toString());
+      return newValue;
+    });
   };
 
   return (
     <MagnifierContext.Provider value={{ isMagnifierEnabled, toggleMagnifier }}>
-      {children}
+      {/* Apply magnifier class ONLY to children (i.e. KioskPage) */}
+      <div className={isMagnifierEnabled ? "magnifier" : ""}>
+        {children}
+      </div>
     </MagnifierContext.Provider>
   );
 }

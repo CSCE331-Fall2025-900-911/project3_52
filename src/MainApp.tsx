@@ -5,6 +5,7 @@ import ManagerPage from "./pages/ManagerPage/ManagerPage";
 import WeatherDisplay from "./components/WeatherDisplay";
 import LoginButton from "./components/LoginButton";
 import { AuthProvider } from "./contexts/AuthContext";
+import { MagnifierProvider } from "./contexts/MagnifierContext";
 import { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 
@@ -20,7 +21,11 @@ const MainApp = ({
       case "home":
         return <HomePage setPage={setPage} />;
       case "kiosk":
-        return <KioskPage />;
+        return (
+          <MagnifierProvider>
+            <KioskPage />
+          </MagnifierProvider>
+        );
       case "cashier":
         return <CashierPage />;
       case "manager":

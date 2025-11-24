@@ -50,7 +50,7 @@ export default function ReportsManager() {
   const [zClosed, setZClosed] = useState<ZCloseResp | null>(null);
   const [loadingX, setLoadingX] = useState(false);
   const [loadingZPrev, setLoadingZPrev] = useState(false);
-  const [closingZ, setClosingZ] = useState(false);
+  const [closingZ] = useState(false);
   const [confirmZOpen, setConfirmZOpen] = useState(false);
   const [isRunningZ, setIsRunningZ] = useState(false);
   const [zClosedToday, setZClosedToday] = useState(false);

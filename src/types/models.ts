@@ -16,6 +16,7 @@ export type Product = {
   milk: number;
   cream: number;
   sugar: number;
+  img_url: string;
 };
 
 export type CartItem = {

@@ -1,6 +1,5 @@
 import { Product } from "../../types/models";
 import { T } from "../../contexts/LangContext";
-import { productImages } from "../../components/ProductImages";
 
 export default function KioskProductCard({
   product,
@@ -38,7 +37,7 @@ export default function KioskProductCard({
 
       {/* Image - bigger but still fits grid */}
       <img
-        src={productImages[product.product_name]}
+        src={product.img_url}
         alt={product.product_name}
         className="
           w-32 h-32 

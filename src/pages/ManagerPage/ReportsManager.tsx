@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import Spinner from "../../components/Spinner";
 import { apiFetch } from "../../api/http";
+import Modal from "../../components/Modal";
 import {
   ResponsiveContainer,
   PieChart,
@@ -50,6 +51,8 @@ export default function ReportsManager() {
   const [loadingX, setLoadingX] = useState(false);
   const [loadingZPrev, setLoadingZPrev] = useState(false);
   const [closingZ, setClosingZ] = useState(false);
+  const [confirmZOpen, setConfirmZOpen] = useState(false);
+  const [isRunningZ, setIsRunningZ] = useState(false);
   const [zClosedToday, setZClosedToday] = useState(false);
   const [zClosedStatus, setZClosedStatus] = useState<{
     closed_at?: string | null;
@@ -105,37 +108,29 @@ export default function ReportsManager() {
   };
 
   const closeZ = async () => {
-    if (
-      !window.confirm(
-        "Run Z Report and close the day? This will reset the counter."
-      )
-    )
-      return;
-
-    setClosingZ(true);
-    try {
-      // ✅ Always make the API call, even if zClosed already exists
-      const res = await apiFetch("/api/reports/z/close", { method: "POST" });
-      const data = await res.json();
-
-      // ✅ Handle backend refusal properly
-      if (!res.ok || data.success === false || data.error) {
-        toast.error(
-          data.message || data.error || "Z-report already run today."
-        );
-        return;
-      }
-
-      // ✅ Successful close
-      setZClosed(data);
-      setZClosedToday(true);
-      toast.success("Z Report closed");
-    } catch (e: any) {
-      toast.error(e.message || "Failed to close Z report");
-    } finally {
-      setClosingZ(false);
-    }
+    setConfirmZOpen(true); // <-- OPEN CUSTOM MODAL
   };
+  const runZReport = async () => {
+  setIsRunningZ(true);
+  try {
+    const res = await apiFetch("/api/reports/z/close", { method: "POST" });
+    const data = await res.json();
+
+    if (!res.ok || data.success === false || data.error) {
+      toast.error(data.message || data.error || "Z-report already run today.");
+      return;
+    }
+
+    setZClosed(data);
+    setZClosedToday(true);
+    toast.success("Z Report closed");
+  } catch (e: any) {
+    toast.error(e.message || "Failed to close Z report");
+  } finally {
+    setIsRunningZ(false);
+    setConfirmZOpen(false); // CLOSE MODAL
+  }
+};
 
   const COLORS = ["#E91E63", "#3D5AFE", "#FFC107", "#4CAF50", "#FF5722"];
 
@@ -468,6 +463,37 @@ export default function ReportsManager() {
           </>
         )}
       </div>
+      <Modal
+        isOpen={confirmZOpen}
+        onClose={() => setConfirmZOpen(false)}
+        title="Generate Z Report?"
+      >
+        <p className="text-gray-700 mb-4">
+            Generating a Z Report will <span className="font-semibold">close the
+            business day</span>, reset X-report totals, and archive today's
+            sales.
+            <br /><br />
+            This action <span className="font-bold text-red-600">cannot be undone</span>.
+            Are you sure you want to continue?
+        </p>
+
+        <div className="flex justify-end gap-3">
+            <button
+            onClick={() => setConfirmZOpen(false)}
+            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg"
+            >
+            Cancel
+            </button>
+
+            <button
+            onClick={runZReport}
+            disabled={isRunningZ}
+            className="px-4 py-2 bg-maroon text-white rounded-lg hover:bg-darkmaroon disabled:opacity-50"
+            >
+            {isRunningZ ? "Processing..." : "Confirm"}
+            </button>
+        </div>
+      </Modal>
     </div>
   );
 }

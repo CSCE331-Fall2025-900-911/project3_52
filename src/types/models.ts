@@ -98,21 +98,51 @@ export type DashboardData = {
     };
   };
   charts: {
+    // === Existing Charts ===
     revenueOverTime: { date: string; revenue: number }[];
     topProducts: { name: string; units_sold: number; revenue: number }[];
     categoryBreakdown: { category: string; sold: number }[];
     hourlyOrders: { hour: number; count: number }[];
-    staffPerformance: {
-      name: string;
-      role: string;
-      hours: number;
-      salary: number;
-      hourly_rate: number;
-    }[];
     lowStockAlerts: {
       name: string;
       remaining: number;
+      servings_per_unit: number;
       servings_left: number;
+    }[];
+
+    // === NEW ADVANCED INSIGHTS ===
+    revenueConcentration: {
+      name: string;
+      revenue: number;
+      pct: number; // percentage of total revenue
+    }[];
+
+    toppingProfit: {
+      combo: string;
+      orders: number;
+      revenue: number;
+    }[];
+
+    sizeAnalysis: {
+      size: string;
+      sold: number;
+      avg_price: number;
+      revenue: number;
+      pct: number; // % of total item revenue
+    }[];
+
+    whaleOrders: {
+      id: number;
+      time: string;
+      total: number;
+      items: number;
+    }[];
+
+    tipBehavior: {
+      method: string;
+      orders: number;
+      tip_pct: number;
+      avg_order: number;
     }[];
   };
 };

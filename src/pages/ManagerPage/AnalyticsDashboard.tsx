@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -91,9 +91,9 @@ export default function AnalyticsDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           {
-            bg: COLORS[0],               // Saddle Brown
-            value: `$${summary.totalRevenue30Days.toFixed(2)}`,
-            label: 'Revenue (30d)',
+            bg: COLORS[0],               // Chocolate
+            value: `$${summary.today.revenue.toFixed(2)}`,
+            label: "Today's Revenue",
           },
           {
             bg: COLORS[1],               // Sienna
@@ -101,12 +101,12 @@ export default function AnalyticsDashboard() {
             label: 'Orders Today',
           },
           {
-            bg: COLORS[2],               // Chocolate
-            value: `$${summary.today.revenue.toFixed(2)}`,
-            label: "Today's Revenue",
+            bg: COLORS[3],               // Saddle Brown
+            value: `$${summary.totalRevenue30Days.toFixed(2)}`,
+            label: 'Revenue (30d)',
           },
           {
-            bg: COLORS[3],               // Peru
+            bg: COLORS[2],               // Peru
             value: summary.lowStockItems,
             label: 'Low Stock Alerts',
           },
@@ -266,46 +266,125 @@ export default function AnalyticsDashboard() {
         </div>
       )}
 
-      {/* Staff Performance Table */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <h3 className="text-xl font-semibold p-6 bg-gray-50 border-b">
-          Staff Performance
-        </h3>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                  Name
-                </th>
-                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                  Role
-                </th>
-                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                  Hours
-                </th>
-                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                  Salary
-                </th>
-                <th className="p-4 text-left text-xs font-medium text-gray-500 uppercase">
-                  Hourly Rate
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {charts.staffPerformance.map((s) => (
-                <tr key={s.name}>
-                  <td className="p-4 font-medium">{s.name}</td>
-                  <td className="p-4 text-gray-600">{s.role}</td>
-                  <td className="p-4">{s.hours}</td>
-                  <td className="p-4">${s.salary.toFixed(2)}</td>
-                  <td className="p-4 font-semibold">
-                    ${s.hourly_rate.toFixed(2)}/hr
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* ========================================
+          NEW SECTION: Advanced Insights (Bottom)
+      ======================================== */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold text-gray-800 mb-8">Advanced Business Insights</h2>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+          {/* 8. Revenue Concentration */}
+          <div className="bg-white p-8 rounded-xl shadow-lg">
+          <h3 className="text-lg font-semibold mb-4 text-orange-700">Revenue Concentration</h3>
+          <ResponsiveContainer width="100%" height={320}>
+              <BarChart data={charts.revenueConcentration} layout="horizontal">
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" angle={-30} textAnchor="end" height={80} tick={{ fontSize: 10 }} />
+              <YAxis
+                yAxisId="left"
+                label={{ value: 'Revenue ($)', angle: -90, position: 'insideLeft', offset: 0 }}
+                tick={{ textAnchor: 'end', dx: -4, fontSize: 10 }}
+              />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                label={{ value: 'Percentage (%)', angle: 90, position: 'insideRight', offset: 0 }}
+                tick={{ textAnchor: 'start', dx: 4, fontSize: 12 }}
+              />
+              <Tooltip formatter={(v: number) => typeof v === 'number' && v > 100 ? `$${v.toFixed(0)}` : `${v.toFixed(1)}%`} />
+              <Bar yAxisId="left" dataKey="revenue" fill="#FF8C00">
+                {charts.revenueConcentration.map((_, i) => (
+                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                ))}
+              </Bar>
+              </BarChart>
+          </ResponsiveContainer>
+          <p className="text-xs text-gray-600 mt-2">Top 15 products driving revenue</p>
+          </div>
+
+          {/* 9. Topping Profit */}
+          <div className="bg-white p-6 rounded-xl shadow-lg">
+            <h3 className="text-lg font-semibold mb-4 text-green-700">Toppings = Profit Engine</h3>
+            <ResponsiveContainer width="100%" height={320}>
+                <BarChart data={charts.toppingProfit}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="combo" angle={-30} textAnchor="end" height={80} tick={{ fontSize: 10 }} />
+                <YAxis />
+                <Tooltip formatter={(v: number) => `$${v.toFixed(0)}`} />
+                <Bar dataKey="revenue">
+                  {charts.toppingProfit.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Bar>
+                </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* 10. Size Impact (Bucee's Watch) */}
+          <div className="bg-white p-6 rounded-xl shadow-lg">
+            <h3 className="text-lg font-semibold mb-4 text-purple-700">Size Revenue Dominance</h3>
+            <ResponsiveContainer width="100%" height={320}>
+              <PieChart>
+                <Pie
+                  data={charts.sizeAnalysis}
+
+
+                  dataKey="revenue"
+                  nameKey="size"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={90}
+                  label={({ size, pct }) => `${size}: ${pct}%`}
+                >
+                  {charts.sizeAnalysis.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(v: number) => `$${v.toFixed(0)}`} />
+              </PieChart>
+            </ResponsiveContainer>
+            <p className="text-xs text-center mt-2">Is Bucee's carrying the store?</p>
+          </div>
+
+          {/* 11. Whale Orders */}
+          <div className="bg-white p-6 rounded-xl shadow-lg lg:col-span-2 xl:col-span-1">
+            <h3 className="text-lg font-semibold mb-4 text-red-700">Whale Orders (≥$150)</h3>
+            <div className="space-y-3 max-h-80 overflow-y-auto">
+              {charts.whaleOrders.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">No big spenders yet</p>
+              ) : (
+                charts.whaleOrders.map((order) => (
+                  <div key={order.id} className="flex justify-between items-center bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-lg">
+                    <div>
+                      <p className="font-semibold">Order #{order.id}</p>
+                      <p className="text-sm text-gray-600">{order.time} · {order.items} items</p>
+                    </div>
+                    <p className="text-2xl font-bold text-amber-700">${order.total}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* 13. Tip Behavior */}
+          <div className="bg-white p-6 rounded-xl shadow-lg lg:col-span-2 xl:col-span-1">
+            <h3 className="text-lg font-semibold mb-4 text-blue-700">Tip % by Payment Method</h3>
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart data={charts.tipBehavior}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="method" />
+                <YAxis />
+                <Tooltip formatter={(v: number) => `${v}%`} />
+                <Bar dataKey="tip_pct" fill="#1E40AF">
+                  {charts.tipBehavior.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i + 3]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            <p className="text-xs text-gray-600 mt-2">Mobile Pay users tip way more</p>
+          </div>
+
         </div>
       </div>
     </div>

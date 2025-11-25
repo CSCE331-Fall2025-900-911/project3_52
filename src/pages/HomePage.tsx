@@ -32,8 +32,11 @@ export default function HomePage({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-      <h1 className="text-6xl font-bold text-gray-800 mb-4">MomTea</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-tr from-[rgba(115,0,0,0.2)] to-white">
+      <h1 className="text-6xl font-bold mb-4">
+        <span className="text-maroon">Mom</span>
+        <span className="text-gray-800">Tea</span>
+      </h1>
       <p className="text-xl text-gray-600 mb-12">Select your view</p>
 
       {/* 7. Apply the dynamic grid class */}

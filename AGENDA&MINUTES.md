@@ -94,3 +94,155 @@ N/A
 ## Minutes from Previous Meeting
 The team discussed progress from the initial “informal” study phase covering React, Django, OAuth2, and Postman.  
 Clarifications were made regarding repository ownership and the correct GitHub workflow for Project 3.  
+
+# SCRUM Meeting 4 – Project 3  
+**Prepared by:** Monty Kang  
+**Meeting Date:** 11/12  
+**Attendees:**  
+1. Monty Kang  
+2. Aidan Veselka  
+3. Aaron Liu  
+4. Peter Wu  
+
+---
+
+## Agenda Items
+- Introduce tasks for accessibility features, rounding out of website  
+- Discuss final steps  
+
+---
+
+## Status Update Since Last Meeting
+### **Accomplishments**
+- Finished Sprint 1  
+- Completed first MVP with X and Z reports, dark mode accessibility feature, and images added to the customer kiosk.
+
+### **Tasks Completed**
+
+| Task Description | Assigned To | Completed? |
+|------------------|-------------|-------------|
+| X/Z reports – Finalize layout and ensure the manager can open them properly | Peter | Yes |
+| Dark mode – High-contrast theme toggle | Monty | Yes |
+| Images added to customer kiosk | Monty | Yes |
+| Finish Sprint 1 | ALL | Yes |
+| Plan next accessibility feature | ALL | Yes |
+
+---
+
+## Plans Before Next Meeting
+
+### **Task Assignments**
+
+| Task Description | Assigned To |
+|------------------|-------------|
+| Unit and usability testing | Monty / Aaron |
+| Tax implementation | Peter |
+| Manager view improvements (analytics, new graphs) | Aidan |
+
+---
+
+## Minutes from Previous Meeting
+We discussed upcoming tasks for Sprint 2, mainly the implementation of a second accessibility feature and finalizing design elements in the manager and customer views.  
+
+---
+
+# SCRUM Meeting 5 – Project 3  
+**Prepared by:** Monty Kang  
+**Meeting Date:** 11/17  
+**Attendees:**  
+- Aidan Veselka  
+- Monty Kang  
+- Peter Wu  
+- Aaron Liu  
+
+---
+
+## Agenda Items
+- Progress on assigned tasks  
+- Clarification of task division  
+
+---
+
+## Status Update Since Last Meeting
+### **Accomplishments**
+- Some progress achieved on tasks  
+
+### **Tasks Completed**
+
+| Task Description | Assigned To | Completed? |
+|------------------|-------------|-------------|
+| Cashier/Customer View UI | Monty | No |
+| Manager View – X/Z Report | Peter | No |
+| Manager View – Graphs | Aidan | No |
+| Manager View – Backend/Tables | Aidan | Yes |
+| Server | Aidan, Aaron | Yes |
+
+---
+
+## Plans Before Next Meeting
+
+### **Task Assignments**
+
+| Task Description | Assigned To |
+|------------------|-------------|
+| Finalize user testing | ALL |
+| Manager View – X/Z report | Peter |
+| Manager View – Graphs | Aidan |
+
+---
+
+## Minutes from Previous Meeting
+We discussed progress made early in Sprint 2. The main change was Aidan completing the ability to export additional orders to the database.
+
+---
+
+# SCRUM Meeting 6 – Project 3  
+**Prepared by:** Monty Kang  
+**Meeting Date:** 11/23  
+**Attendees:**  
+- Aidan Veselka  
+- Aaron Liu  
+- Peter Wu  
+- Monty Kang  
+
+---
+
+## Agenda Items
+- Completion of assigned tasks  
+- Confirm demo functionality  
+
+---
+
+## Status Update Since Last Meeting
+### **Accomplishments**
+- All assigned tasks completed and tested locally  
+- Demo prepared with slides and accessibility features ready  
+
+### **Tasks Completed**
+
+| Task Description | Assigned To | Completed? |
+|------------------|-------------|-------------|
+| Demo testing | Monty / Aaron | Yes |
+| Accessibility features implemented | Aidan | Yes |
+| Manager View improvements | Aidan | Yes |
+| Slides prepared | Monty | Yes |
+| Tax/tip implemented | Aaron / Peter | Yes |
+| New data export | Aidan | Yes |
+
+---
+
+## Plans Before Next Meeting
+
+### **Task Assignments**
+
+| Task Description | Assigned To |
+|------------------|-------------|
+| Finalize Sprint 2 | ALL |
+| Finalize Sprint 2 slides | Monty / ALL |
+| Create demo | ALL |
+| Create GitHub Issues for final sprint | ALL |
+
+---
+
+## Minutes from Previous Meeting
+All tasks were confirmed completed. We presented features to each other and discussed positives and negatives. Minor aesthetic recommendations were made, and the team reviewed the live demo hosted online. Members then left to refine their tasks based on feedback.

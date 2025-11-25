@@ -26,6 +26,7 @@ export default function KioskHeader({
 
       <div className="flex w-full sm:w-auto gap-2 magnifier:gap-6">
         <button
+          type="button"
           onClick={toggleMagnifier}
           aria-pressed={isMagnifierEnabled}
           className={`w-1/2 sm:w-auto min-w-[10rem] p-3 dark:text-white rounded-lg shadow text-base sm:text-lg ${

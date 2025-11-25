@@ -49,6 +49,7 @@ export type OrderPayload = {
   special_notes: string;
   payment_method: string;
   items: OrderItem[];
+  tax: number;
 };
 
 export type Staff = {
@@ -77,6 +78,7 @@ export type OrderHistoryRecord = {
   total_price: number;
   payment_method: string;
   special_notes: string;
+  tax: number;
 };
 
 export type CustomizationData = {

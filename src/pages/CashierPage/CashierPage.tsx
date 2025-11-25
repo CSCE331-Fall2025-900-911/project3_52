@@ -286,10 +286,20 @@ export default function CashierPage() {
   const removeFromCart = (id: string) =>
     setCart((prev) => prev.filter((i) => i.cart_id !== id));
 
-  const total = useMemo(
+  const total = useMemo( //subtotal, only summing base prices of items
     () => cart.reduce((s, i) => s + i.final_price, 0),
     [cart]
   );
+
+  const tax = useMemo(
+    () => Number((total * 0.0825).toFixed(2)), //assuming tax rate in Cstat = 8.25%
+    [total]
+  );
+
+  const grandTotal = useMemo(
+    () => total + tax,
+    [total, tax]
+  )
 
   const handleFinalSubmit = async (
     paymentMethod: "Card" | "Mobile Pay" | "Cash"
@@ -316,7 +326,7 @@ export default function CashierPage() {
       day: now.getDate(),
       month: now.getMonth() + 1,
       year: now.getFullYear(),
-      total_price: total,
+      total_price: total, //i assume we don't get to add the taxed amount as revenue, just the total (subtotal)
       tip: 0,
       special_notes: "Kiosk Order",
       payment_method: paymentMethod,
@@ -328,6 +338,7 @@ export default function CashierPage() {
         toppings: i.toppings,
         price: i.final_price,
       })),
+      tax: tax,
     };
 
     try {
@@ -455,12 +466,24 @@ export default function CashierPage() {
             </div>
 
             <div className="border-t pt-4 mt-2 dark:border-gray-700">
-              <div className="flex justify-between items-center text-xl md:text-2xl font-bold mb-4 dark:text-white">
-                <span>
-                  <T>Total</T>:
-                </span>
-                <span>${total.toFixed(2)}</span>
-              </div>
+              <div className="flex flex-col gap-2 mb-4 dark:text-white">
+                  <div className="flex justify-between text-xl md:text-2xl font-bold">
+                    <span>
+                      <T>Total</T>:
+                    </span>
+                    <span>${total.toFixed(2)}</span>
+                  </div>
+
+                  <div className="flex justify-between text-lg md:text-xl font-medium opacity-80">
+                    <span>Tax:</span>
+                    <span>${tax.toFixed(2)}</span>
+                  </div>
+                  
+                  <div className="flex justify-between text-2xl md:text-3xl font-extrabold">
+                    <span>Grand Total:</span>
+                    <span>${grandTotal.toFixed(2)}</span>
+                  </div>
+                </div>
               <button
                 onClick={() => setIsPaymentModalOpen(true)}
                 disabled={cart.length === 0}
@@ -481,7 +504,7 @@ export default function CashierPage() {
               <p className="text-lg md:text-xl text-center">
                 <T>Your total is</T>:
                 <span className="font-bold ml-2 text-maroon dark:text-yellow-300">
-                  ${total.toFixed(2)}
+                  ${grandTotal.toFixed(2)}
                 </span>
               </p>
 
@@ -538,7 +561,7 @@ export default function CashierPage() {
             >
               <Elements stripe={stripePromise}>
                 <PaymentForm
-                  total={total}
+                  total={grandTotal}
                   isDarkMode={isHighContrast}
                   onSuccess={async () => {
                     setIsStripeModalOpen(false);
@@ -556,7 +579,7 @@ export default function CashierPage() {
               title="Pay with PayPal"
             >
               <PayPalCheckout
-                total={total}
+                total={grandTotal}
                 onSuccess={() => {
                   toast.success("Payment successful via PayPal!");
                   setIsPayPalModalOpen(false);

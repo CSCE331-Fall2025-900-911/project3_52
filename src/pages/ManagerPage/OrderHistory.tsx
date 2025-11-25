@@ -105,6 +105,9 @@ const OrderDetailsModal = ({
         <p className="text-xl font-bold mt-2">
           Total: ${order.total_price ?? 0}
         </p>
+        <p>
+          <strong>Tax:</strong> {order.tax ?? 0}
+        </p>
       </div>
       <div className="max-h-64 overflow-y-auto">{renderContent()}</div>
     </Modal>
@@ -339,6 +342,7 @@ export default function OrderHistory() {
                       <td className="p-4 whitespace-nowrap text-sm text-gray-500">
                         ${order.tip ?? 0}
                       </td>
+                      {/* add tax to the column */}
                       <td className="p-4 whitespace-nowrap text-sm font-medium text-right">
                         <button
                           onClick={() => openDetailsModal(order)}

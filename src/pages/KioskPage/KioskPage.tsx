@@ -304,6 +304,16 @@ export default function KioskPage() {
     [cart]
   );
 
+  const tax = useMemo(
+    () => Number((total * 0.0825).toFixed(2)), //assuming tax rate in Cstat = 8.25%
+    [total]
+  );
+
+  const grandTotal = useMemo(
+    () => total + tax,
+    [total, tax]
+  )
+
   const handleFinalSubmit = async (
     paymentMethod: "Card" | "Mobile Pay" | "Cash"
   ) => {
@@ -324,7 +334,7 @@ export default function KioskPage() {
     setSubmitError(null);
 
     const now = new Date();
-    const payload: OrderPayload = {
+    const payload: OrderPayload = { //need to add tax to order payload after changing db
       time: now.toTimeString().split(" ")[0],
       day: now.getDate(),
       month: now.getMonth() + 1,
@@ -341,6 +351,7 @@ export default function KioskPage() {
         toppings: i.toppings,
         price: i.final_price,
       })),
+      tax: tax,
     };
 
     try {
@@ -514,11 +525,23 @@ export default function KioskPage() {
               </div>
 
               <div className="border-t pt-4 mt-2 dark:border-gray-700">
-                <div className="flex justify-between items-center text-xl md:text-2xl magnifier:text-5xl font-bold mb-4 dark:text-white">
-                  <span>
-                    <T>Total</T>:
-                  </span>
-                  <span>${total.toFixed(2)}</span>
+                <div className="flex flex-col gap-2 mb-4 dark:text-white">
+                  <div className="flex justify-between text-xl md:text-2xl magnifier:text-5xl font-bold">
+                    <span>
+                      <T>Total</T>:
+                    </span>
+                    <span>${total.toFixed(2)}</span>
+                  </div>
+
+                  <div className="flex justify-between text-lg md:text-xl magnifier:text-4xl font-medium opacity-80">
+                    <span>Tax:</span>
+                    <span>${tax}</span>
+                  </div>
+                  
+                  <div className="flex justify-between text-2xl md:text-3xl magnifier:text-5xl font-extrabold">
+                    <span>Grand Total:</span>
+                    <span>${grandTotal.toFixed(2)}</span>
+                  </div>
                 </div>
                 <button
                   onClick={() => {setIsPaymentModalOpen(true);}}
@@ -541,7 +564,7 @@ export default function KioskPage() {
                 <p className="text-lg md:text-xl text-center">
                   <T>Your total is</T>:
                   <span className="font-bold ml-2 text-maroon dark:text-yellow-300">
-                    ${total.toFixed(2)}
+                    ${grandTotal.toFixed(2)}
                   </span>
                 </p>
 
@@ -601,7 +624,7 @@ export default function KioskPage() {
               >
                 <Elements stripe={stripePromise}>
                   <PaymentForm
-                    total={total}
+                    total={grandTotal}
                     isDarkMode={isHighContrast}
                     onSuccess={async () => {
                       setIsStripeModalOpen(false);
@@ -623,7 +646,7 @@ export default function KioskPage() {
                 title="Pay with PayPal"
               >
                 <PayPalCheckout
-                  total={total}
+                  total={grandTotal}
                   onSuccess={() => {
                     toast.success("Payment successful via PayPal!");
                     setIsPayPalModalOpen(false);

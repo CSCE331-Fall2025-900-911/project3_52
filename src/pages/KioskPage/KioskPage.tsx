@@ -202,6 +202,12 @@ export default function KioskPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
   const [isPayPalModalOpen, setIsPayPalModalOpen] = useState(false);
+  // states for discount codes
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [discountError, setDiscountError] = useState("");
+
+
   // Initialize activeCategory from localStorage if available, else null (will set after products load)
   const [activeCategory, setActiveCategory] = useState<string | null>(() => {
     const stored = localStorage.getItem("kiosk.activeCategory");
@@ -303,6 +309,18 @@ export default function KioskPage() {
     () => cart.reduce((s, i) => s + i.final_price, 0),
     [cart]
   );
+
+  const handleApplyDiscount = () => {
+    setDiscountError("");
+
+    if (discountCode.trim().toUpperCase() === "BOBA10") {
+      setDiscountAmount(total * 0.10); // 10% off
+    } else {
+      setDiscountAmount(0);
+      setDiscountError("Invalid code");
+    }
+  };
+
 
   const taxRate = 0.0825; // temporary static tax rate
 
@@ -525,6 +543,30 @@ export default function KioskPage() {
                   ))
                 )}
               </div>
+            
+            <div className="mb-3 flex flex-col gap-1">
+              <div className="flex gap-1">
+                <input
+                  type="text"
+                  value={discountCode}
+                  onChange={(e) => setDiscountCode(e.target.value)}
+                  className="flex-1 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                  placeholder="Enter discount code"
+                />
+                <button
+                  onClick={handleApplyDiscount}
+                  className="px-4 bg-maroon text-white rounded-md font-bold hover:bg-darkmaroon"
+                >
+                  Apply
+                </button>
+              </div>
+              <div className="h-3">
+                {discountError && (
+                  <p className="text-red-500 text-xs">{discountError}</p>
+                )}
+              </div>
+            </div>
+
 
             <div className="border-t pt-2 mt-1 dark:border-gray-700">
                 <div className="flex flex-col gap-1 mb-2 dark:text-white">
@@ -540,7 +582,7 @@ export default function KioskPage() {
                     <span>${tax}</span>
                   </div>
                   
-                  <div className="flex justify-between text-3xl md:text-3xl font-bold">
+                  <div className="flex justify-between text-2xl md:text-2xl font-bold">
                     <span>Total:</span>
                     <span>${total.toFixed(2)}</span>
                   </div>
@@ -548,7 +590,7 @@ export default function KioskPage() {
                 <button
                   onClick={() => {setIsPaymentModalOpen(true);}}
                   disabled={cart.length === 0}
-                  className="w-full py-3 md:py-4 bg-maroon text-white text-lg md:text-xl font-bold rounded-lg shadow-lg disabled:opacity-50 hover:bg-darkmaroon"
+                  className="w-full py-2 md:py-2.5 bg-maroon text-white text-lg md:text-xl font-bold rounded-lg shadow-lg disabled:opacity-50 hover:bg-darkmaroon"
                 >
                   <T>Pay Now</T>
                 </button>

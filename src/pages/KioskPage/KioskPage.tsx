@@ -301,19 +301,21 @@ export default function KioskPage() {
   const removeFromCart = (id: string) =>
     setCart((prev) => prev.filter((i) => i.cart_id !== id));
 
-  const total = useMemo(
+  const subtotal = useMemo(
     () => cart.reduce((s, i) => s + i.final_price, 0),
     [cart]
   );
 
+  const taxRate = 0.0825; // temporary static tax rate
+
   const tax = useMemo(
-    () => Number((total * 0.0825).toFixed(2)), //assuming tax rate in Cstat = 8.25%
-    [total]
+    () => Number((subtotal * taxRate).toFixed(2)), //assuming tax rate in Cstat = 8.25%
+    [subtotal]
   );
 
-  const grandTotal = useMemo(
-    () => total + tax,
-    [total, tax]
+  const total = useMemo(
+    () => subtotal + tax,
+    [subtotal, tax]
   )
 
   const handleFinalSubmit = async (
@@ -540,23 +542,23 @@ export default function KioskPage() {
                 />
               </div>
 
-              <div className="border-t pt-4 mt-2 dark:border-gray-700">
-                <div className="flex flex-col gap-2 mb-4 dark:text-white">
-                  <div className="flex justify-between text-xl md:text-2xl magnifier:text-5xl font-bold">
+            <div className="border-t pt-2 mt-1 dark:border-gray-700">
+                <div className="flex flex-col gap-1 mb-2 dark:text-white">
+                  <div className="flex justify-between text-xs md:text-base text-gray-600 dark:text-gray-300 mb-.1">
                     <span>
-                      <T>Total</T>:
+                      <T>subtotal</T>:
                     </span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>${subtotal.toFixed(2)}</span>
                   </div>
 
-                  <div className="flex justify-between text-lg md:text-xl magnifier:text-4xl font-medium opacity-80">
+                  <div className="flex justify-between text-xs md:text-base text-gray-600 dark:text-gray-300 mb-.5">
                     <span>Tax:</span>
                     <span>${tax}</span>
                   </div>
                   
-                  <div className="flex justify-between text-2xl md:text-3xl magnifier:text-5xl font-extrabold">
-                    <span>Grand Total:</span>
-                    <span>${grandTotal.toFixed(2)}</span>
+                  <div className="flex justify-between text-3xl md:text-3xl font-bold">
+                    <span>Total:</span>
+                    <span>${total.toFixed(2)}</span>
                   </div>
                 </div>
                 <button
@@ -580,7 +582,7 @@ export default function KioskPage() {
                 <p className="text-lg md:text-xl text-center">
                   <T>Your total is</T>:
                   <span className="font-bold ml-2 text-maroon dark:text-yellow-300">
-                    ${grandTotal.toFixed(2)}
+                    ${total.toFixed(2)}
                   </span>
                 </p>
 
@@ -640,7 +642,7 @@ export default function KioskPage() {
               >
                 <Elements stripe={stripePromise}>
                   <PaymentForm
-                    total={grandTotal}
+                    total={total}
                     isDarkMode={isHighContrast}
                     onSuccess={async () => {
                       setIsStripeModalOpen(false);
@@ -662,7 +664,7 @@ export default function KioskPage() {
                 title="Pay with PayPal"
               >
                 <PayPalCheckout
-                  total={grandTotal}
+                  total={total}
                   onSuccess={() => {
                     toast.success("Payment successful via PayPal!");
                     setIsPayPalModalOpen(false);

@@ -235,6 +235,8 @@ export default function KioskPage() {
     useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
+  const [specialNotes, setSpecialNotes] = useState("");
+
   const stripePromise = loadStripe(
     "pk_test_51SQ9h8HxLrRxAwUAXhDDu2tC5tKVWITYIGhCfr8Jjjkq9IFhjnUoOCaDUa4gNy9BRaOHTRNuLrZ39piTTYCD5Hyv00Y0s0Vcsq"
   );
@@ -334,14 +336,14 @@ export default function KioskPage() {
     setSubmitError(null);
 
     const now = new Date();
-    const payload: OrderPayload = { //need to add tax to order payload after changing db
+    const payload: OrderPayload = { 
       time: now.toTimeString().split(" ")[0],
       day: now.getDate(),
       month: now.getMonth() + 1,
       year: now.getFullYear(),
       total_price: total,
       tip: 0,
-      special_notes: "Kiosk Order",
+      special_notes: specialNotes,
       payment_method: paymentMethod,
       items: cart.map((i) => ({
         product_id: i.product.product_id,
@@ -370,6 +372,7 @@ export default function KioskPage() {
 
       toast.success("Order submitted successfully!");
       setCart([]);
+      setSpecialNotes("");
       setIsPaymentModalOpen(false);
     } catch (e: any) {
       const errorText = e.message || "An unknown error occurred";
@@ -522,6 +525,19 @@ export default function KioskPage() {
                     />
                   ))
                 )}
+              </div>
+              
+              <div className="border-t pt-4 mt-2 dark:border-gray-700">
+                <label className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">Special Notes~</label>
+                <input
+                  type="text"
+                  value={specialNotes}
+                  onChange={(e) => {
+                      setSpecialNotes(e.target.value);
+                    }}
+                  placeholder="Input any additional info here..."
+                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
+                />
               </div>
 
               <div className="border-t pt-4 mt-2 dark:border-gray-700">

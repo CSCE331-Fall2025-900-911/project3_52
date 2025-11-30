@@ -224,6 +224,8 @@ export default function CashierPage() {
     useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
+    const [specialNotes, setSpecialNotes] = useState("");
+
   const stripePromise = loadStripe(
     "pk_test_51SQ9h8HxLrRxAwUAXhDDu2tC5tKVWITYIGhCfr8Jjjkq9IFhjnUoOCaDUa4gNy9BRaOHTRNuLrZ39piTTYCD5Hyv00Y0s0Vcsq"
   );
@@ -328,7 +330,7 @@ export default function CashierPage() {
       year: now.getFullYear(),
       total_price: total, //i assume we don't get to add the taxed amount as revenue, just the total (subtotal)
       tip: 0,
-      special_notes: "Kiosk Order",
+      special_notes: specialNotes,
       payment_method: paymentMethod,
       items: cart.map((i) => ({
         product_id: i.product.product_id,
@@ -357,6 +359,7 @@ export default function CashierPage() {
 
       toast.success("Order submitted successfully!");
       setCart([]);
+      setSpecialNotes("");
       setIsPaymentModalOpen(false);
     } catch (e: any) {
       const errorText = e.message || "An unknown error occurred";
@@ -463,6 +466,19 @@ export default function CashierPage() {
                   />
                 ))
               )}
+            </div>
+
+            <div className="border-t pt-4 mt-2 dark:border-gray-700">
+              <label className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">Special Notes~</label>
+              <input
+                type="text"
+                value={specialNotes}
+                onChange={(e) => {
+                    setSpecialNotes(e.target.value);
+                  }}
+                placeholder="Input any additional info here..."
+                className="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
+              />
             </div>
 
             <div className="border-t pt-4 mt-2 dark:border-gray-700">

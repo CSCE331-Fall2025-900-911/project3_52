@@ -22,7 +22,7 @@ export default function KioskProductCard({
       "
     >
       {/* Product Name - grows nicely */}
-      <h3
+      <p
         className="
           text-lg md:text-xl 
           magnifier:text-3xl lg:magnifier:text-4xl 
@@ -33,7 +33,7 @@ export default function KioskProductCard({
         "
       >
         <T>{product.product_name}</T>
-      </h3>
+      </p>
 
       {/* Image - bigger but still fits grid */}
       <img

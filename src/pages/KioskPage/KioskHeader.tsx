@@ -59,6 +59,7 @@ export default function KioskHeader({
 
         <select
           title="Select Language"
+          aria-label="Select Language"
           value={lang}
           onChange={(e) => setLang(e.target.value as Lang)}
           className="w-1/2 sm:w-auto p-3 bg-white dark:bg-gray-700 magnifier:text-4xl dark:text-white rounded-lg shadow cursor-pointer text-base sm:text-lg"

@@ -531,10 +531,11 @@ export default function KioskPage() {
               </div>
               
               <div className="border-t pt-4 mt-2 dark:border-gray-700">
-                <label className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">Special Notes</label>
+                <span className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">Special Notes</span>
                 <input
                   type="text"
                   value={specialNotes}
+                  aria-label="Special Notes Textbox"
                   onChange={(e) => {
                       setSpecialNotes(e.target.value);
                     }}

@@ -471,7 +471,7 @@ export default function CashierPage() {
             </div>
 
             <div className="border-t pt-4 mt-2 dark:border-gray-700">
-              <label className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">Special Notes~</label>
+              <label className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">Special Notes</label>
               <input
                 type="text"
                 value={specialNotes}

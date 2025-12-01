@@ -368,6 +368,7 @@ export default function OrderHistory() {
               Page{" "}
               <input
                 type="number"
+                title="Page Number"
                 min={1}
                 max={totalPages}
                 value={pageInput}

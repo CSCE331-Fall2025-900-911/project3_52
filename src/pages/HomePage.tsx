@@ -32,7 +32,7 @@ export default function HomePage({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-tr from-[rgba(115,0,0,0.2)] to-white">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-tr from-maroon to-white">
       <h1 className="text-6xl font-bold mb-4">
         <span className="text-maroon">Mom</span>
         <span className="text-gray-800">Tea</span>

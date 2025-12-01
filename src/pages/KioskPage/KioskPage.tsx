@@ -530,14 +530,14 @@ export default function KioskPage() {
               </div>
               
               <div className="border-t pt-4 mt-2 dark:border-gray-700">
-                <label className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">Special Notes~</label>
+                <label className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">Special Notes</label>
                 <input
                   type="text"
                   value={specialNotes}
                   onChange={(e) => {
                       setSpecialNotes(e.target.value);
                     }}
-                  placeholder="Input any additional info here..."
+                  placeholder="Anything you want us to know? (e.g., allergies, preferences)"
                   className="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
                 />
               </div>
@@ -546,7 +546,7 @@ export default function KioskPage() {
                 <div className="flex flex-col gap-1 mb-2 dark:text-white">
                   <div className="flex justify-between text-xs md:text-base text-gray-600 dark:text-gray-300 mb-.1">
                     <span>
-                      <T>subtotal</T>:
+                      <T>Subtotal</T>:
                     </span>
                     <span>${subtotal.toFixed(2)}</span>
                   </div>

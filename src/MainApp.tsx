@@ -42,7 +42,8 @@ const MainApp = ({
           onClick={() => setPage("home")}
           className="text-3xl md:text-4xl font-bold text-maroon hover:text-red-700 truncate max-w-[60vw] sm:max-w-none"
         >
-          MomTea POS
+          <span className="text-maroon">Mom</span>
+          <span className="text-gray-800">Tea</span>
         </button>
         <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2">
           <WeatherDisplay />

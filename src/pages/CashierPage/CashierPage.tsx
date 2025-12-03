@@ -17,20 +17,6 @@ import PaymentForm from "../../components/PaymentForm";
 import { loadStripe } from "@stripe/stripe-js";
 import PayPalCheckout from "../../components/PaypalCheckout";
 
-// export default function CashierPage() {
-//   const { user } = useAuth();
-//   // if (!user || (user.role !== "Manager" && user.role !== "Cashier"))
-//   //   return <AccessDenied />;
-//   return (
-//     <div className="p-8">
-//       <h1 className="text-3xl font-bold mb-4">Cashier POS Terminal</h1>
-//       <div className="mt-8 p-8 border rounded-lg bg-gray-50">
-//         <h2 className="text-xl font-semibold">Point of Sale Interface</h2>
-//       </div>
-//     </div>
-//   );
-// }
-
 const AVAILABLE_TOPPINGS = [
   "Boba",
   "Lychee Jelly",
@@ -308,17 +294,7 @@ export default function CashierPage() {
   const handleFinalSubmit = async (
     paymentMethod: "Card" | "Mobile Pay" | "Cash"
   ) => {
-    // Handle special payment flows first
-    if (paymentMethod === "Card") {
-      setIsStripeModalOpen(true);
-      return;
-    }
 
-    if (paymentMethod === "Mobile Pay") {
-      // Open PayPal modal instead of direct order
-      setIsPayPalModalOpen(true);
-      return;
-    }
 
     // Normal flow for non-digital payments
     setIsSubmitting(true);
@@ -528,12 +504,12 @@ export default function CashierPage() {
 
               <PaymentButton
                 label="Card"
-                onClick={() => handleFinalSubmit("Card")}
+                onClick={() => setIsStripeModalOpen(true)}
                 disabled={isSubmitting}
               />
               <PaymentButton
                 label="PayPal (Mobile Pay)"
-                onClick={() => handleFinalSubmit("Mobile Pay")}
+                onClick={() => setIsPayPalModalOpen(true)}
                 disabled={isSubmitting}
               />
               <PaymentButton
@@ -583,7 +559,7 @@ export default function CashierPage() {
                   isDarkMode={isHighContrast}
                   onSuccess={async () => {
                     setIsStripeModalOpen(false);
-                    await handleFinalSubmit("Cash"); // reuse existing backend logic to save order
+                    await handleFinalSubmit("Card"); // reuse existing backend logic to save order
                   }}
                 />
               </Elements>
@@ -601,7 +577,7 @@ export default function CashierPage() {
                 onSuccess={() => {
                   toast.success("Payment successful via PayPal!");
                   setIsPayPalModalOpen(false);
-                  handleFinalSubmit("Cash"); // record order after PayPal
+                  handleFinalSubmit("Mobile Pay"); // record order after PayPal
                 }}
               />
             </Modal>

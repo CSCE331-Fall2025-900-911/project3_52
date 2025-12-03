@@ -88,7 +88,7 @@ export default function AnalyticsDashboard() {
       <h2 className="text-3xl font-bold text-gray-800">Data Analytics</h2>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
         {[
           {
             bg: COLORS[0],               // Chocolate
@@ -116,7 +116,7 @@ export default function AnalyticsDashboard() {
             className="p-6 rounded-xl shadow-lg text-white"
             style={{ backgroundColor: card.bg }}   // <-- dynamic fall color
           >
-            <p className="text-4xl font-bold">{card.value}</p>
+            <p className="text-xl sm:text-xl md:text-2xl lg:text-3xl font-bold">{card.value}</p>
             <p className="text-lg opacity-90">{card.label}</p>
           </div>
         ))}

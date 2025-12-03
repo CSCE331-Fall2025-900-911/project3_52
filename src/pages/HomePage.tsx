@@ -37,7 +37,7 @@ export default function HomePage({
         <span className="text-maroon">Mom</span>
         <span className="text-gray-800">Tea</span>
       </h1>
-      <p className="text-xl text-gray-600 mb-12">Select your view</p>
+      <p className="text-xl text-gray-800 mb-12">Select your view</p>
 
       {/* 7. Apply the dynamic grid class */}
       <div

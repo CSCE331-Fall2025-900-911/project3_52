@@ -530,7 +530,7 @@ export default function KioskPage() {
                 )}
               </div>
               
-              <div className="border-t pt-4 mt-2 dark:border-gray-700">
+              <div className="border-t pt-4 my-2 dark:border-gray-700">
                 <span className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">Special Notes</span>
                 <input
                   type="text"

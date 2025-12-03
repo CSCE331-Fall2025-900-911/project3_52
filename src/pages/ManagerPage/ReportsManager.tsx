@@ -108,6 +108,8 @@ export default function ReportsManager() {
   };
 
   const closeZ = async () => {
+    setXData(null);
+    setZPrev(null);
     setConfirmZOpen(true); // <-- OPEN CUSTOM MODAL
   };
   const runZReport = async () => {

@@ -321,18 +321,7 @@ export default function KioskPage() {
   const handleFinalSubmit = async (
     paymentMethod: "Card" | "Mobile Pay" | "Cash"
   ) => {
-    // Handle special payment flows first
-    if (paymentMethod === "Card") {
-      setIsStripeModalOpen(true);
-      return;
-    }
-
-    if (paymentMethod === "Mobile Pay") {
-      // Open PayPal modal instead of direct order
-      setIsPayPalModalOpen(true);
-      return;
-    }
-
+    
     // Normal flow for non-digital payments
     setIsSubmitting(true);
     setSubmitError(null);
@@ -590,19 +579,19 @@ export default function KioskPage() {
 
                 <PaymentButton
                   label="Card"
-                  onClick={() => handleFinalSubmit("Card")}
+                  onClick={() => setIsStripeModalOpen(true)}
                   disabled={isSubmitting}
                 />
                 <PaymentButton
                   label="PayPal (Mobile Pay)"
-                  onClick={() => handleFinalSubmit("Mobile Pay")}
+                  onClick={() => setIsPayPalModalOpen(true)}
                   disabled={isSubmitting}
                 />
-                <PaymentButton
+                {/* <PaymentButton
                   label="Cash (Pay at Counter)"
                   onClick={() => handleFinalSubmit("Cash")}
                   disabled={isSubmitting}
-                />
+                /> */}
 
                 {isSubmitting && <Spinner />}
                 {submitError && (
@@ -649,7 +638,7 @@ export default function KioskPage() {
                     onSuccess={async () => {
                       setIsStripeModalOpen(false);
                       
-                      await handleFinalSubmit("Cash"); // reuse existing backend logic to save order
+                      await handleFinalSubmit("Card"); // reuse existing backend logic to save order
                     }}
                   />
                 </Elements>
@@ -667,11 +656,11 @@ export default function KioskPage() {
               >
                 <PayPalCheckout
                   total={total}
-                  onSuccess={() => {
+                  onSuccess={async () => {
                     toast.success("Payment successful via PayPal!");
                     setIsPayPalModalOpen(false);
                     
-                    handleFinalSubmit("Cash"); // record order after PayPal
+                    await handleFinalSubmit("Mobile Pay"); // record order after PayPal
                   }}
                 />
               </Modal>

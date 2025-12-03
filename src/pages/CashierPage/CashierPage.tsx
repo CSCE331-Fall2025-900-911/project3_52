@@ -559,7 +559,7 @@ export default function CashierPage() {
                   isDarkMode={isHighContrast}
                   onSuccess={async () => {
                     setIsStripeModalOpen(false);
-                    await handleFinalSubmit("Card"); // reuse existing backend logic to save order
+                    await handleFinalSubmit("Card"); 
                   }}
                 />
               </Elements>

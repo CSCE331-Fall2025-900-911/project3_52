@@ -638,7 +638,7 @@ export default function KioskPage() {
                     onSuccess={async () => {
                       setIsStripeModalOpen(false);
                       
-                      await handleFinalSubmit("Card"); // reuse existing backend logic to save order
+                      await handleFinalSubmit("Card"); // record order after successful card payment
                     }}
                   />
                 </Elements>

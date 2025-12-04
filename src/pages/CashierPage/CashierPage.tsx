@@ -28,18 +28,19 @@ const AVAILABLE_TOPPINGS = [
 const CustomizationForm = ({
   product,
   onSubmit,
+  defaults,
 }: {
   product: Product;
   onSubmit: (data: CustomizationData) => void;
+  defaults?: CustomizationData;
 }) => {
   // Internal state for the form, with defaults
-  const [size, setSize] = useState<"Small" | "Medium" | "Large" | "Bucee's">(
-    "Medium"
+  const [size, setSize] = useState(defaults?.size || "Medium");
+  const [sugar, setSugar] = useState(defaults?.sugar_level || "100");
+  const [ice, setIce] = useState(defaults?.ice_level || "100");
+  const [selectedToppings, setSelectedToppings] = useState(
+    defaults?.toppings ? defaults.toppings.split(",").map(s=>s.trim()) : []
   );
-  const [sugar, setSugar] = useState<"0" | "50" | "75" | "100">("100");
-  const [ice, setIce] = useState<"0" | "50" | "75" | "100">("100");
-
-  const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
 
   // --- UPDATED: Handler to limit selection to 3 ---
   const handleToppingChange = (topping: string) => {
@@ -209,6 +210,8 @@ export default function CashierPage() {
   const [isCustomizationModalOpen, setIsCustomizationModalOpen] =
     useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [editingCartId, setEditingCartId] = useState<string | null>(null);
+  const [editingDefaults, setEditingDefaults] = useState<CustomizationData | null>(null);
 
     const [specialNotes, setSpecialNotes] = useState("");
 
@@ -231,11 +234,38 @@ export default function CashierPage() {
   // --- RENAMED: This now opens the modal ---
   const openCustomizationModal = (product: Product) => {
     setSelectedProduct(product);
+    setEditingCartId(null);
+    setEditingDefaults(null);
+    setIsCustomizationModalOpen(true);
+  };
+
+  const handleEditCartItem = (id: string) => {
+    const target = cart.find(c => c.cart_id === id);
+    if (!target) return;
+    setSelectedProduct(target.product);
+    setEditingCartId(id);
+    setEditingDefaults({
+      size: target.size,
+      sugar_level: target.sugar_level,
+      ice_level: target.ice_level,
+      toppings: target.toppings
+    });
     setIsCustomizationModalOpen(true);
   };
 
   // --- NEW: This is the new "Add to Cart" handler, called by the form ---
   const handleAddToCart = (customData: CustomizationData) => {
+    if (editingCartId) {
+      setCart(prev =>
+        prev.map(c => c.cart_id === editingCartId ? { ...c, ...customData } : c)
+      );
+      setIsCustomizationModalOpen(false);
+      setSelectedProduct(null);
+      setEditingCartId(null);
+      setEditingDefaults(null);
+      toast.success("Item updated!");
+      return;
+    }
     if (!selectedProduct) return; // Guard clause
 
     //shallow product copy to avoid mutating original
@@ -441,6 +471,7 @@ export default function CashierPage() {
                     key={item.cart_id}
                     item={item}
                     onRemove={removeFromCart}
+                    onEdit={handleEditCartItem}
                   />
                 ))
               )}
@@ -541,6 +572,7 @@ export default function CashierPage() {
                 <CustomizationForm
                   product={selectedProduct}
                   onSubmit={handleAddToCart}
+                  defaults={editingDefaults || undefined}
                 />
               </div>
             </Modal>

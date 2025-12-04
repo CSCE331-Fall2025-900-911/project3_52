@@ -26,18 +26,21 @@ const AVAILABLE_TOPPINGS = [
 const CustomizationForm = ({
   product,
   onSubmit,
+  defaults,
 }: {
   product: Product;
   onSubmit: (data: CustomizationData) => void;
+  defaults?: CustomizationData;
 }) => {
   // Internal state for the form, with defaults
   const [size, setSize] = useState<"Small" | "Medium" | "Large" | "Bucee's">(
-    "Medium"
+    defaults?.size || "Medium"
   );
-  const [sugar, setSugar] = useState<"0" | "50" | "75" | "100">("100");
-  const [ice, setIce] = useState<"0" | "50" | "75" | "100">("100");
-
-  const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
+  const [sugar, setSugar] = useState<"0" | "50" | "75" | "100">(defaults?.sugar_level || "100");
+  const [ice, setIce] = useState<"0" | "50" | "75" | "100">(defaults?.ice_level || "100");
+  const [selectedToppings, setSelectedToppings] = useState<string[]>(
+    defaults?.toppings ? defaults.toppings.split(",").map(s => s.trim()) : []
+  );
 
   // --- UPDATED: Handler to limit selection to 3 ---
   const handleToppingChange = (topping: string) => {
@@ -234,6 +237,8 @@ export default function KioskPage() {
   const [isCustomizationModalOpen, setIsCustomizationModalOpen] =
     useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [editingCartId, setEditingCartId] = useState<string | null>(null);
+  const [editingDefaults, setEditingDefaults] = useState<CustomizationData | null>(null);
 
   const [specialNotes, setSpecialNotes] = useState("");
 
@@ -256,6 +261,23 @@ export default function KioskPage() {
   // --- RENAMED: This now opens the modal ---
   const openCustomizationModal = (product: Product) => {
     setSelectedProduct(product);
+    setEditingCartId(null);
+    setEditingDefaults(null);
+    setIsCustomizationModalOpen(true);
+  };
+
+  // --- Handler for editing cart item ---
+  const handleEditCartItem = (id: string) => {
+    const target = cart.find(c => c.cart_id === id);
+    if (!target) return;
+    setSelectedProduct(target.product);
+    setEditingCartId(id);
+    setEditingDefaults({
+      size: target.size,
+      sugar_level: target.sugar_level,
+      ice_level: target.ice_level,
+      toppings: target.toppings
+    });
     setIsCustomizationModalOpen(true);
   };
 
@@ -264,6 +286,22 @@ export default function KioskPage() {
   //fix so the original/base price doesn't change after alterations are made
   const handleAddToCart = (customData: CustomizationData) => {
     if (!selectedProduct) return; // Guard clause
+
+    if (editingCartId) {
+      setCart(prev =>
+        prev.map(c =>
+          c.cart_id === editingCartId
+            ? { ...c, ...customData }
+            : c
+        )
+      );
+      setIsCustomizationModalOpen(false);
+      setSelectedProduct(null);
+      setEditingCartId(null);
+      setEditingDefaults(null);
+      toast.success(`${selectedProduct.product_name} updated!`);
+      return;
+    }
 
     //shallow product copy to avoid mutating original
     const productCopy = { ...selectedProduct };
@@ -295,6 +333,8 @@ export default function KioskPage() {
     // Close and reset
     setIsCustomizationModalOpen(false);
     setSelectedProduct(null);
+    setEditingCartId(null);
+    setEditingDefaults(null);
     toast.success(`${selectedProduct.product_name} added to order!`);
   };
 
@@ -514,6 +554,7 @@ export default function KioskPage() {
                       key={item.cart_id}
                       item={item}
                       onRemove={removeFromCart}
+                      onEdit={handleEditCartItem}
                     />
                   ))
                 )}
@@ -616,6 +657,7 @@ export default function KioskPage() {
                   <CustomizationForm
                     product={selectedProduct}
                     onSubmit={handleAddToCart}
+                    defaults={editingDefaults || undefined}
                   />
                 </div>
               </Modal>

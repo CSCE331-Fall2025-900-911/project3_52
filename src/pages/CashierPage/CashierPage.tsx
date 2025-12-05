@@ -39,7 +39,7 @@ const CustomizationForm = ({
   const [sugar, setSugar] = useState(defaults?.sugar_level || "100");
   const [ice, setIce] = useState(defaults?.ice_level || "100");
   const [selectedToppings, setSelectedToppings] = useState(
-    defaults?.toppings ? defaults.toppings.split(",").map(s=>s.trim()) : []
+    defaults?.toppings ? defaults.toppings.split(",").map((s) => s.trim()) : []
   );
 
   // --- UPDATED: Handler to limit selection to 3 ---
@@ -211,9 +211,10 @@ export default function CashierPage() {
     useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [editingCartId, setEditingCartId] = useState<string | null>(null);
-  const [editingDefaults, setEditingDefaults] = useState<CustomizationData | null>(null);
+  const [editingDefaults, setEditingDefaults] =
+    useState<CustomizationData | null>(null);
 
-    const [specialNotes, setSpecialNotes] = useState("");
+  const [specialNotes, setSpecialNotes] = useState("");
 
   const stripePromise = loadStripe(
     "pk_test_51SQ9h8HxLrRxAwUAXhDDu2tC5tKVWITYIGhCfr8Jjjkq9IFhjnUoOCaDUa4gNy9BRaOHTRNuLrZ39piTTYCD5Hyv00Y0s0Vcsq"
@@ -240,7 +241,7 @@ export default function CashierPage() {
   };
 
   const handleEditCartItem = (id: string) => {
-    const target = cart.find(c => c.cart_id === id);
+    const target = cart.find((c) => c.cart_id === id);
     if (!target) return;
     setSelectedProduct(target.product);
     setEditingCartId(id);
@@ -248,7 +249,7 @@ export default function CashierPage() {
       size: target.size,
       sugar_level: target.sugar_level,
       ice_level: target.ice_level,
-      toppings: target.toppings
+      toppings: target.toppings,
     });
     setIsCustomizationModalOpen(true);
   };
@@ -256,8 +257,10 @@ export default function CashierPage() {
   // --- NEW: This is the new "Add to Cart" handler, called by the form ---
   const handleAddToCart = (customData: CustomizationData) => {
     if (editingCartId) {
-      setCart(prev =>
-        prev.map(c => c.cart_id === editingCartId ? { ...c, ...customData } : c)
+      setCart((prev) =>
+        prev.map((c) =>
+          c.cart_id === editingCartId ? { ...c, ...customData } : c
+        )
       );
       setIsCustomizationModalOpen(false);
       setSelectedProduct(null);
@@ -304,28 +307,24 @@ export default function CashierPage() {
   const removeFromCart = (id: string) =>
     setCart((prev) => prev.filter((i) => i.cart_id !== id));
 
-  const subtotal = useMemo( //subtotal, only summing base prices of items
+  const subtotal = useMemo(
+    //subtotal, only summing base prices of items
     () => cart.reduce((s, i) => s + i.final_price, 0),
     [cart]
   );
-  
+
   const taxRate = 0.0825; // temporary static 8.25% tax rate
 
   const tax = useMemo(
     () => Number((subtotal * taxRate).toFixed(2)), //assuming tax rate in Cstat = 8.25%
-    [subtotal,taxRate]
+    [subtotal, taxRate]
   );
 
-  const total = useMemo(
-    () => subtotal + tax,
-    [subtotal, tax]
-  )
+  const total = useMemo(() => subtotal + tax, [subtotal, tax]);
 
   const handleFinalSubmit = async (
     paymentMethod: "Card" | "Mobile Pay" | "Cash"
   ) => {
-
-
     // Normal flow for non-digital payments
     setIsSubmitting(true);
     setSubmitError(null);
@@ -478,37 +477,39 @@ export default function CashierPage() {
             </div>
 
             <div className="border-t pt-4 my-2 dark:border-gray-700">
-              <label className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">Special Notes</label>
+              <label className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">
+                Special Notes
+              </label>
               <input
                 type="text"
                 value={specialNotes}
                 onChange={(e) => {
-                    setSpecialNotes(e.target.value);
-                  }}
+                  setSpecialNotes(e.target.value);
+                }}
                 placeholder="Input any additional info here..."
                 className="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
               />
             </div>
 
             <div className="border-t pt-2 mt-1 dark:border-gray-700">
-                <div className="flex flex-col gap-1 mb-2 dark:text-white">
-                  <div className="flex justify-between text-xs md:text-base text-gray-600 dark:text-gray-300 mb-.1">
-                    <span>
-                      <T>Subtotal</T>:
-                    </span>
-                    <span>${subtotal.toFixed(2)}</span>
-                  </div>
-
-                  <div className="flex justify-between text-xs md:text-base text-gray-600 dark:text-gray-300 mb-.5">
-                    <span>Tax:</span>
-                    <span>${tax.toFixed(2)}</span>
-                  </div>
-                  
-                  <div className="flex justify-between text-3xl md:text-3xl font-bold">
-                    <span>Total:</span>
-                    <span>${total.toFixed(2)}</span>
-                  </div>
+              <div className="flex flex-col gap-1 mb-2 dark:text-white">
+                <div className="flex justify-between text-xs md:text-base text-gray-600 dark:text-gray-300 mb-.1">
+                  <span>
+                    <T>Subtotal</T>:
+                  </span>
+                  <span>${subtotal.toFixed(2)}</span>
                 </div>
+
+                <div className="flex justify-between text-xs md:text-base text-gray-600 dark:text-gray-300 mb-.5">
+                  <span>Tax:</span>
+                  <span>${tax.toFixed(2)}</span>
+                </div>
+
+                <div className="flex justify-between text-3xl md:text-3xl font-bold">
+                  <span>Total:</span>
+                  <span>${total.toFixed(2)}</span>
+                </div>
+              </div>
               <button
                 onClick={() => setIsPaymentModalOpen(true)}
                 disabled={cart.length === 0}
@@ -538,11 +539,22 @@ export default function CashierPage() {
                 onClick={() => setIsStripeModalOpen(true)}
                 disabled={isSubmitting}
               />
-              <PaymentButton
-                label="PayPal (Mobile Pay)"
+              <button
                 onClick={() => setIsPayPalModalOpen(true)}
                 disabled={isSubmitting}
-              />
+                className="
+                    w-full py-4
+                    font-bold text-lg
+                    rounded-lg shadow-md
+                    transition-colors
+                    disabled:opacity-50
+                    bg-[#FFC439] hover:bg-[#FFB020]
+                    text-[#003087]
+                  "
+              >
+                <span className="text-[#003087] italic">Pay</span>
+                <span className="text-[#009CDE] italic">Pal</span>
+              </button>
               <PaymentButton
                 label="Cash (Pay at Counter)"
                 onClick={() => handleFinalSubmit("Cash")}
@@ -591,7 +603,7 @@ export default function CashierPage() {
                   isDarkMode={isHighContrast}
                   onSuccess={async () => {
                     setIsStripeModalOpen(false);
-                    await handleFinalSubmit("Card"); 
+                    await handleFinalSubmit("Card");
                   }}
                 />
               </Elements>

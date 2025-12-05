@@ -623,11 +623,21 @@ export default function KioskPage() {
                   onClick={() => setIsStripeModalOpen(true)}
                   disabled={isSubmitting}
                 />
-                <PaymentButton
-                  label="PayPal (Mobile Pay)"
+                <button
                   onClick={() => setIsPayPalModalOpen(true)}
                   disabled={isSubmitting}
-                />
+                  className="
+                    w-full py-4
+                    font-bold text-lg
+                    rounded-lg shadow-md
+                    transition-colors
+                    disabled:opacity-50
+                    bg-[#FFC439] hover:bg-[#FFB020]
+                    text-[#003087]
+                  "
+                >
+                  <span className="text-[#003087] italic">Pay</span><span className="text-[#009CDE] italic">Pal</span>
+                </button>
                 {/* <PaymentButton
                   label="Cash (Pay at Counter)"
                   onClick={() => handleFinalSubmit("Cash")}

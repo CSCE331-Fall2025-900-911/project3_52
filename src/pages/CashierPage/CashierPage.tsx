@@ -539,6 +539,13 @@ export default function CashierPage() {
                 onClick={() => setIsStripeModalOpen(true)}
                 disabled={isSubmitting}
               />
+
+              <PaymentButton
+                label="Cash"
+                onClick={() => handleFinalSubmit("Cash")}
+                disabled={isSubmitting}
+              />
+
               <button
                 onClick={() => setIsPayPalModalOpen(true)}
                 disabled={isSubmitting}
@@ -555,12 +562,7 @@ export default function CashierPage() {
                 <span className="text-[#003087] italic">Pay</span>
                 <span className="text-[#009CDE] italic">Pal</span>
               </button>
-              <PaymentButton
-                label="Cash (Pay at Counter)"
-                onClick={() => handleFinalSubmit("Cash")}
-                disabled={isSubmitting}
-              />
-
+              
               {isSubmitting && <Spinner />}
               {submitError && (
                 <p className="text-red-500 text-center font-semibold">

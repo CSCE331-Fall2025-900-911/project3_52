@@ -651,8 +651,8 @@ export default function KioskPage() {
             </div>
 
             <div className=" dark:border-gray-700">
-                <div className="flex flex-col gap-1 mb-2 dark:text-white">
-                  <div className="flex justify-between text-xs md:text-base text-gray-600 dark:text-gray-300 mb-.1">
+                <div className="flex flex-col gap-1 mb-2 dark:text-white magnifier:text-4x1">
+                  <div className="flex justify-between text-xs magnifier:text-4xl md:text-base text-gray-600 dark:text-gray-300 mb-.1">
                     <span>
                       <T>Subtotal</T>:
                     </span>
@@ -661,7 +661,7 @@ export default function KioskPage() {
 
                   {discountAmount > 0 && (
                     <div className="flex justify-between items-center text-xs md:text-base text-green-600 dark:text-gray-300 mb-.1">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 magnifier:text-4xl">
                           <span>Discount</span>
                           <button
                             onClick={() => setShowDiscountInfo(true)}
@@ -677,12 +677,12 @@ export default function KioskPage() {
                     </div>
                   )}
 
-                  <div className="flex justify-between text-xs md:text-base text-gray-600 dark:text-gray-300 mb-.5">
+                  <div className="flex justify-between text-xs magnifier:text-4xl md:text-base text-gray-600 dark:text-gray-300 mb-.5">
                     <span>Tax:</span>
                     <span>${tax}</span>
                   </div>
                   
-                  <div className="flex justify-between text-2xl md:text-2xl font-bold">
+                  <div className="flex justify-between text-2xl magnifier:text-5xl md:text-2xl font-bold">
                     <span>Total:</span>
                     <span>${total.toFixed(2)}</span>
                   </div>

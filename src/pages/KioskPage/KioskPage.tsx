@@ -537,6 +537,7 @@ export default function KioskPage() {
                 bg-white dark:bg-gray-800 shadow-lg p-6 flex flex-col
                 border-t lg:border-t-0
                 lg:fixed lg:top-20 lg:right-0 lg:h-[calc(100vh-5rem)]
+                 magnifier:text-4xl
                 "
             >
               <h2 className="text-2xl magnifier:text-5xl md:text-3xl font-bold mb-4 dark:text-white text-center lg:text-left">
@@ -574,7 +575,7 @@ export default function KioskPage() {
                 />
               </div>
 
-            <div className="border-t pt-2 mt-1 dark:border-gray-700">
+            <div className="border-t pt-2 mt-1 magnifier:text-5xl dark:border-gray-700">
                 <div className="flex flex-col gap-1 mb-2 dark:text-white">
                   <div className="flex justify-between text-xs md:text-base text-gray-600 dark:text-gray-300 mb-.1">
                     <span>

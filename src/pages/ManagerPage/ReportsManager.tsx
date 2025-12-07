@@ -113,41 +113,28 @@ export default function ReportsManager() {
     setConfirmZOpen(true); // <-- OPEN CUSTOM MODAL
   };
   const runZReport = async () => {
-    setIsRunningZ(true);
-    try {
-      const res = await apiFetch("/api/reports/z/close", { method: "POST" });
-      const data = await res.json();
+  setIsRunningZ(true);
+  try {
+    const res = await apiFetch("/api/reports/z/close", { method: "POST" });
+    const data = await res.json();
 
-      if (!res.ok || data.success === false || data.error) {
-        toast.error(
-          data.message || data.error || "Z-report already run today."
-        );
-        return;
-      }
-
-      setZClosed(data);
-      setZClosedToday(true);
-      toast.success("Z Report closed");
-    } catch (e: any) {
-      toast.error(e.message || "Failed to close Z report");
-    } finally {
-      setIsRunningZ(false);
-      setConfirmZOpen(false); // CLOSE MODAL
+    if (!res.ok || data.success === false || data.error) {
+      toast.error(data.message || data.error || "Z-report already run today.");
+      return;
     }
-  };
 
-  const COLORS = [
-    "#800000", // Maroon
-    "#8B4513", // Saddle Brown
-    "#A0522D", // Sienna
-    "#556B2F", // Dark Olive Green
-    "#D2691E", // Chocolate
-    "#CD853F", // Peru
-    "#B8860B", // Dark Goldenrod
-    "#FF8C00", // Dark Orange
-    "#B22222", // Firebrick
-    "#654321", // Dark Brown
-  ];
+    setZClosed(data);
+    setZClosedToday(true);
+    toast.success("Z Report closed");
+  } catch (e: any) {
+    toast.error(e.message || "Failed to close Z report");
+  } finally {
+    setIsRunningZ(false);
+    setConfirmZOpen(false); // CLOSE MODAL
+  }
+};
+
+  const COLORS = ["#E91E63", "#3D5AFE", "#FFC107", "#4CAF50", "#FF5722"];
 
   return (
     <div className="space-y-8">
@@ -191,19 +178,19 @@ export default function ReportsManager() {
               id="xReport"
               className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 print:w-[80mm] print:leading-tight"
             >
-              <div className="bg-[#654321] text-white p-4 rounded-xl">
+              <div className="bg-gray-800 text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Total Orders</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   {xData.summary.total_orders ?? 0}
                 </p>
               </div>
-              <div className="bg-maroon text-white p-4 rounded-xl">
+              <div className="bg-green-600 text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Revenue</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(xData.summary.total_revenue ?? 0).toFixed(2)}
                 </p>
               </div>
-              <div className="bg-[#CD853F] text-white p-4 rounded-xl">
+              <div className="bg-blue-600 text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Tips</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(xData.summary.total_tips ?? 0).toFixed(2)}
@@ -272,14 +259,14 @@ export default function ReportsManager() {
                     <Line
                       type="monotone"
                       dataKey="revenue"
-                      stroke="#730000"
+                      stroke="#8B1A1A"
                       strokeWidth={3}
                       name="Revenue"
                     />
                     <Line
                       type="monotone"
                       dataKey="tips"
-                      stroke="#CD853F"
+                      stroke="#2196F3"
                       strokeWidth={3}
                       name="Tips"
                     />
@@ -355,19 +342,19 @@ export default function ReportsManager() {
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-              <div className="bg-[#654321] text-white p-4 rounded-xl">
+              <div className="bg-gray-800 text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Orders</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   {zPrev.summary.total_orders ?? 0}
                 </p>
               </div>
-              <div className="bg-maroon text-white p-4 rounded-xl">
+              <div className="bg-green-600 text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Revenue</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(zPrev.summary.total_revenue ?? 0).toFixed(2)}
                 </p>
               </div>
-              <div className="bg-[#CD853F] text-white p-4 rounded-xl">
+              <div className="bg-blue-600 text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Tips</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(zPrev.summary.total_tips ?? 0).toFixed(2)}
@@ -484,31 +471,29 @@ export default function ReportsManager() {
         title="Generate Z Report?"
       >
         <p className="text-gray-700 mb-4">
-          Generating a Z Report will{" "}
-          <span className="font-semibold">close the business day</span>, reset
-          X-report totals, and archive today's sales.
-          <br />
-          <br />
-          This action{" "}
-          <span className="font-bold text-red-600">cannot be undone</span>. Are
-          you sure you want to continue?
+            Generating a Z Report will <span className="font-semibold">close the
+            business day</span>, reset X-report totals, and archive today's
+            sales.
+            <br /><br />
+            This action <span className="font-bold text-red-600">cannot be undone</span>.
+            Are you sure you want to continue?
         </p>
 
         <div className="flex justify-end gap-3">
-          <button
+            <button
             onClick={() => setConfirmZOpen(false)}
             className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg"
-          >
+            >
             Cancel
-          </button>
+            </button>
 
-          <button
+            <button
             onClick={runZReport}
             disabled={isRunningZ}
             className="px-4 py-2 bg-maroon text-white rounded-lg hover:bg-darkmaroon disabled:opacity-50"
-          >
+            >
             {isRunningZ ? "Processing..." : "Confirm"}
-          </button>
+            </button>
         </div>
       </Modal>
     </div>

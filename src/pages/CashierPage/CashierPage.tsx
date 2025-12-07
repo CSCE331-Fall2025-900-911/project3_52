@@ -205,15 +205,6 @@ export default function CashierPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
   const [isPayPalModalOpen, setIsPayPalModalOpen] = useState(false);
-  // states for discount code
-  type DiscountInfo = {
-    type: "percent" | "fixed";
-    value: number;
-  };
-  const [discountCode, setDiscountCode] = useState("");
-  const [discountError, setDiscountError] = useState("");
-  const [discountInfo, setDiscountInfo] = useState<DiscountInfo | null>(null);
-  const [showDiscountInfo, setShowDiscountInfo] = useState(false);
 
   // --- NEW STATE for customization modal ---
   const [isCustomizationModalOpen, setIsCustomizationModalOpen] =
@@ -313,31 +304,6 @@ export default function CashierPage() {
     toast.success(`${selectedProduct.product_name} added to order!`);
   };
 
-  const handleApplyDiscount = async () => {
-    setDiscountError("");
-
-    try {
-      const res = await kioskApiFetch("/api/discounts/check", {
-        method: "POST",
-        body: JSON.stringify({ code: discountCode }),
-      });
-
-      const data = await res.json();
-
-      if (!data.valid) {
-        setDiscountError(data.reason || "Invalid code");
-        return;
-      }
-
-      setDiscountInfo({
-        type: data.type,
-        value: data.value,
-      });
-    } catch {
-      setDiscountError("Server error");
-    }
-  };
-
   const removeFromCart = (id: string) =>
     setCart((prev) => prev.filter((i) => i.cart_id !== id));
 
@@ -349,29 +315,12 @@ export default function CashierPage() {
 
   const taxRate = 0.0825; // temporary static 8.25% tax rate
 
-  const discountAmount = useMemo(() => {
-    if (!discountInfo) return 0;
-
-    if (discountInfo.type === "percent") {
-      return subtotal * (discountInfo.value / 100);
-    }
-
-    if (discountInfo.type === "fixed") {
-      return Math.min(subtotal, discountInfo.value);
-    }
-
-    return 0;
-  }, [discountInfo, subtotal]);
-
   const tax = useMemo(
-    () => Number(((subtotal - discountAmount) * taxRate).toFixed(2)), //assuming tax rate in Cstat = 8.25%
-    [subtotal, discountAmount, taxRate]
+    () => Number((subtotal * taxRate).toFixed(2)), //assuming tax rate in Cstat = 8.25%
+    [subtotal, taxRate]
   );
 
-  const total = useMemo(
-    () => subtotal - discountAmount + tax,
-    [subtotal, discountAmount, tax]
-  );
+  const total = useMemo(() => subtotal + tax, [subtotal, tax]);
 
   const handleFinalSubmit = async (
     paymentMethod: "Card" | "Mobile Pay" | "Cash"
@@ -500,13 +449,13 @@ export default function CashierPage() {
           {/* --- RIGHT: Cart --- */}
           <div
             className="
-                         w-full lg:w-1/3 
-                         bg-white dark:bg-gray-800 shadow-lg p-6 flex flex-col
-                         border-t lg:border-t-0
-                         lg:fixed lg:top-20 lg:right-0 lg:h-[calc(100vh-5rem)]
-                         "
+      w-full lg:w-1/3 
+      bg-white dark:bg-gray-800 shadow-lg p-6 flex flex-col
+      border-t lg:border-t-0
+      lg:fixed lg:top-20 lg:right-0 lg:h-[calc(100vh-5rem)]
+    "
           >
-            <h2 className="text-2xl magnifier:text-5xl md:text-3xl font-bold mb-4 dark:text-white text-center lg:text-left">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 dark:text-white text-center lg:text-left">
               <T>Your Order</T>
             </h2>
 
@@ -527,47 +476,22 @@ export default function CashierPage() {
               )}
             </div>
 
-            <div className="border-t pt-2 my-1 dark:border-gray-700">
-              <span className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">
+            <div className="border-t pt-4 my-2 dark:border-gray-700">
+              <label className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">
                 Special Notes
-              </span>
+              </label>
               <input
                 type="text"
                 value={specialNotes}
-                aria-label="Special Notes Textbox"
                 onChange={(e) => {
                   setSpecialNotes(e.target.value);
                 }}
-                placeholder="Anything you want us to know? (e.g., allergies, preferences)"
+                placeholder="Input any additional info here..."
                 className="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
               />
             </div>
-            <div className="border-t pt-2 mt-2 dark:border-gray-700">
-              <div className="flex flex-col gap-1">
-                <div className="flex gap-1">
-                  <input
-                    type="text"
-                    value={discountCode}
-                    onChange={(e) => setDiscountCode(e.target.value)}
-                    className="flex-1 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
-                    placeholder="Enter discount code"
-                  />
-                  <button
-                    onClick={handleApplyDiscount}
-                    className="px-4 bg-maroon text-white rounded-md font-bold hover:bg-darkmaroon"
-                  >
-                    Apply
-                  </button>
-                </div>
-                <div className="h-3">
-                  {discountError && (
-                    <p className="text-red-500 text-xs">{discountError}</p>
-                  )}
-                </div>
-              </div>
-            </div>
 
-            <div className=" dark:border-gray-700">
+            <div className="border-t pt-2 mt-1 dark:border-gray-700">
               <div className="flex flex-col gap-1 mb-2 dark:text-white">
                 <div className="flex justify-between text-xs md:text-base text-gray-600 dark:text-gray-300 mb-.1">
                   <span>
@@ -576,40 +500,20 @@ export default function CashierPage() {
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
 
-                {discountAmount > 0 && (
-                  <div className="flex justify-between items-center text-xs md:text-base text-green-600 dark:text-gray-300 mb-.1">
-                    <div className="flex items-center gap-1">
-                      <span>Discount</span>
-                      <button
-                        onClick={() => setShowDiscountInfo(true)}
-                        className="w-3 h-3 flex items-center justify-center border border-gray-500 
-                                                 rounded-full text-[10px] leading-none text-gray-600 
-                                                 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                        title="Discount Info"
-                      >
-                        i
-                      </button>
-                    </div>
-                    <span>-${discountAmount.toFixed(2)}</span>
-                  </div>
-                )}
-
                 <div className="flex justify-between text-xs md:text-base text-gray-600 dark:text-gray-300 mb-.5">
                   <span>Tax:</span>
-                  <span>${tax}</span>
+                  <span>${tax.toFixed(2)}</span>
                 </div>
 
-                <div className="flex justify-between text-2xl md:text-2xl font-bold">
+                <div className="flex justify-between text-3xl md:text-3xl font-bold">
                   <span>Total:</span>
                   <span>${total.toFixed(2)}</span>
                 </div>
               </div>
               <button
-                onClick={() => {
-                  setIsPaymentModalOpen(true);
-                }}
+                onClick={() => setIsPaymentModalOpen(true)}
                 disabled={cart.length === 0}
-                className="w-full py-2 md:py-2.5 bg-maroon text-white text-lg md:text-xl font-bold rounded-lg shadow-lg disabled:opacity-50 hover:bg-darkmaroon"
+                className="w-full py-3 md:py-3 bg-maroon text-white text-lg md:text-xl font-bold rounded-lg shadow-lg disabled:opacity-50 hover:bg-darkmaroon"
               >
                 <T>Pay Now</T>
               </button>
@@ -658,7 +562,7 @@ export default function CashierPage() {
                 <span className="text-[#003087] italic">Pay</span>
                 <span className="text-[#009CDE] italic">Pal</span>
               </button>
-
+              
               {isSubmitting && <Spinner />}
               {submitError && (
                 <p className="text-red-500 text-center font-semibold">
@@ -667,27 +571,6 @@ export default function CashierPage() {
               )}
             </div>
           </Modal>
-
-          {showDiscountInfo && (
-            <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-80 text-center">
-                <h2 className="text-lg font-bold mb-2 dark:text-white">
-                  Discount Rules
-                </h2>
-
-                <p className="text-gray-700 dark:text-gray-300 mb-4">
-                  Only one discount code can be applied at a time.
-                </p>
-
-                <button
-                  onClick={() => setShowDiscountInfo(false)}
-                  className="px-4 py-2 bg-maroon text-white rounded-md font-semibold hover:bg-darkmaroon"
-                >
-                  OK
-                </button>
-              </div>
-            </div>
-          )}
 
           {selectedProduct && (
             <Modal

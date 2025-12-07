@@ -611,7 +611,7 @@ export default function KioskPage() {
                 )}
               </div>
               
-              <div className="border-t pt-4 my-2 dark:border-gray-700">
+              <div className="border-t pt-2 my-1 dark:border-gray-700">
                 <span className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">Special Notes</span>
                 <input
                   type="text"
@@ -624,9 +624,8 @@ export default function KioskPage() {
                   className="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
                 />
               </div>
-            <div className="border-t pt-4 my-2 dark:border-gray-700">
+            <div className="border-t pt-2 mt-2 dark:border-gray-700">
               <div className="flex flex-col gap-1">
-                <span className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">Discount Codes</span>
                 <div className="flex gap-1">
                   <input
                   type="text"
@@ -650,7 +649,7 @@ export default function KioskPage() {
               </div>
             </div>
 
-            <div className="border-t pt-2 mt-1 dark:border-gray-700">
+            <div className=" dark:border-gray-700">
                 <div className="flex flex-col gap-1 mb-2 dark:text-white">
                   <div className="flex justify-between text-xs md:text-base text-gray-600 dark:text-gray-300 mb-.1">
                     <span>

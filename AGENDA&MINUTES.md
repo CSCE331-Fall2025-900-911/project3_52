@@ -246,3 +246,36 @@ We discussed progress made early in Sprint 2. The main change was Aidan completi
 
 ## Minutes from Previous Meeting
 All tasks were confirmed completed. We presented features to each other and discussed positives and negatives. Minor aesthetic recommendations were made, and the team reviewed the live demo hosted online. Members then left to refine their tasks based on feedback.
+
+# Retrospective Meeting – Project 3  
+**Prepared by:** Team  
+**Meeting Date:** 12/06  
+**Meeting Time:** 9:30 PM  
+**Attendees:**  
+1. Monty Kang  
+2. Aidan Veselka  
+3. Aaron Liu  
+4. Peter Wu  
+
+---
+
+## Agenda Items
+- Discuss high points and low points during the project  
+- Compare expectations vs. actual outcomes  
+- Identify major lessons learned  
+
+---
+
+## Task Assignments
+
+| Task Description | Assigned To |
+|------------------|-------------|
+| Executive Summary | Monty |
+| Product Analysis | Aidan |
+| Work Analysis | Peter |
+| Going Forward | Aaron |
+
+---
+
+## Minutes from Meeting
+This meeting focused on a reflective review of the completed project. Overall, the team expressed positive feelings about the experience. Members agreed that the project was engaging and provided valuable exposure to real-world frontend and backend development. The final product was satisfying, and the team felt they achieved most of their individual goals. Looking ahead, we expect to use the knowledge and components developed in this project as references in future coursework and professional environments, making the project a meaningful learning resource.

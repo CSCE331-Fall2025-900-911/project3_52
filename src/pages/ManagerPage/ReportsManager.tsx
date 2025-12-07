@@ -272,14 +272,14 @@ export default function ReportsManager() {
                     <Line
                       type="monotone"
                       dataKey="revenue"
-                      stroke="#8B1A1A"
+                      stroke="#730000"
                       strokeWidth={3}
                       name="Revenue"
                     />
                     <Line
                       type="monotone"
                       dataKey="tips"
-                      stroke="#2196F3"
+                      stroke="#CD853F"
                       strokeWidth={3}
                       name="Tips"
                     />

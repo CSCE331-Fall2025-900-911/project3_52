@@ -134,7 +134,42 @@ export default function ReportsManager() {
   }
 };
 
-  const COLORS = ["#E91E63", "#3D5AFE", "#FFC107", "#4CAF50", "#FF5722"];
+  // REGULAR COLORS
+  // const COLORS = [
+  //   '#4B0082', // Deep Indigo (dark purple)
+  //   '#8B1A1A', // Maroon (your original)
+  //   '#2F4F4F', // Dark Slate Gray
+  //   '#191970', // Midnight Blue
+  //   '#483D8B', // Dark Slate Blue
+  //   '#2E0854', // Deep Violet
+  //   '#800000', // Dark Red/Maroon
+  //   '#006400', // Dark Green
+  //   '#1C2526', // Almost Black (charcoal)
+  //   '#353839'  // Gunmetal Gray
+  // ];
+
+  // FALL COLORS
+  const COLORS = [
+    '#800000', // Maroon
+    '#8B4513', // Saddle Brown
+    '#A0522D', // Sienna
+    '#556B2F',  // Dark Olive Green
+    '#D2691E', // Chocolate
+    '#CD853F', // Peru
+    '#B8860B', // Dark Goldenrod
+    '#FF8C00', // Dark Orange
+    '#B22222', // Firebrick
+    '#654321', // Dark Brown
+  ];
+
+  // FOURTH OF JULY COLORS
+  // const COLORS = [
+  //   '#8C1D40', // Firecracker Crimson
+  //   '#003087', // Midnight Navy
+  //   '#C0C0C0', // Silver Sparkle (fireworks)
+  //   '#A52A2A', // Flag Red
+  //   '#00205B', // Deep Patriot Blue
+  // ];
 
   return (
     <div className="space-y-8">
@@ -178,19 +213,28 @@ export default function ReportsManager() {
               id="xReport"
               className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 print:w-[80mm] print:leading-tight"
             >
-              <div className="bg-gray-800 text-white p-4 rounded-xl">
+              <div 
+                style={{ backgroundColor: COLORS[0] }}
+                className="bg-gray-800 text-white p-4 rounded-xl"
+              >
                 <p className="text-sm opacity-90">Total Orders</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   {xData.summary.total_orders ?? 0}
                 </p>
               </div>
-              <div className="bg-green-600 text-white p-4 rounded-xl">
+              <div 
+                style={{ backgroundColor: COLORS[1] }}
+                className="bg-gray-800 text-white p-4 rounded-xl"
+              >
                 <p className="text-sm opacity-90">Revenue</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(xData.summary.total_revenue ?? 0).toFixed(2)}
                 </p>
               </div>
-              <div className="bg-blue-600 text-white p-4 rounded-xl">
+              <div 
+                style={{ backgroundColor: COLORS[3] }}
+                className="bg-gray-800 text-white p-4 rounded-xl"
+              >
                 <p className="text-sm opacity-90">Tips</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(xData.summary.total_tips ?? 0).toFixed(2)}
@@ -227,7 +271,7 @@ export default function ReportsManager() {
                       {xData.by_payment.map((_, index) => (
                         <Cell
                           key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
+                          fill={COLORS[(index+3) % COLORS.length]}
                         />
                       ))}
                     </Pie>

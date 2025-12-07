@@ -191,7 +191,7 @@ export default function ReportsManager() {
               id="xReport"
               className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 print:w-[80mm] print:leading-tight"
             >
-              <div className="bg-gray-800 text-white p-4 rounded-xl">
+              <div className="bg-[#654321] text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Total Orders</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   {xData.summary.total_orders ?? 0}
@@ -203,7 +203,7 @@ export default function ReportsManager() {
                   ${(xData.summary.total_revenue ?? 0).toFixed(2)}
                 </p>
               </div>
-              <div className="bg-[#8B4513] text-white p-4 rounded-xl">
+              <div className="bg-[#CD853F] text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Tips</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(xData.summary.total_tips ?? 0).toFixed(2)}
@@ -355,7 +355,7 @@ export default function ReportsManager() {
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-              <div className="bg-gray-800 text-white p-4 rounded-xl">
+              <div className="bg-[#654321] text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Orders</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   {zPrev.summary.total_orders ?? 0}

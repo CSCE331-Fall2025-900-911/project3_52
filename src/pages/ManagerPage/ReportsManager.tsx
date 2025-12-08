@@ -113,63 +113,41 @@ export default function ReportsManager() {
     setConfirmZOpen(true); // <-- OPEN CUSTOM MODAL
   };
   const runZReport = async () => {
-  setIsRunningZ(true);
-  try {
-    const res = await apiFetch("/api/reports/z/close", { method: "POST" });
-    const data = await res.json();
+    setIsRunningZ(true);
+    try {
+      const res = await apiFetch("/api/reports/z/close", { method: "POST" });
+      const data = await res.json();
 
-    if (!res.ok || data.success === false || data.error) {
-      toast.error(data.message || data.error || "Z-report already run today.");
-      return;
+      if (!res.ok || data.success === false || data.error) {
+        toast.error(
+          data.message || data.error || "Z-report already run today."
+        );
+        return;
+      }
+
+      setZClosed(data);
+      setZClosedToday(true);
+      toast.success("Z Report closed");
+    } catch (e: any) {
+      toast.error(e.message || "Failed to close Z report");
+    } finally {
+      setIsRunningZ(false);
+      setConfirmZOpen(false); // CLOSE MODAL
     }
+  };
 
-    setZClosed(data);
-    setZClosedToday(true);
-    toast.success("Z Report closed");
-  } catch (e: any) {
-    toast.error(e.message || "Failed to close Z report");
-  } finally {
-    setIsRunningZ(false);
-    setConfirmZOpen(false); // CLOSE MODAL
-  }
-};
-
-  // REGULAR COLORS
-  // const COLORS = [
-  //   '#4B0082', // Deep Indigo (dark purple)
-  //   '#8B1A1A', // Maroon (your original)
-  //   '#2F4F4F', // Dark Slate Gray
-  //   '#191970', // Midnight Blue
-  //   '#483D8B', // Dark Slate Blue
-  //   '#2E0854', // Deep Violet
-  //   '#800000', // Dark Red/Maroon
-  //   '#006400', // Dark Green
-  //   '#1C2526', // Almost Black (charcoal)
-  //   '#353839'  // Gunmetal Gray
-  // ];
-
-  // FALL COLORS
   const COLORS = [
-    '#800000', // Maroon
-    '#8B4513', // Saddle Brown
-    '#A0522D', // Sienna
-    '#556B2F',  // Dark Olive Green
-    '#D2691E', // Chocolate
-    '#CD853F', // Peru
-    '#B8860B', // Dark Goldenrod
-    '#FF8C00', // Dark Orange
-    '#B22222', // Firebrick
-    '#654321', // Dark Brown
+    "#800000", // Maroon
+    "#8B4513", // Saddle Brown
+    "#A0522D", // Sienna
+    "#556B2F", // Dark Olive Green
+    "#D2691E", // Chocolate
+    "#CD853F", // Peru
+    "#B8860B", // Dark Goldenrod
+    "#FF8C00", // Dark Orange
+    "#B22222", // Firebrick
+    "#654321", // Dark Brown
   ];
-
-  // FOURTH OF JULY COLORS
-  // const COLORS = [
-  //   '#8C1D40', // Firecracker Crimson
-  //   '#003087', // Midnight Navy
-  //   '#C0C0C0', // Silver Sparkle (fireworks)
-  //   '#A52A2A', // Flag Red
-  //   '#00205B', // Deep Patriot Blue
-  // ];
 
   return (
     <div className="space-y-8">
@@ -213,28 +191,19 @@ export default function ReportsManager() {
               id="xReport"
               className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 print:w-[80mm] print:leading-tight"
             >
-              <div 
-                style={{ backgroundColor: COLORS[0] }}
-                className="bg-gray-800 text-white p-4 rounded-xl"
-              >
+              <div className="bg-maroon text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Total Orders</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   {xData.summary.total_orders ?? 0}
                 </p>
               </div>
-              <div 
-                style={{ backgroundColor: COLORS[1] }}
-                className="bg-gray-800 text-white p-4 rounded-xl"
-              >
+              <div className="bg-[#556B2F] text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Revenue</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(xData.summary.total_revenue ?? 0).toFixed(2)}
                 </p>
               </div>
-              <div 
-                style={{ backgroundColor: COLORS[3] }}
-                className="bg-gray-800 text-white p-4 rounded-xl"
-              >
+              <div className="bg-[#CD853F] text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Tips</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(xData.summary.total_tips ?? 0).toFixed(2)}
@@ -271,7 +240,7 @@ export default function ReportsManager() {
                       {xData.by_payment.map((_, index) => (
                         <Cell
                           key={`cell-${index}`}
-                          fill={COLORS[(index+3) % COLORS.length]}
+                          fill={COLORS[index % COLORS.length]}
                         />
                       ))}
                     </Pie>
@@ -303,14 +272,14 @@ export default function ReportsManager() {
                     <Line
                       type="monotone"
                       dataKey="revenue"
-                      stroke="#8B1A1A"
+                      stroke="#730000"
                       strokeWidth={3}
                       name="Revenue"
                     />
                     <Line
                       type="monotone"
                       dataKey="tips"
-                      stroke="#2196F3"
+                      stroke="#CD853F"
                       strokeWidth={3}
                       name="Tips"
                     />
@@ -386,19 +355,19 @@ export default function ReportsManager() {
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-              <div className="bg-gray-800 text-white p-4 rounded-xl">
+              <div className="bg-maroon text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Orders</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   {zPrev.summary.total_orders ?? 0}
                 </p>
               </div>
-              <div className="bg-green-600 text-white p-4 rounded-xl">
+              <div className="bg-[#556B2F] text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Revenue</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(zPrev.summary.total_revenue ?? 0).toFixed(2)}
                 </p>
               </div>
-              <div className="bg-blue-600 text-white p-4 rounded-xl">
+              <div className="bg-[#CD853F] text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Tips</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(zPrev.summary.total_tips ?? 0).toFixed(2)}
@@ -515,29 +484,31 @@ export default function ReportsManager() {
         title="Generate Z Report?"
       >
         <p className="text-gray-700 mb-4">
-            Generating a Z Report will <span className="font-semibold">close the
-            business day</span>, reset X-report totals, and archive today's
-            sales.
-            <br /><br />
-            This action <span className="font-bold text-red-600">cannot be undone</span>.
-            Are you sure you want to continue?
+          Generating a Z Report will{" "}
+          <span className="font-semibold">close the business day</span>, reset
+          X-report totals, and archive today's sales.
+          <br />
+          <br />
+          This action{" "}
+          <span className="font-bold text-red-600">cannot be undone</span>. Are
+          you sure you want to continue?
         </p>
 
         <div className="flex justify-end gap-3">
-            <button
+          <button
             onClick={() => setConfirmZOpen(false)}
             className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg"
-            >
+          >
             Cancel
-            </button>
+          </button>
 
-            <button
+          <button
             onClick={runZReport}
             disabled={isRunningZ}
             className="px-4 py-2 bg-maroon text-white rounded-lg hover:bg-darkmaroon disabled:opacity-50"
-            >
+          >
             {isRunningZ ? "Processing..." : "Confirm"}
-            </button>
+          </button>
         </div>
       </Modal>
     </div>

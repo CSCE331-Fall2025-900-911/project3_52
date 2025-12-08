@@ -197,13 +197,13 @@ export default function ReportsManager() {
                   {xData.summary.total_orders ?? 0}
                 </p>
               </div>
-              <div className="bg-[#556B2F] text-white p-4 rounded-xl">
+              <div className="bg-[#CD853F] text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Revenue</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(xData.summary.total_revenue ?? 0).toFixed(2)}
                 </p>
               </div>
-              <div className="bg-[#CD853F] text-white p-4 rounded-xl">
+              <div className="bg-[#556B2F] text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Tips</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(xData.summary.total_tips ?? 0).toFixed(2)}
@@ -361,13 +361,13 @@ export default function ReportsManager() {
                   {zPrev.summary.total_orders ?? 0}
                 </p>
               </div>
-              <div className="bg-[#556B2F] text-white p-4 rounded-xl">
+              <div className="bg-[#CD853F] text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Revenue</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(zPrev.summary.total_revenue ?? 0).toFixed(2)}
                 </p>
               </div>
-              <div className="bg-[#CD853F] text-white p-4 rounded-xl">
+              <div className="bg-[#556B2F] text-white p-4 rounded-xl">
                 <p className="text-sm opacity-90">Tips</p>
                 <p className="text-2xl sm:text-3xl font-bold">
                   ${(zPrev.summary.total_tips ?? 0).toFixed(2)}

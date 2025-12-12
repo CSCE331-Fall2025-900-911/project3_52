@@ -790,11 +790,11 @@ export default function KioskPage() {
                   <span className="text-[#003087] italic">Pay</span>
                   <span className="text-[#009CDE] italic">Pal</span>
                 </button>
-                <PaymentButton
+                {/* <PaymentButton
                   label="Cash (Pay at Counter)"
                   onClick={() => handleFinalSubmit("Cash")}
                   disabled={isSubmitting}
-                />
+                /> */}
 
                 {isSubmitting && <Spinner />}
                 {submitError && (

@@ -4,6 +4,20 @@ import { OrderHistoryRecord } from "../../types/models";
 import Modal from "../../components/Modal";
 import Spinner from "../../components/Spinner";
 
+const SUGAR_LABELS: Record<string, string> = {
+  "100": "Extra",
+  "75": "Normal",
+  "50": "Less",
+  "0": "No Sugar",
+};
+
+const ICE_LABELS: Record<string, string> = {
+  "100": "Extra",
+  "75": "Normal",
+  "50": "Less",
+  "0": "Hot",
+};
+
 /**
  * A modal component to display the items in a specific order.
  */
@@ -66,8 +80,8 @@ const OrderDetailsModal = ({
               </p>
 
               <p className="text-sm text-gray-500">
-                Size: {item.size} | Sugar: {item.sugar_level}% | Ice:{" "}
-                {item.ice_level}%
+                Size: {item.size} | Sugar: {SUGAR_LABELS[item.sugar_level]} | Ice:{" "}
+                {ICE_LABELS[item.ice_level]}
               </p>
 
               {item.toppings && (

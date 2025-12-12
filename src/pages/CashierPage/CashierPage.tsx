@@ -42,7 +42,7 @@ const CustomizationForm = ({
     defaults?.toppings ? defaults.toppings.split(",").map((s) => s.trim()) : []
   );
 
-  // --- UPDATED: Handler to limit selection to 3 ---
+ 
   const handleToppingChange = (topping: string) => {
     setSelectedToppings((prev) => {
       const isSelected = prev.includes(topping);
@@ -51,14 +51,7 @@ const CustomizationForm = ({
         // Always allow un-checking
         return prev.filter((t) => t !== topping);
       } else {
-        // Only allow checking if under the limit
-        if (prev.length < 3) {
-          return [...prev, topping];
-        } else {
-          // Show a warning and do not add the 4th topping
-          toast.error("You can select up to 3 toppings");
-          return prev; // Return the state unchanged
-        }
+        return [...prev, topping];
       }
     });
   };
@@ -110,10 +103,10 @@ const CustomizationForm = ({
           onChange={(e) => setSugar(e.target.value as any)}
           className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
         >
-          <option value="100">100%</option>
-          <option value="75">75%</option>
-          <option value="50">50%</option>
-          <option value="0">0%</option>
+          <option value="100">Extra</option>
+          <option value="75">Normal</option>
+          <option value="50">Less</option>
+          <option value="0">No Sugar</option>
         </select>
       </label>
 
@@ -127,10 +120,10 @@ const CustomizationForm = ({
           onChange={(e) => setIce(e.target.value as any)}
           className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
         >
-          <option value="100">100%</option>
-          <option value="75">75%</option>
-          <option value="50">50%</option>
-          <option value="0">0%</option>
+          <option value="100">Extra</option>
+          <option value="75">Normal</option>
+          <option value="50">Less</option>
+          <option value="0">Hot</option>
         </select>
       </label>
 
@@ -562,7 +555,7 @@ export default function CashierPage() {
                 <span className="text-[#003087] italic">Pay</span>
                 <span className="text-[#009CDE] italic">Pal</span>
               </button>
-              
+
               {isSubmitting && <Spinner />}
               {submitError && (
                 <p className="text-red-500 text-center font-semibold">

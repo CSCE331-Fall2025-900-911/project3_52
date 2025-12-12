@@ -110,10 +110,10 @@ const CustomizationForm = ({
           onChange={(e) => setSugar(e.target.value as any)}
           className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
         >
-          <option value="100">100%</option>
-          <option value="75">75%</option>
-          <option value="50">50%</option>
-          <option value="0">0%</option>
+          <option value="100">Extra</option>
+          <option value="75">Normal</option>
+          <option value="50">Less</option>
+          <option value="0">No Sugar</option>
         </select>
       </label>
 
@@ -127,10 +127,10 @@ const CustomizationForm = ({
           onChange={(e) => setIce(e.target.value as any)}
           className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
         >
-          <option value="100">100%</option>
-          <option value="75">75%</option>
-          <option value="50">50%</option>
-          <option value="0">0%</option>
+          <option value="100">Extra</option>
+          <option value="75">Normal</option>
+          <option value="50">Less</option>
+          <option value="0">Hot</option>
         </select>
       </label>
 

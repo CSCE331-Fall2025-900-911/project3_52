@@ -54,25 +54,33 @@ const OrderDetailsModal = ({
       <ul className="divide-y divide-gray-200">
         {items.map((item, index) => (
           <li
-            key={item.product_id || index}
-            className="py-3 flex justify-between"
+            key={item.item_id || index}
+            className="py-3 flex justify-between items-start"
           >
             <div>
               <p className="font-semibold text-gray-800">
                 {item.product_name || `Product ID: ${item.product_id}`}
+                <span className="ml-2 text-sm text-gray-500">
+                  ×{item.quantity ?? 1}
+                </span>
               </p>
+
               <p className="text-sm text-gray-500">
                 Size: {item.size} | Sugar: {item.sugar_level}% | Ice:{" "}
                 {item.ice_level}%
               </p>
+
               {item.toppings && (
                 <p className="text-sm text-gray-500">
                   Toppings: {item.toppings}
                 </p>
               )}
             </div>
+
             <div className="text-right">
-              <p className="font-semibold">${item.price ?? 0}</p>
+              <p className="font-semibold">
+                ${((item.price ?? 0) * (item.quantity ?? 1)).toFixed(2)}
+              </p>
             </div>
           </li>
         ))}
@@ -80,6 +88,7 @@ const OrderDetailsModal = ({
     );
   };
 
+  
   return (
     <Modal
       isOpen={true}

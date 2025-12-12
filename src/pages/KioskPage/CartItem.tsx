@@ -24,7 +24,38 @@ export default function KioskCartItem({
         </p>
       </div>
       <div className="text-right">
-        <p className="font-bold dark:text-white">${item.final_price}</p>
+        <p className="font-bold dark:text-white">
+          ${ (item.final_price * item.quantity).toFixed(2) }
+        </p>
+        <div className="flex items-center gap-2 justify-end mb-1">
+          <button
+            onClick={() => onEdit?.(item.cart_id + ":dec")}
+            disabled={item.quantity <= 1}
+            className={`px-2 py-0.5 rounded 
+              ${item.quantity <= 1
+                ? "bg-gray-200 dark:bg-gray-700 opacity-50 cursor-not-allowed"
+                : "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"}
+            `}
+          >
+            −
+          </button>
+          <span
+            className="font-semibold dark:text-white inline-flex justify-center items-center w-6 tabular-nums"
+          >
+            {Math.min(99, Math.max(1, item.quantity))}
+          </span>
+          <button
+            onClick={() => onEdit?.(item.cart_id + ":inc")}
+            disabled={item.quantity >= 99}
+            className={`px-2 py-0.5 rounded
+              ${item.quantity >= 99
+                ? "bg-gray-200 dark:bg-gray-700 opacity-50 cursor-not-allowed"
+                : "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"}
+            `}
+          >
+            +
+          </button>
+        </div>
         {onEdit && (
           <button
             onClick={() => onEdit(item.cart_id)}

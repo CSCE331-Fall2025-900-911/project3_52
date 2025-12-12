@@ -36,8 +36,8 @@ const CustomizationForm = ({
 }) => {
   // Internal state for the form, with defaults
   const [size, setSize] = useState(defaults?.size || "Medium");
-  const [sugar, setSugar] = useState(defaults?.sugar_level || "100");
-  const [ice, setIce] = useState(defaults?.ice_level || "100");
+  const [sugar, setSugar] = useState(defaults?.sugar_level ?? "75");
+  const [ice, setIce] = useState(defaults?.ice_level ?? "75");
   const [selectedToppings, setSelectedToppings] = useState(
     defaults?.toppings ? defaults.toppings.split(",").map((s) => s.trim()) : []
   );
@@ -67,7 +67,7 @@ const CustomizationForm = ({
   };
 
   // This will be true when 3 toppings are selected
-  const toppingsLimitReached = selectedToppings.length >= 3;
+  // const toppingsLimitReached = selectedToppings.length >= 3;
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -133,9 +133,9 @@ const CustomizationForm = ({
           <legend className="block text-gray-700 dark:text-gray-300">
             <T>Toppings</T>
           </legend>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            <T>Select up to 3</T> ({selectedToppings.length} / 3)
-          </span>
+          {/* <span className="text-sm text-gray-500 dark:text-gray-400">
+            <T>Select toppings</T>
+          </span> */}
         </div>
 
         {/* Responsive grid, larger tap targets with borders */}
@@ -143,7 +143,7 @@ const CustomizationForm = ({
           {AVAILABLE_TOPPINGS.map((topping) => {
             const isSelected = selectedToppings.includes(topping);
             // Disable if limit is reached AND this item is not already selected
-            const isDisabled = toppingsLimitReached && !isSelected;
+            const isDisabled = false;
 
             return (
               <label
@@ -234,8 +234,37 @@ export default function CashierPage() {
   };
 
   const handleEditCartItem = (id: string) => {
+    // quantity controls
+    if (id.endsWith(":inc")) {
+      const realId = id.replace(":inc", "");
+      setCart((prev) =>
+        prev.map((c) =>
+          c.cart_id === realId
+            ? { ...c, quantity: Math.min(99, c.quantity + 1) }
+            : c
+        )
+      );
+      return;
+    }
+
+    if (id.endsWith(":dec")) {
+      const realId = id.replace(":dec", "");
+      setCart((prev) =>
+        prev
+          .map((c) =>
+            c.cart_id === realId
+              ? { ...c, quantity: Math.max(1, c.quantity - 1) }
+              : c
+          )
+          .filter((c) => c.quantity > 0)
+      );
+      return;
+    }
+
+    // customization edit
     const target = cart.find((c) => c.cart_id === id);
     if (!target) return;
+
     setSelectedProduct(target.product);
     setEditingCartId(id);
     setEditingDefaults({
@@ -263,6 +292,31 @@ export default function CashierPage() {
       return;
     }
     if (!selectedProduct) return; // Guard clause
+
+    // If same product + same customization exists, just increment quantity
+    const existing = cart.find(
+      (c) =>
+        c.product.product_id === selectedProduct.product_id &&
+        c.size === customData.size &&
+        c.sugar_level === customData.sugar_level &&
+        c.ice_level === customData.ice_level &&
+        c.toppings === customData.toppings
+    );
+
+    if (existing) {
+      setCart((prev) =>
+        prev.map((c) =>
+          c.cart_id === existing.cart_id
+            ? { ...c, quantity: Math.min(99, c.quantity + 1) }
+            : c
+        )
+      );
+
+      setIsCustomizationModalOpen(false);
+      setSelectedProduct(null);
+      toast.success(`${selectedProduct.product_name} quantity increased`);
+      return;
+    }
 
     //shallow product copy to avoid mutating original
     const productCopy = { ...selectedProduct };
@@ -302,7 +356,7 @@ export default function CashierPage() {
 
   const subtotal = useMemo(
     //subtotal, only summing base prices of items
-    () => cart.reduce((s, i) => s + i.final_price, 0),
+    () => cart.reduce((s, i) => s + i.final_price * i.quantity, 0),
     [cart]
   );
 
@@ -339,6 +393,7 @@ export default function CashierPage() {
         ice_level: i.ice_level,
         toppings: i.toppings,
         price: i.final_price,
+        quantity: i.quantity,
       })),
       tax: tax,
     };

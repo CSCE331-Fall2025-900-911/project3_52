@@ -36,10 +36,14 @@ const CustomizationForm = ({
   const [size, setSize] = useState<"Small" | "Medium" | "Large" | "Bucee's">(
     defaults?.size || "Medium"
   );
-  const [sugar, setSugar] = useState<"0" | "50" | "75" | "100">(defaults?.sugar_level || "100");
-  const [ice, setIce] = useState<"0" | "50" | "75" | "100">(defaults?.ice_level || "100");
+  const [sugar, setSugar] = useState<"0" | "50" | "75" | "100">(
+    defaults?.sugar_level || "75"
+  );
+  const [ice, setIce] = useState<"0" | "50" | "75" | "100">(
+    defaults?.ice_level || "75"
+  );
   const [selectedToppings, setSelectedToppings] = useState<string[]>(
-    defaults?.toppings ? defaults.toppings.split(",").map(s => s.trim()) : []
+    defaults?.toppings ? defaults.toppings.split(",").map((s) => s.trim()) : []
   );
 
   // --- UPDATED: Handler to limit selection to 3 ---
@@ -51,14 +55,7 @@ const CustomizationForm = ({
         // Always allow un-checking
         return prev.filter((t) => t !== topping);
       } else {
-        // Only allow checking if under the limit
-        if (prev.length < 3) {
-          return [...prev, topping];
-        } else {
-          // Show a warning and do not add the 4th topping
-          toast.error("You can select up to 3 toppings");
-          return prev; // Return the state unchanged
-        }
+        return [...prev, topping];
       }
     });
   };
@@ -74,7 +71,7 @@ const CustomizationForm = ({
   };
 
   // This will be true when 3 toppings are selected
-  const toppingsLimitReached = selectedToppings.length >= 3;
+  // const toppingsLimitReached = selectedToppings.length >= 3;
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -140,9 +137,9 @@ const CustomizationForm = ({
           <legend className="block text-gray-700 dark:text-gray-300">
             <T>Toppings</T>
           </legend>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            <T>Select up to 3</T> ({selectedToppings.length} / 3)
-          </span>
+          {/* <span className="text-sm text-gray-500 dark:text-gray-400">
+            <T>Select toppings</T>
+          </span> */}
         </div>
 
         {/* Responsive grid, larger tap targets with borders */}
@@ -150,7 +147,7 @@ const CustomizationForm = ({
           {AVAILABLE_TOPPINGS.map((topping) => {
             const isSelected = selectedToppings.includes(topping);
             // Disable if limit is reached AND this item is not already selected
-            const isDisabled = toppingsLimitReached && !isSelected;
+            const isDisabled = false;
 
             return (
               <label
@@ -215,7 +212,6 @@ export default function KioskPage() {
   const [discountInfo, setDiscountInfo] = useState<DiscountInfo | null>(null);
   const [showDiscountInfo, setShowDiscountInfo] = useState(false);
 
-
   // Initialize activeCategory from localStorage if available, else null (will set after products load)
   const [activeCategory, setActiveCategory] = useState<string | null>(() => {
     const stored = localStorage.getItem("kiosk.activeCategory");
@@ -249,7 +245,8 @@ export default function KioskPage() {
     useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [editingCartId, setEditingCartId] = useState<string | null>(null);
-  const [editingDefaults, setEditingDefaults] = useState<CustomizationData | null>(null);
+  const [editingDefaults, setEditingDefaults] =
+    useState<CustomizationData | null>(null);
 
   const [specialNotes, setSpecialNotes] = useState("");
 
@@ -279,15 +276,42 @@ export default function KioskPage() {
 
   // --- Handler for editing cart item ---
   const handleEditCartItem = (id: string) => {
-    const target = cart.find(c => c.cart_id === id);
+    // quantity controls
+    if (id.endsWith(":inc")) {
+      const realId = id.replace(":inc", "");
+      setCart((prev) =>
+        prev.map((c) =>
+          c.cart_id === realId ? { ...c, quantity: c.quantity + 1 } : c
+        )
+      );
+      return;
+    }
+
+    if (id.endsWith(":dec")) {
+      const realId = id.replace(":dec", "");
+      setCart((prev) =>
+        prev
+          .map((c) =>
+            c.cart_id === realId
+              ? { ...c, quantity: Math.max(1, c.quantity - 1) }
+              : c
+          )
+          .filter((c) => c.quantity > 0)
+      );
+      return;
+    }
+
+    // customization edit
+    const target = cart.find((c) => c.cart_id === id);
     if (!target) return;
+
     setSelectedProduct(target.product);
     setEditingCartId(id);
     setEditingDefaults({
       size: target.size,
       sugar_level: target.sugar_level,
       ice_level: target.ice_level,
-      toppings: target.toppings
+      toppings: target.toppings,
     });
     setIsCustomizationModalOpen(true);
   };
@@ -299,11 +323,9 @@ export default function KioskPage() {
     if (!selectedProduct) return; // Guard clause
 
     if (editingCartId) {
-      setCart(prev =>
-        prev.map(c =>
-          c.cart_id === editingCartId
-            ? { ...c, ...customData }
-            : c
+      setCart((prev) =>
+        prev.map((c) =>
+          c.cart_id === editingCartId ? { ...c, ...customData } : c
         )
       );
       setIsCustomizationModalOpen(false);
@@ -311,6 +333,31 @@ export default function KioskPage() {
       setEditingCartId(null);
       setEditingDefaults(null);
       toast.success(`${selectedProduct.product_name} updated!`);
+      return;
+    }
+
+    // If same product + same customization exists, just increment quantity
+    const existing = cart.find(
+      (c) =>
+        c.product.product_id === selectedProduct.product_id &&
+        c.size === customData.size &&
+        c.sugar_level === customData.sugar_level &&
+        c.ice_level === customData.ice_level &&
+        c.toppings === customData.toppings
+    );
+
+    if (existing) {
+      setCart((prev) =>
+        prev.map((c) =>
+          c.cart_id === existing.cart_id
+            ? { ...c, quantity: c.quantity + 1 }
+            : c
+        )
+      );
+
+      setIsCustomizationModalOpen(false);
+      setSelectedProduct(null);
+      toast.success(`${selectedProduct.product_name} quantity increased`);
       return;
     }
 
@@ -355,7 +402,7 @@ export default function KioskPage() {
     try {
       const res = await kioskApiFetch("/api/discounts/check", {
         method: "POST",
-        body: JSON.stringify({ code: discountCode })
+        body: JSON.stringify({ code: discountCode }),
       });
 
       const data = await res.json();
@@ -367,9 +414,8 @@ export default function KioskPage() {
 
       setDiscountInfo({
         type: data.type,
-        value: data.value
+        value: data.value,
       });
-
     } catch {
       setDiscountError("Server error");
     }
@@ -379,7 +425,7 @@ export default function KioskPage() {
     setCart((prev) => prev.filter((i) => i.cart_id !== id));
 
   const subtotal = useMemo(
-    () => cart.reduce((s, i) => s + i.final_price, 0),
+    () => cart.reduce((s, i) => s + i.final_price * i.quantity, 0),
     [cart]
   );
 
@@ -400,25 +446,24 @@ export default function KioskPage() {
   }, [discountInfo, subtotal]);
 
   const tax = useMemo(
-    () => Number(((subtotal-discountAmount) * taxRate).toFixed(2)), //assuming tax rate in Cstat = 8.25%
+    () => Number(((subtotal - discountAmount) * taxRate).toFixed(2)), //assuming tax rate in Cstat = 8.25%
     [subtotal, discountAmount]
   );
 
   const total = useMemo(
-    () => (subtotal-discountAmount) + tax,
+    () => subtotal - discountAmount + tax,
     [subtotal, discountAmount, tax]
-  )
+  );
 
   const handleFinalSubmit = async (
     paymentMethod: "Card" | "Mobile Pay" | "Cash"
   ) => {
-    
     // Normal flow for non-digital payments
     setIsSubmitting(true);
     setSubmitError(null);
 
     const now = new Date();
-    const payload: OrderPayload = { 
+    const payload: OrderPayload = {
       time: now.toTimeString().split(" ")[0],
       day: now.getDate(),
       month: now.getMonth() + 1,
@@ -434,6 +479,7 @@ export default function KioskPage() {
         ice_level: i.ice_level,
         toppings: i.toppings,
         price: i.final_price,
+        quantity: i.quantity,
       })),
       tax: tax,
     };
@@ -518,13 +564,16 @@ export default function KioskPage() {
               <div className="mb-4 mt-4">
                 <div className="sm:hidden flex w-full">
                   <select
-                    title = "Select Category" //added for accessibility, remove warning
+                    title="Select Category" //added for accessibility, remove warning
                     aria-label="Select Category"
                     className="block w-full p-3 rounded-lg border bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 text-center text-lg font-semibold"
                     value={activeCategory ?? ""}
                     onChange={(e) => {
                       setActiveCategory(e.target.value);
-                      localStorage.setItem("kiosk.activeCategory", e.target.value);
+                      localStorage.setItem(
+                        "kiosk.activeCategory",
+                        e.target.value
+                      );
                     }}
                   >
                     {availableCategories.map((category) => (
@@ -542,7 +591,10 @@ export default function KioskPage() {
                         key={category}
                         onClick={() => {
                           setActiveCategory(category);
-                          localStorage.setItem("kiosk.activeCategory", category);
+                          localStorage.setItem(
+                            "kiosk.activeCategory",
+                            category
+                          );
                         }}
                         className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-colors
                           ${
@@ -611,46 +663,48 @@ export default function KioskPage() {
                   ))
                 )}
               </div>
-              
+
               <div className="border-t pt-2 my-1 dark:border-gray-700">
-                <span className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">Special Notes</span>
+                <span className="block mb-2 text-xl md:text-2xl font-bold dark:text-white">
+                  Special Notes
+                </span>
                 <input
                   type="text"
                   value={specialNotes}
                   aria-label="Special Notes Textbox"
                   onChange={(e) => {
-                      setSpecialNotes(e.target.value);
-                    }}
+                    setSpecialNotes(e.target.value);
+                  }}
                   placeholder="Anything you want us to know? (e.g., allergies, preferences)"
                   className="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
                 />
               </div>
-            <div className="border-t pt-2 mt-2 dark:border-gray-700">
-              <div className="flex flex-col gap-1">
-                <div className="flex gap-1">
-                  <input
-                  type="text"
-                  value={discountCode}
-                  onChange={(e) => setDiscountCode(e.target.value)}
-                  className="flex-1 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
-                  placeholder="Enter discount code"
-                  />
-                  <button
-                  onClick={handleApplyDiscount}
-                  className="px-4 bg-maroon text-white rounded-md font-bold hover:bg-darkmaroon"
-                  >
-                  Apply
-                  </button>
-                </div>
-                <div className="h-3">
-                  {discountError && (
-                  <p className="text-red-500 text-xs">{discountError}</p>
-                  )}
+              <div className="border-t pt-2 mt-2 dark:border-gray-700">
+                <div className="flex flex-col gap-1">
+                  <div className="flex gap-1">
+                    <input
+                      type="text"
+                      value={discountCode}
+                      onChange={(e) => setDiscountCode(e.target.value)}
+                      className="flex-1 p-2 border rounded-md dark:bg-gray-700 dark:text-white"
+                      placeholder="Enter discount code"
+                    />
+                    <button
+                      onClick={handleApplyDiscount}
+                      className="px-4 bg-maroon text-white rounded-md font-bold hover:bg-darkmaroon"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                  <div className="h-3">
+                    {discountError && (
+                      <p className="text-red-500 text-xs">{discountError}</p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className=" dark:border-gray-700">
+              <div className=" dark:border-gray-700">
                 <div className="flex flex-col gap-1 mb-2 dark:text-white magnifier:text-4x1">
                   <div className="flex justify-between text-xs magnifier:text-4xl md:text-base text-gray-600 dark:text-gray-300 mb-.1">
                     <span>
@@ -662,18 +716,18 @@ export default function KioskPage() {
                   {discountAmount > 0 && (
                     <div className="flex justify-between items-center text-xs md:text-base text-green-600 dark:text-gray-300 mb-.1">
                       <div className="flex items-center gap-1 magnifier:text-4xl">
-                          <span>Discount</span>
-                          <button
-                            onClick={() => setShowDiscountInfo(true)}
-                            className="w-3 h-3 flex items-center justify-center border border-gray-500 
+                        <span>Discount</span>
+                        <button
+                          onClick={() => setShowDiscountInfo(true)}
+                          className="w-3 h-3 flex items-center justify-center border border-gray-500 
                                         rounded-full text-[10px] leading-none text-gray-600 
                                         dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                            title="Discount Info"
-                          >
-                            i
-                          </button>
-                        </div>
-                        <span>-${discountAmount.toFixed(2)}</span>
+                          title="Discount Info"
+                        >
+                          i
+                        </button>
+                      </div>
+                      <span>-${discountAmount.toFixed(2)}</span>
                     </div>
                   )}
 
@@ -681,14 +735,16 @@ export default function KioskPage() {
                     <span>Tax:</span>
                     <span>${tax}</span>
                   </div>
-                  
+
                   <div className="flex justify-between text-2xl magnifier:text-5xl md:text-2xl font-bold">
                     <span>Total:</span>
                     <span>${total.toFixed(2)}</span>
                   </div>
                 </div>
                 <button
-                  onClick={() => {setIsPaymentModalOpen(true);}}
+                  onClick={() => {
+                    setIsPaymentModalOpen(true);
+                  }}
                   disabled={cart.length === 0}
                   className="w-full py-2 md:py-2.5 bg-maroon text-white text-lg md:text-xl font-bold rounded-lg shadow-lg disabled:opacity-50 hover:bg-darkmaroon"
                 >
@@ -699,8 +755,9 @@ export default function KioskPage() {
 
             <Modal
               isOpen={isPaymentModalOpen}
-              onClose={() => {setIsPaymentModalOpen(false);
-                          }}
+              onClose={() => {
+                setIsPaymentModalOpen(false);
+              }}
               title="Select Payment Method"
               isDarkMode={isHighContrast}
             >
@@ -730,13 +787,14 @@ export default function KioskPage() {
                     text-[#003087]
                   "
                 >
-                  <span className="text-[#003087] italic">Pay</span><span className="text-[#009CDE] italic">Pal</span>
+                  <span className="text-[#003087] italic">Pay</span>
+                  <span className="text-[#009CDE] italic">Pal</span>
                 </button>
-                {/* <PaymentButton
+                <PaymentButton
                   label="Cash (Pay at Counter)"
                   onClick={() => handleFinalSubmit("Cash")}
                   disabled={isSubmitting}
-                /> */}
+                />
 
                 {isSubmitting && <Spinner />}
                 {submitError && (
@@ -793,7 +851,6 @@ export default function KioskPage() {
                 isOpen={isStripeModalOpen}
                 onClose={() => {
                   setIsStripeModalOpen(false);
-                  
                 }}
                 title="Card Payment"
                 isDarkMode={isHighContrast}
@@ -804,7 +861,7 @@ export default function KioskPage() {
                     isDarkMode={isHighContrast}
                     onSuccess={async () => {
                       setIsStripeModalOpen(false);
-                      
+
                       await handleFinalSubmit("Card"); // record order after successful card payment
                     }}
                   />
@@ -817,7 +874,6 @@ export default function KioskPage() {
                 isOpen={isPayPalModalOpen}
                 onClose={() => {
                   setIsPayPalModalOpen(false);
-                  
                 }}
                 title="Pay with PayPal"
               >
@@ -826,7 +882,7 @@ export default function KioskPage() {
                   onSuccess={async () => {
                     toast.success("Payment successful via PayPal!");
                     setIsPayPalModalOpen(false);
-                    
+
                     await handleFinalSubmit("Mobile Pay"); // record order after PayPal
                   }}
                 />
